@@ -1,0 +1,18 @@
+{
+  "id": "bat",
+  "level": 3,
+  "hp": 10,
+  "maxHp": 10,
+  "atk": 10,
+  "def": 6,
+  "spd": 6,
+  "exp": 5,
+  "gold": 5,
+  "color": "#8e44ad",
+  "imageSrc": "images/bat.png",
+  "name": {
+    "ja": "ジャイアントバット",
+    "en": "Giant Bat",
+    "es": "Murciélago gigante"
+  }
+}

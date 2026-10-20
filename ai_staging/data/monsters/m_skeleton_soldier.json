@@ -1,0 +1,18 @@
+{
+  "id": "skeleton_soldier",
+  "level": 12,
+  "hp": 88,
+  "maxHp": 88,
+  "atk": 46,
+  "def": 28,
+  "spd": 16,
+  "exp": 105,
+  "gold": 70,
+  "color": "#ced6e0",
+  "imageSrc": "images/skeleton_soldier.png",
+  "name": {
+    "ja": "骸骨兵",
+    "en": "Skeleton Soldier",
+    "es": "Soldado esqueleto"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "behoma",
+  "cost": 10,
+  "type": "heal",
+  "fieldUsable": true,
+  "battleUsable": true,
+  "learnLevel": 19,
+  "name": {
+    "ja": "ベホマ",
+    "en": "Fullheal",
+    "es": "Maxicura"
+  }
+}

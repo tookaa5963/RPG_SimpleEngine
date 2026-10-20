@@ -1,0 +1,18 @@
+{
+  "id": "wolf",
+  "level": 5,
+  "hp": 20,
+  "maxHp": 20,
+  "atk": 16,
+  "def": 9,
+  "spd": 11,
+  "exp": 12,
+  "gold": 13,
+  "color": "#7f8c8d",
+  "imageSrc": "images/wolf.png",
+  "name": {
+    "ja": "灰色狼",
+    "en": "Gray Wolf",
+    "es": "Lobo gris"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "ghoul",
+  "level": 13,
+  "hp": 98,
+  "maxHp": 98,
+  "atk": 48,
+  "def": 27,
+  "spd": 14,
+  "exp": 142,
+  "gold": 96,
+  "color": "#2d3436",
+  "imageSrc": "images/ghoul.png",
+  "poisonChance": 0.35,
+  "name": {
+    "ja": "グール",
+    "en": "Ghoul",
+    "es": "Necrófago"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "sage_water",
+  "type": "item",
+  "price": 200,
+  "name": {
+    "ja": "賢者の聖水",
+    "en": "Sage's Water",
+    "es": "Agua de sabio"
+  }
+}

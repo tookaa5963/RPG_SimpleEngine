@@ -1,0 +1,13 @@
+{
+  "id": "kiari",
+  "cost": 3,
+  "type": "cure",
+  "fieldUsable": true,
+  "battleUsable": true,
+  "learnLevel": 5,
+  "name": {
+    "ja": "キアリー",
+    "en": "Squelch",
+    "es": "Purifica"
+  }
+}

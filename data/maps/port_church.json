@@ -1,0 +1,154 @@
+{
+  "name": "港町の教会",
+  "bgm": "church",
+  "encounterRate": 0,
+  "monsters": [],
+  "backgroundImage": "images/maps/first_church_bg.png",
+  "data": [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+    ]
+  ],
+  "warps": [
+    {
+      "gridX": 3,
+      "gridY": 10,
+      "targetMap": "port_town",
+      "targetX": 17,
+      "targetY": 6,
+      "direction": "down"
+    }
+  ],
+  "interactables": [],
+  "npcs": [
+    {
+      "id": "port_sister",
+      "sprite": "sister",
+      "type": "human",
+      "name": "シスター",
+      "gridX": 3,
+      "gridY": 3,
+      "pixelX": 192,
+      "pixelY": 192,
+      "targetPixelX": 192,
+      "targetPixelY": 192,
+      "direction": "down",
+      "animFrame": 0,
+      "isMoving": false,
+      "color": "#8e44ad",
+      "walkTimer": 999999,
+      "isChurch": true,
+      "returnPoint": {
+        "mapId": "port_church",
+        "gridX": 3,
+        "gridY": 5,
+        "direction": "up"
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "wraith",
+  "level": 12,
+  "hp": 68,
+  "maxHp": 68,
+  "atk": 42,
+  "def": 25,
+  "spd": 18,
+  "exp": 95,
+  "gold": 60,
+  "color": "#a4b0be",
+  "imageSrc": "images/wraith.png",
+  "physicalDamageRate": 0.8,
+  "sleepResist": 1,
+  "spells": [
+    {
+      "id": "gira",
+      "chance": 0.35,
+      "minDmg": 16,
+      "maxDmg": 24
+    }
+  ],
+  "name": {
+    "ja": "レイス",
+    "en": "Wraith",
+    "es": "Espectro"
+  }
+}

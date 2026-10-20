@@ -1,0 +1,11 @@
+{
+  "id": "iron_armor",
+  "type": "armor",
+  "def": 10,
+  "price": 200,
+  "name": {
+    "ja": "鉄の鎧",
+    "en": "Iron Armor",
+    "es": "Armadura de hierro"
+  }
+}

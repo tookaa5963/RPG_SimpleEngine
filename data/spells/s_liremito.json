@@ -1,0 +1,13 @@
+{
+  "id": "liremito",
+  "cost": 6,
+  "type": "teleport",
+  "fieldUsable": true,
+  "battleUsable": false,
+  "learnLevel": 9,
+  "name": {
+    "ja": "リレミト",
+    "en": "Evac",
+    "es": "Evacua"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "steel_sword",
+  "type": "weapon",
+  "atk": 22,
+  "price": 500,
+  "name": {
+    "ja": "鋼鉄の剣",
+    "en": "Steel Sword",
+    "es": "Espada de acero"
+  }
+}

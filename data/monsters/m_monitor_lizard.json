@@ -1,0 +1,19 @@
+{
+  "id": "monitor_lizard",
+  "level": 14,
+  "hp": 82,
+  "maxHp": 82,
+  "atk": 46,
+  "def": 26,
+  "spd": 18,
+  "exp": 155,
+  "gold": 112,
+  "color": "#27ae60",
+  "imageSrc": "images/monitor_lizard.png",
+  "poisonChance": 0.6,
+  "name": {
+    "ja": "オオトカゲ",
+    "en": "Monitor Lizard",
+    "es": "Varano"
+  }
+}

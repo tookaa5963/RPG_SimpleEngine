@@ -1,0 +1,16 @@
+{
+  "hoimi": { "id": "hoimi", "nameKey": "spells.hoimi.name", "cost": 3, "type": "heal", "fieldUsable": true, "battleUsable": true, "learnLevel": 3 },
+  "mera": { "id": "mera", "nameKey": "spells.mera.name", "cost": 2, "type": "damage", "fieldUsable": false, "battleUsable": true, "learnLevel": 4 },
+  "kiari": { "id": "kiari", "nameKey": "spells.kiari.name", "cost": 3, "type": "cure", "fieldUsable": true, "battleUsable": true, "learnLevel": 5 },
+  "remira": { "id": "remira", "nameKey": "spells.remira.name", "cost": 3, "type": "light", "fieldUsable": true, "battleUsable": false, "learnLevel": 6 },
+  "rariho": { "id": "rariho", "nameKey": "spells.rariho.name", "cost": 3, "type": "sleep", "fieldUsable": false, "battleUsable": true, "learnLevel": 7 },
+  "gira": { "id": "gira", "nameKey": "spells.gira.name", "cost": 4, "type": "damage", "fieldUsable": false, "battleUsable": true, "learnLevel": 8 },
+  "liremito": { "id": "liremito", "nameKey": "spells.liremito.name", "cost": 6, "type": "teleport", "fieldUsable": true, "battleUsable": false, "learnLevel": 9 },
+  "mahoton": { "id": "mahoton", "nameKey": "spells.mahoton.name", "cost": 2, "type": "seal", "fieldUsable": false, "battleUsable": true, "learnLevel": 10 },
+  "behoimi": { "id": "behoimi", "nameKey": "spells.behoimi.name", "cost": 5, "type": "heal", "fieldUsable": true, "battleUsable": true, "learnLevel": 11 },
+  "toherosu": { "id": "toherosu", "nameKey": "spells.toherosu.name", "cost": 2, "type": "repel", "fieldUsable": true, "battleUsable": false, "learnLevel": 12 },
+  "rula": { "id": "rula", "nameKey": "spells.rula.name", "cost": 8, "type": "teleport", "fieldUsable": true, "battleUsable": false, "learnLevel": 13 },
+  "begirama": { "id": "begirama", "nameKey": "spells.begirama.name", "cost": 8, "type": "damage", "fieldUsable": false, "battleUsable": true, "learnLevel": 17 },
+  "behoma": { "id": "behoma", "nameKey": "spells.behoma.name", "cost": 10, "type": "heal", "fieldUsable": true, "battleUsable": true, "learnLevel": 19 },
+  "merami": { "id": "merami", "nameKey": "spells.merami.name", "cost": 10, "type": "damage", "fieldUsable": false, "battleUsable": true, "learnLevel": 20 }
+}

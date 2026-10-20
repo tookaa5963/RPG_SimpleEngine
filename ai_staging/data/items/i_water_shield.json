@@ -1,0 +1,12 @@
+{
+  "id": "water_shield",
+  "type": "shield",
+  "def": 15,
+  "breathCut": 0.5,
+  "price": 0,
+  "name": {
+    "ja": "水霊の盾",
+    "en": "Water Spirit Shield",
+    "es": "Escudo del espíritu del agua"
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "name": "灯台守の小屋",
+  "bgm": "field",
+  "encounterRate": 0,
+  "monsters": [],
+  "backgroundImage": "images/maps/lighthousekeeper_cottage_bg.png",
+  "data": [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+    ]
+  ],
+  "warps": [
+    {
+      "gridX": 3,
+      "gridY": 6,
+      "targetMap": "first_island",
+      "targetX": 2,
+      "targetY": 20,
+      "direction": "down"
+    }
+  ],
+  "interactables": [],
+  "npcs": [
+    {
+      "id": "lighthousekeeper",
+      "type": "human",
+      "name": "灯台守",
+      "gridX": 3,
+      "gridY": 3,
+      "pixelX": 192,
+      "pixelY": 192,
+      "targetPixelX": 192,
+      "targetPixelY": 192,
+      "direction": "down",
+      "animFrame": 0,
+      "isMoving": false,
+      "color": "#9b59b6",
+      "walkTimer": 60,
+      "moveArea": {
+        "minX": 1,
+        "maxX": 4,
+        "minY": 2,
+        "maxY": 5
+      }
+    }
+  ]
+}

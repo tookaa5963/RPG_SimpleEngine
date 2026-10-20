@@ -1,0 +1,13 @@
+{
+  "id": "remira",
+  "cost": 3,
+  "type": "light",
+  "fieldUsable": true,
+  "battleUsable": false,
+  "learnLevel": 6,
+  "name": {
+    "ja": "レミーラ",
+    "en": "Glow",
+    "es": "Destello"
+  }
+}

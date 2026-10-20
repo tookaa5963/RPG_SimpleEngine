@@ -1,0 +1,10 @@
+{
+  "id": "magic_water",
+  "type": "item",
+  "price": 30,
+  "name": {
+    "ja": "魔法の聖水",
+    "en": "Magic Water",
+    "es": "Agua mágica"
+  }
+}

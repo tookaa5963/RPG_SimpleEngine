@@ -1,0 +1,760 @@
+{
+  "slime": {
+    "id": "slime",
+    "nameKey": "monsters.slime",
+    "level": 1,
+    "hp": 6,
+    "maxHp": 6,
+    "atk": 6,
+    "def": 3,
+    "spd": 3,
+    "exp": 3,
+    "gold": 3,
+    "color": "#1abc9c",
+    "imageSrc": "images/slime.png"
+  },
+  "ruby_slime": {
+    "id": "ruby_slime",
+    "nameKey": "monsters.ruby_slime",
+    "level": 2,
+    "hp": 7,
+    "maxHp": 7,
+    "atk": 7,
+    "def": 4,
+    "spd": 3,
+    "exp": 4,
+    "gold": 4,
+    "color": "#1abc9c",
+    "imageSrc": "images/ruby_slime.png"
+  },
+  "bat": {
+    "id": "bat",
+    "nameKey": "monsters.bat",
+    "level": 3,
+    "hp": 10,
+    "maxHp": 10,
+    "atk": 10,
+    "def": 6,
+    "spd": 6,
+    "exp": 5,
+    "gold": 5,
+    "color": "#8e44ad",
+    "imageSrc": "images/bat.png"
+  },
+  "ghost": {
+    "id": "ghost",
+    "nameKey": "monsters.ghost",
+    "level": 4,
+    "hp": 14,
+    "maxHp": 14,
+    "atk": 13,
+    "def": 8,
+    "spd": 7,
+    "exp": 7,
+    "gold": 8,
+    "color": "#bdc3c7",
+    "imageSrc": "images/ghost.png",
+    "spells": [
+      {
+        "id": "mera",
+        "chance": 0.35,
+        "minDmg": 6,
+        "maxDmg": 12
+      }
+    ]
+  },
+  "skeleton": {
+    "id": "skeleton",
+    "nameKey": "monsters.skeleton",
+    "level": 6,
+    "hp": 24,
+    "maxHp": 24,
+    "atk": 17,
+    "def": 11,
+    "spd": 8,
+    "exp": 14,
+    "gold": 16,
+    "color": "#ecf0f1",
+    "imageSrc": "images/skeleton.png"
+  },
+  "wolf": {
+    "id": "wolf",
+    "nameKey": "monsters.wolf",
+    "level": 5,
+    "hp": 20,
+    "maxHp": 20,
+    "atk": 16,
+    "def": 9,
+    "spd": 11,
+    "exp": 12,
+    "gold": 13,
+    "color": "#7f8c8d",
+    "imageSrc": "images/wolf.png"
+  },
+  "gargoyle": {
+    "id": "gargoyle",
+    "nameKey": "monsters.gargoyle",
+    "level": 7,
+    "hp": 65,
+    "maxHp": 65,
+    "atk": 22,
+    "def": 16,
+    "spd": 12,
+    "exp": 90,
+    "gold": 90,
+    "color": "#c0392b",
+    "imageSrc": "images/gargoyle.png",
+    "noEscape": true,
+    "sleepResist": 1.0,
+    "sealResist": 1.0,
+    "dropItem": "antique_key",
+    "spells": [
+      {
+        "id": "gira",
+        "chance": 0.4,
+        "minDmg": 12,
+        "maxDmg": 20
+      }
+    ]
+  },
+  "giant_centipede": {
+    "id": "giant_centipede",
+    "nameKey": "monsters.giant_centipede",
+    "level": 8,
+    "hp": 38,
+    "maxHp": 38,
+    "atk": 22,
+    "def": 13,
+    "spd": 12,
+    "exp": 36,
+    "gold": 35,
+    "color": "#8e44ad",
+    "imageSrc": "images/giant_centipede.png",
+    "poisonChance": 0.5
+  },
+  "goblin": {
+    "id": "goblin",
+    "nameKey": "monsters.goblin",
+    "level": 7,
+    "hp": 36,
+    "maxHp": 36,
+    "atk": 24,
+    "def": 15,
+    "spd": 13,
+    "exp": 26,
+    "gold": 24,
+    "color": "#2ecc71",
+    "imageSrc": "images/goblin.png"
+  },
+  "kobold": {
+    "id": "kobold",
+    "nameKey": "monsters.kobold",
+    "level": 8,
+    "hp": 44,
+    "maxHp": 44,
+    "atk": 27,
+    "def": 17,
+    "spd": 11,
+    "exp": 33,
+    "gold": 30,
+    "color": "#d35400",
+    "imageSrc": "images/kobold.png"
+  },
+  "orc": {
+    "id": "orc",
+    "nameKey": "monsters.orc",
+    "level": 8,
+    "hp": 52,
+    "maxHp": 52,
+    "atk": 31,
+    "def": 19,
+    "spd": 10,
+    "exp": 42,
+    "gold": 38,
+    "color": "#27ae60",
+    "imageSrc": "images/orc.png"
+  },
+  "goblin_warrior": {
+    "id": "goblin_warrior",
+    "nameKey": "monsters.goblin_warrior",
+    "level": 9,
+    "hp": 58,
+    "maxHp": 58,
+    "atk": 35,
+    "def": 21,
+    "spd": 15,
+    "exp": 56,
+    "gold": 46,
+    "color": "#27ae60",
+    "imageSrc": "images/goblin_warrior.png"
+  },
+  "kobold_warrior": {
+    "id": "kobold_warrior",
+    "nameKey": "monsters.kobold_warrior",
+    "level": 10,
+    "hp": 64,
+    "maxHp": 64,
+    "atk": 37,
+    "def": 22,
+    "spd": 13,
+    "exp": 62,
+    "gold": 50,
+    "color": "#e67e22",
+    "imageSrc": "images/kobold_warrior.png"
+  },
+  "orc_warrior": {
+    "id": "orc_warrior",
+    "nameKey": "monsters.orc_warrior",
+    "level": 10,
+    "hp": 72,
+    "maxHp": 72,
+    "atk": 40,
+    "def": 24,
+    "spd": 11,
+    "exp": 70,
+    "gold": 56,
+    "color": "#1e8449",
+    "imageSrc": "images/orc_warrior.png"
+  },
+  "goblin_shaman": {
+    "id": "goblin_shaman",
+    "nameKey": "monsters.goblin_shaman",
+    "level": 9,
+    "hp": 48,
+    "maxHp": 48,
+    "atk": 28,
+    "def": 18,
+    "spd": 16,
+    "exp": 60,
+    "gold": 55,
+    "color": "#8e44ad",
+    "imageSrc": "images/goblin_shaman.png",
+    "spells": [
+      {
+        "id": "gira",
+        "chance": 0.35,
+        "minDmg": 12,
+        "maxDmg": 20
+      }
+    ]
+  },
+  "troll": {
+    "id": "troll",
+    "nameKey": "monsters.troll",
+    "level": 10,
+    "hp": 200,
+    "maxHp": 200,
+    "atk": 45,
+    "def": 22,
+    "spd": 18,
+    "exp": 250,
+    "gold": 200,
+    "color": "#e67e22",
+    "imageSrc": "images/troll.png",
+    "noEscape": true,
+    "criticalChance": 0.1,
+    "sleepResist": 1.0
+  },
+  "zombie": {
+    "id": "zombie",
+    "nameKey": "monsters.zombie",
+    "level": 11,
+    "hp": 82,
+    "maxHp": 82,
+    "atk": 44,
+    "def": 24,
+    "spd": 10,
+    "exp": 88,
+    "gold": 55,
+    "color": "#5f7161",
+    "imageSrc": "images/zombie.png"
+  },
+  "ghoul": {
+    "id": "ghoul",
+    "nameKey": "monsters.ghoul",
+    "level": 13,
+    "hp": 98,
+    "maxHp": 98,
+    "atk": 48,
+    "def": 27,
+    "spd": 14,
+    "exp": 142,
+    "gold": 96,
+    "color": "#2d3436",
+    "imageSrc": "images/ghoul.png",
+    "poisonChance": 0.35
+  },
+  "hitodama": {
+    "id": "hitodama",
+    "nameKey": "monsters.hitodama",
+    "level": 13,
+    "hp": 62,
+    "maxHp": 62,
+    "atk": 46,
+    "def": 22,
+    "spd": 22,
+    "exp": 120,
+    "gold": 75,
+    "color": "#00cec9",
+    "imageSrc": "images/hitodama.png",
+    "physicalDamageRate": 0.6,
+    "sleepResist": 1.0,
+    "spells": [
+      {
+        "id": "mera",
+        "chance": 0.35,
+        "minDmg": 14,
+        "maxDmg": 22
+      }
+    ]
+  },
+  "wraith": {
+    "id": "wraith",
+    "nameKey": "monsters.wraith",
+    "level": 12,
+    "hp": 68,
+    "maxHp": 68,
+    "atk": 42,
+    "def": 25,
+    "spd": 18,
+    "exp": 95,
+    "gold": 60,
+    "color": "#a4b0be",
+    "imageSrc": "images/wraith.png",
+    "physicalDamageRate": 0.8,
+    "sleepResist": 1.0,
+    "spells": [
+      {
+        "id": "gira",
+        "chance": 0.35,
+        "minDmg": 16,
+        "maxDmg": 24
+      }
+    ]
+  },
+  "skeleton_soldier": {
+    "id": "skeleton_soldier",
+    "nameKey": "monsters.skeleton_soldier",
+    "level": 12,
+    "hp": 88,
+    "maxHp": 88,
+    "atk": 46,
+    "def": 28,
+    "spd": 16,
+    "exp": 105,
+    "gold": 70,
+    "color": "#ced6e0",
+    "imageSrc": "images/skeleton_soldier.png"
+  },
+  "grave_thief": {
+    "id": "grave_thief",
+    "nameKey": "monsters.grave_thief",
+    "level": 12,
+    "hp": 160,
+    "maxHp": 160,
+    "atk": 52,
+    "def": 30,
+    "spd": 17,
+    "exp": 220,
+    "gold": 180,
+    "color": "#34495e",
+    "imageSrc": "images/grave_thief.png",
+    "noEscape": true,
+    "sleepResist": 1.0,
+    "sealResist": 0.7,
+    "dropItem": "lovers_ring",
+    "actions": [
+      {
+        "type": "attack",
+        "weight": 8
+      },
+      {
+        "type": "defense",
+        "weight": 2
+      }
+    ]
+  },
+  "yellow_viper": {
+    "id": "yellow_viper",
+    "nameKey": "monsters.yellow_viper",
+    "level": 12,
+    "hp": 70,
+    "maxHp": 70,
+    "atk": 42,
+    "def": 24,
+    "spd": 22,
+    "exp": 105,
+    "gold": 38,
+    "color": "#27ae60",
+    "imageSrc": "images/yellow_viper.png",
+    "poisonChance": 0.5
+  },
+  "killer_bee": {
+    "id": "killer_bee",
+    "nameKey": "monsters.killer_bee",
+    "level": 9,
+    "hp": 42,
+    "maxHp": 42,
+    "atk": 29,
+    "def": 16,
+    "spd": 22,
+    "exp": 48,
+    "gold": 38,
+    "color": "#f1c40f",
+    "imageSrc": "images/killer_bee.png",
+    "poisonChance": 0.3
+  },
+  "man_eater_plant": {
+    "id": "man_eater_plant",
+    "nameKey": "monsters.man_eater_plant",
+    "level": 9,
+    "hp": 55,
+    "maxHp": 55,
+    "atk": 33,
+    "def": 20,
+    "spd": 13,
+    "exp": 52,
+    "gold": 38,
+    "color": "#27ae60",
+    "imageSrc": "images/man_eater_plant.png"
+  },
+  "treant": {
+    "id": "treant",
+    "nameKey": "monsters.treant",
+    "level": 10,
+    "hp": 70,
+    "maxHp": 70,
+    "atk": 32,
+    "def": 25,
+    "spd": 6,
+    "exp": 44,
+    "gold": 35,
+    "color": "#8b4513",
+    "imageSrc": "images/treant.png"
+  },
+  "evil_treant": {
+    "id": "evil_treant",
+    "nameKey": "monsters.evil_treant",
+    "level": 13,
+    "hp": 92,
+    "maxHp": 92,
+    "atk": 46,
+    "def": 27,
+    "spd": 11,
+    "exp": 102,
+    "gold": 64,
+    "color": "#2c3e50",
+    "imageSrc": "images/evil_treant.png",
+    "spells": [
+      {
+        "id": "gira",
+        "chance": 0.25,
+        "minDmg": 14,
+        "maxDmg": 20
+      }
+    ]
+  },
+  "spartoi": {
+    "id": "spartoi",
+    "nameKey": "monsters.spartoi",
+    "level": 13,
+    "hp": 76,
+    "maxHp": 76,
+    "atk": 45,
+    "def": 26,
+    "spd": 18,
+    "exp": 130,
+    "gold": 85,
+    "color": "#dcdde1",
+    "imageSrc": "images/spartoi.png",
+    "sleepResist": 0.5
+  },
+  "gorgon": {
+    "id": "gorgon",
+    "nameKey": "monsters.gorgon",
+    "level": 13,
+    "hp": 70,
+    "maxHp": 70,
+    "atk": 42,
+    "def": 24,
+    "spd": 20,
+    "exp": 150,
+    "gold": 100,
+    "color": "#8c7ae6",
+    "imageSrc": "images/gorgon.png",
+    "poisonChance": 0.3,
+    "sleepResist": 0.5,
+    "sealResist": 0.5,
+    "spells": [
+      {
+        "id": "gira",
+        "nameKey": "spells.petrifying_gaze.name",
+        "chance": 0.35,
+        "minDmg": 16,
+        "maxDmg": 24
+      }
+    ]
+  },
+  "minotaur": {
+    "id": "minotaur",
+    "nameKey": "monsters.minotaur",
+    "level": 14,
+    "hp": 110,
+    "maxHp": 110,
+    "atk": 52,
+    "def": 28,
+    "spd": 12,
+    "exp": 175,
+    "gold": 115,
+    "color": "#e1b12c",
+    "imageSrc": "images/minotaur.png",
+    "sleepResist": 0.5,
+    "criticalChance": 0.15
+  },
+  "talos": {
+    "id": "talos",
+    "nameKey": "monsters.talos",
+    "level": 15,
+    "hp": 250,
+    "maxHp": 250,
+    "atk": 58,
+    "def": 32,
+    "spd": 13,
+    "exp": 500,
+    "gold": 500,
+    "color": "#cd7f32",
+    "imageSrc": "images/talos.png",
+    "noEscape": true,
+    "sleepResist": 1.0,
+    "dropItem": "bronze_key",
+    "physicalDamageRate": 0.8,
+    "spells": [
+      {
+        "id": "bronze_wind",
+        "nameKey": "spells.bronze_wind.name",
+        "chance": 0.35,
+        "isBreath": true,
+        "baseDmg": 85
+      }
+    ]
+  },
+  "monitor_lizard": {
+    "id": "monitor_lizard",
+    "nameKey": "monsters.monitor_lizard",
+    "level": 14,
+    "hp": 82,
+    "maxHp": 82,
+    "atk": 46,
+    "def": 26,
+    "spd": 18,
+    "exp": 155,
+    "gold": 112,
+    "color": "#27ae60",
+    "imageSrc": "images/monitor_lizard.png",
+    "poisonChance": 0.6
+  },
+  "lizardman": {
+    "id": "lizardman",
+    "nameKey": "monsters.lizardman",
+    "level": 14,
+    "hp": 96,
+    "maxHp": 96,
+    "atk": 50,
+    "def": 28,
+    "spd": 16,
+    "exp": 135,
+    "gold": 92,
+    "color": "#2ecc71",
+    "imageSrc": "images/lizardman.png"
+  },
+  "lizardman_shaman": {
+    "id": "lizardman_shaman",
+    "nameKey": "monsters.lizardman_shaman",
+    "level": 14,
+    "hp": 84,
+    "maxHp": 84,
+    "atk": 42,
+    "def": 26,
+    "spd": 19,
+    "exp": 150,
+    "gold": 98,
+    "color": "#8e44ad",
+    "imageSrc": "images/lizardman_shaman.png",
+    "sealResist": 0.4,
+    "spells": [
+      {
+        "id": "gira",
+        "chance": 0.4,
+        "minDmg": 16,
+        "maxDmg": 24
+      },
+      {
+        "id": "rariho",
+        "chance": 0.2
+      }
+    ]
+  },
+  "lizardman_warrior": {
+    "id": "lizardman_warrior",
+    "nameKey": "monsters.lizardman_warrior",
+    "level": 15,
+    "hp": 125,
+    "maxHp": 125,
+    "atk": 55,
+    "def": 30,
+    "spd": 17,
+    "exp": 165,
+    "gold": 120,
+    "color": "#16a085",
+    "imageSrc": "images/lizardman_warrior.png",
+    "criticalChance": 0.1
+  },
+  "redlizardman": {
+    "id": "redlizardman",
+    "nameKey": "monsters.redlizardman",
+    "level": 14,
+    "hp": 104,
+    "maxHp": 104,
+    "atk": 52,
+    "def": 29,
+    "spd": 17,
+    "exp": 142,
+    "gold": 98,
+    "color": "#e74c3c",
+    "imageSrc": "images/redlizardman.png"
+  },
+  "redlizardman_shaman": {
+    "id": "redlizardman_shaman",
+    "nameKey": "monsters.redlizardman_shaman",
+    "level": 15,
+    "hp": 92,
+    "maxHp": 92,
+    "atk": 45,
+    "def": 28,
+    "spd": 20,
+    "exp": 180,
+    "gold": 118,
+    "color": "#c0392b",
+    "imageSrc": "images/redlizardman_shaman.png",
+    "sealResist": 0.5,
+    "spells": [
+      {
+        "id": "gira",
+        "chance": 0.35,
+        "minDmg": 22,
+        "maxDmg": 32
+      },
+      {
+        "id": "mahoton",
+        "chance": 0.2
+      },
+      {
+        "id": "rariho",
+        "chance": 0.15
+      }
+    ]
+  },
+  "redlizardman_warrior": {
+    "id": "redlizardman_warrior",
+    "nameKey": "monsters.redlizardman_warrior",
+    "level": 16,
+    "hp": 160,
+    "maxHp": 160,
+    "atk": 60,
+    "def": 32,
+    "spd": 18,
+    "exp": 190,
+    "gold": 135,
+    "color": "#d63031",
+    "imageSrc": "images/redlizardman_warrior.png",
+    "criticalChance": 0.15
+  },
+  "black_lizardman": {
+    "id": "black_lizardman",
+    "nameKey": "monsters.black_lizardman",
+    "level": 16,
+    "hp": 260,
+    "maxHp": 260,
+    "atk": 62,
+    "def": 34,
+    "spd": 1,
+    "exp": 650,
+    "gold": 500,
+    "color": "#2d3436",
+    "imageSrc": "images/black_lizardman.png",
+    "noEscape": true,
+    "sleepResist": 1.0,
+    "sealResist": 1.0,
+    "criticalChance": 0.1,
+    "spells": [
+      {
+        "id": "gira",
+        "chance": 0.35,
+        "minDmg": 22,
+        "maxDmg": 30
+      }
+    ]
+  },
+  "cerberus": {
+    "id": "cerberus",
+    "nameKey": "monsters.cerberus",
+    "level": 18,
+    "hp": 400,
+    "maxHp": 400,
+    "atk": 65,
+    "def": 37,
+    "spd": 18,
+    "exp": 1100,
+    "gold": 850,
+    "color": "#c0392b",
+    "imageSrc": "images/cerberus.png",
+    "noEscape": true,
+    "sleepResist": 1.0,
+    "sealResist": 1.0,
+    "dropItem": "cerberus_mane",
+    "criticalChance": 0.1,
+    "spells": [
+      {
+        "id": "fire_breath",
+        "nameKey": "spells.fire_breath.name",
+        "chance": 0.45,
+        "isBreath": true,
+        "baseDmg": 180
+      }
+    ]
+  },
+  "black_dragon": {
+    "id": "black_dragon",
+    "nameKey": "monsters.black_dragon",
+    "level": 20,
+    "hp": 1100,
+    "maxHp": 1100,
+    "atk": 72,
+    "def": 38,
+    "spd": 20,
+    "exp": 3500,
+    "gold": 2000,
+    "color": "#111111",
+    "imageSrc": "images/black_dragon.png",
+    "noEscape": true,
+    "sleepResist": 1.0,
+    "sealResist": 1.0,
+    "criticalChance": 0.12,
+    "spells": [
+      {
+        "id": "hellfire_breath",
+        "nameKey": "spells.hellfire_breath.name",
+        "chance": 0.4,
+        "isBreath": true,
+        "baseDmg": 280
+      },
+      {
+        "id": "dragon_claw",
+        "nameKey": "spells.dragon_claw.name",
+        "chance": 0.35,
+        "isSpecialPhysical": true,
+        "baseDmg": 240
+      }
+    ]
+  }
+}

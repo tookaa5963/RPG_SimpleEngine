@@ -1,0 +1,11 @@
+{
+  "id": "copper_sword",
+  "type": "weapon",
+  "atk": 5,
+  "price": 50,
+  "name": {
+    "ja": "銅の剣",
+    "en": "Copper Sword",
+    "es": "Espada de cobre"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "lizardman_warrior",
+  "level": 15,
+  "hp": 125,
+  "maxHp": 125,
+  "atk": 55,
+  "def": 30,
+  "spd": 17,
+  "exp": 165,
+  "gold": 120,
+  "color": "#16a085",
+  "imageSrc": "images/lizardman_warrior.png",
+  "criticalChance": 0.1,
+  "name": {
+    "ja": "リザードマン戦士",
+    "en": "Lizardman Warrior",
+    "es": "Guerrero lagarto"
+  }
+}

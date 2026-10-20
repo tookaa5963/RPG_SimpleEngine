@@ -1,0 +1,13 @@
+{
+  "id": "mera",
+  "cost": 2,
+  "type": "damage",
+  "fieldUsable": false,
+  "battleUsable": true,
+  "learnLevel": 4,
+  "name": {
+    "ja": "メラ",
+    "en": "Frizz",
+    "es": "Ígneo"
+  }
+}

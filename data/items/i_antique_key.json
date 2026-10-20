@@ -1,0 +1,10 @@
+{
+  "id": "antique_key",
+  "type": "key",
+  "price": 0,
+  "name": {
+    "ja": "古びた鍵",
+    "en": "Ancient Key",
+    "es": "Llave antigua"
+  }
+}

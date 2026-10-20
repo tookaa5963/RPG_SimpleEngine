@@ -1,0 +1,10 @@
+{
+  "id": "torch",
+  "type": "item",
+  "price": 3,
+  "name": {
+    "ja": "たいまつ",
+    "en": "Torch",
+    "es": "Antorcha"
+  }
+}

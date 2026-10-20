@@ -1,0 +1,10 @@
+{
+  "id": "lovers_ring",
+  "type": "key",
+  "price": 0,
+  "name": {
+    "ja": "恋人の指輪",
+    "en": "Lover's Ring",
+    "es": "Anillo de amantes"
+  }
+}

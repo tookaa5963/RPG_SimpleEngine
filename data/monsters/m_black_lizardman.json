@@ -1,0 +1,30 @@
+{
+  "id": "black_lizardman",
+  "level": 16,
+  "hp": 260,
+  "maxHp": 260,
+  "atk": 62,
+  "def": 34,
+  "spd": 1,
+  "exp": 650,
+  "gold": 500,
+  "color": "#2d3436",
+  "imageSrc": "images/black_lizardman.png",
+  "noEscape": true,
+  "sleepResist": 1,
+  "sealResist": 1,
+  "criticalChance": 0.1,
+  "spells": [
+    {
+      "id": "gira",
+      "chance": 0.35,
+      "minDmg": 22,
+      "maxDmg": 30
+    }
+  ],
+  "name": {
+    "ja": "ブラックリザードマン",
+    "en": "Black Lizardman",
+    "es": "Hombre lagarto negro"
+  }
+}

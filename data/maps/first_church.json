@@ -1,0 +1,192 @@
+{
+  "name": "始まりの町の教会",
+  "bgm": "church",
+  "encounterRate": 0,
+  "monsters": [],
+  "backgroundImage": "images/maps/first_church_bg.png",
+  "data": [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+    ]
+  ],
+  "warps": [
+    {
+      "gridX": 3,
+      "gridY": 10,
+      "targetMap": "first_town",
+      "targetX": 15,
+      "targetY": 9,
+      "direction": "down"
+    }
+  ],
+  "interactables": [],
+  "npcs": [
+    {
+      "id": "sister",
+      "type": "human",
+      "name": "シスター",
+      "gridX": 3,
+      "gridY": 3,
+      "pixelX": 192,
+      "pixelY": 192,
+      "targetPixelX": 192,
+      "targetPixelY": 192,
+      "direction": "down",
+      "animFrame": 0,
+      "isMoving": false,
+      "color": "#8e44ad",
+      "walkTimer": 999999,
+      "isChurch": true,
+      "returnPoint": {
+        "mapId": "first_church",
+        "gridX": 3,
+        "gridY": 5,
+        "direction": "up"
+      }
+    },
+    {
+      "id": "inn_guest",
+      "sprite": "soldier",
+      "type": "human",
+      "name": "旅人",
+      "gridX": 1,
+      "gridY": 6,
+      "pixelX": 64,
+      "pixelY": 256,
+      "targetPixelX": 128,
+      "targetPixelY": 448,
+      "direction": "right",
+      "animFrame": 0,
+      "isMoving": false,
+      "color": "#3498db",
+      "walkTimer": 120,
+      "pages": [
+        "復活の祈りをしておきなよ。"
+      ]
+    },
+    {
+      "id": "inn_keeper",
+      "type": "human",
+      "name": "宿屋のおばさん",
+      "gridX": 5,
+      "gridY": 6,
+      "pixelX": 256,
+      "pixelY": 256,
+      "targetPixelX": 320,
+      "targetPixelY": 448,
+      "direction": "right",
+      "animFrame": 0,
+      "isMoving": false,
+      "color": "#3498db",
+      "walkTimer": 120,
+      "pages": [
+        "神様が救ってくれますよ。"
+      ]
+    }
+  ]
+}

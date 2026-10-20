@@ -1,0 +1,10 @@
+{
+  "id": "holy_water",
+  "type": "item",
+  "price": 20,
+  "name": {
+    "ja": "聖水",
+    "en": "Holy Water",
+    "es": "Agua bendita"
+  }
+}

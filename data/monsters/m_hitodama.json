@@ -1,0 +1,28 @@
+{
+  "id": "hitodama",
+  "level": 13,
+  "hp": 62,
+  "maxHp": 62,
+  "atk": 46,
+  "def": 22,
+  "spd": 22,
+  "exp": 120,
+  "gold": 75,
+  "color": "#00cec9",
+  "imageSrc": "images/hitodama.png",
+  "physicalDamageRate": 0.6,
+  "sleepResist": 1,
+  "spells": [
+    {
+      "id": "mera",
+      "chance": 0.35,
+      "minDmg": 14,
+      "maxDmg": 22
+    }
+  ],
+  "name": {
+    "ja": "人魂",
+    "en": "Wisp",
+    "es": "Fuego fatuo"
+  }
+}

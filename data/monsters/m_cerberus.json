@@ -1,0 +1,36 @@
+{
+  "id": "cerberus",
+  "level": 18,
+  "hp": 400,
+  "maxHp": 400,
+  "atk": 65,
+  "def": 37,
+  "spd": 18,
+  "exp": 1100,
+  "gold": 850,
+  "color": "#c0392b",
+  "imageSrc": "images/cerberus.png",
+  "noEscape": true,
+  "sleepResist": 1.0,
+  "sealResist": 1.0,
+  "dropItem": "cerberus_mane",
+  "criticalChance": 0.1,
+  "name": {
+    "ja": "ケルベロス",
+    "en": "Cerberus",
+    "es": "Cerbero"
+  },
+  "spells": [
+    {
+      "id": "fire_breath",
+      "name": {
+        "ja": "炎の息",
+        "en": "Flame Breath",
+        "es": "Aliento de fuego"
+      },
+      "chance": 0.45,
+      "isBreath": true,
+      "baseDmg": 180
+    }
+  ]
+}

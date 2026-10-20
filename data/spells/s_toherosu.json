@@ -1,0 +1,13 @@
+{
+  "id": "toherosu",
+  "cost": 2,
+  "type": "repel",
+  "fieldUsable": true,
+  "battleUsable": false,
+  "learnLevel": 12,
+  "name": {
+    "ja": "トヘロス",
+    "en": "Holy Protection",
+    "es": "Protección"
+  }
+}

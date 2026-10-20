@@ -1,0 +1,10 @@
+{
+  "id": "herb",
+  "type": "item",
+  "price": 5,
+  "name": {
+    "ja": "薬草",
+    "en": "Medicinal Herb",
+    "es": "Planta medicinal"
+  }
+}

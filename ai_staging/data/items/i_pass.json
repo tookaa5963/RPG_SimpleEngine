@@ -1,0 +1,10 @@
+{
+  "id": "pass",
+  "type": "key",
+  "price": 0,
+  "name": {
+    "ja": "通行手形",
+    "en": "Travel Pass",
+    "es": "Salvoconducto"
+  }
+}

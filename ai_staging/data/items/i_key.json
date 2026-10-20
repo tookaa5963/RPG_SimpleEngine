@@ -1,0 +1,10 @@
+{
+  "id": "key",
+  "type": "key",
+  "price": 0,
+  "name": {
+    "ja": "鍵",
+    "en": "Key",
+    "es": "Llave"
+  }
+}

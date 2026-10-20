@@ -1,0 +1,10 @@
+{
+  "id": "lantern",
+  "type": "item",
+  "price": 200,
+  "name": {
+    "ja": "ランタン",
+    "en": "Lantern",
+    "es": "Farol"
+  }
+}

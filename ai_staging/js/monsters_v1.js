@@ -1,0 +1,61 @@
+// FILE_ENTRY: ai_staging/js/monsters.js
+import { i18n } from './i18n.js';
+import { SPELL_DB } from './items.js';
+
+export const MONSTER_DEFINITIONS = {};
+
+/**
+ * IDによるモンスター定義の取得
+ * @param {string} id
+ * @returns {object|null}
+ */
+export function getMonsterById(id) {
+    return MONSTER_DEFINITIONS[id] || null;
+}
+
+/**
+ * monsters/index.json をフェッチし、
+ * 個別のモジュール化された JSON を Promise.all で並行ロードして初期化する。
+ */
+export async function initMonsterData() {
+    try {
+        const manifestRes = await fetch('data/monsters/index.json');
+        if (!manifestRes.ok) throw new Error(`HTTP error! status: ${manifestRes.status} on monsters/index.json`);
+        
+        const monsterIds = await manifestRes.json();
+        const monsterPromises = monsterIds.map(id => fetch(`data/monsters/m_${id}.json`).then(r => {
+             if (!r.ok) throw new Error(`HTTP error! status: ${r.status} on m_${id}.json`);
+             return r.json();
+        }));
+
+        const monstersRaw = await Promise.all(monsterPromises);
+
+        for (const raw of monstersRaw) {
+            const monster = {
+                ...raw,
+                // 新しい resolve API で多言語オブジェクトを解決 (Fail-Fast)
+                get name() { return i18n.resolve(raw.name); }
+            };
+
+            if (raw.spells && Array.isArray(raw.spells)) {
+                monster.spells = raw.spells.map(sp => {
+                    return {
+                        ...sp,
+                        get name() {
+                            // モンスター固有の呪文名がある場合は解決、なければ SPELL_DB を参照
+                            if (sp.name) return i18n.resolve(sp.name);
+                            if (SPELL_DB[sp.id]) return SPELL_DB[sp.id].name;
+                            return sp.id;
+                        }
+                    };
+                });
+            }
+
+            MONSTER_DEFINITIONS[raw.id] = monster;
+        }
+        console.log("MONSTER_DEFINITIONS initialized successfully from module JSONs.");
+    } catch (error) {
+        console.error("Failed to fetch monster data:", error);
+        throw error;
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "begirama",
+  "cost": 8,
+  "type": "damage",
+  "fieldUsable": false,
+  "battleUsable": true,
+  "learnLevel": 17,
+  "name": {
+    "ja": "ベギラマ",
+    "en": "Sizzle",
+    "es": "Superchispa"
+  }
+}

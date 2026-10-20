@@ -1,0 +1,215 @@
+{
+  "sister": [
+    { "type": "check_flag", "flag": "talkedToScholar", "if_true": "normal_church" },
+    { "type": "check_flag", "flag": "receivedSisterHerb", "if_true": "after_herb" },
+    { "type": "check_inventory_full", "additional": 1, "if_true": "bag_full" },
+    { "type": "set_flag", "flag": "receivedSisterHerb", "value": true },
+    { "type": "set_flag", "flag": "talkedToSister", "value": true },
+    { "type": "give_item", "itemId": "herb", "count": 1 },
+    { "type": "set_return_point" },
+    { "type": "show_dialog", "textKey": "events.sister.give_herb" },
+    { "type": "end" },
+
+    { "label": "bag_full", "type": "show_dialog", "textKey": "events.sister.bag_full" },
+    { "type": "end" },
+
+    { "label": "after_herb", "type": "set_return_point" },
+    { "type": "show_dialog", "textKey": "events.sister.after" },
+    { "type": "end" },
+
+    { "label": "normal_church", "type": "open_church" }
+  ],
+  "dwarf_soldier": [
+    { "type": "check_flag", "flag": "blackLizardQuestCompleted", "if_true": "after_complete" },
+    { "type": "check_flag", "flag": "blackLizardDefeated", "if_true": "check_quest_started" },
+    { "type": "check_flag", "flag": "blackLizardQuestStarted", "if_true": "waiting" },
+    { "label": "start_quest", "type": "set_flag", "flag": "blackLizardQuestStarted", "value": true },
+    { "type": "show_dialog", "textKey": "events.dwarf_soldier.quest_start", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "check_quest_started", "type": "check_flag", "flag": "blackLizardQuestStarted", "if_true": "give_reward", "if_false": "start_quest" },
+    
+    { "label": "give_reward", "type": "check_inventory_full", "additional": 1, "if_true": "bag_full" },
+    { "type": "give_item", "itemId": "fire_charm", "count": 1 },
+    { "type": "set_flag", "flag": "blackLizardQuestCompleted", "value": true },
+    { "type": "play_sound", "se": "victory" },
+    { "type": "show_dialog", "textKey": "events.dwarf_soldier.quest_complete", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "bag_full", "type": "show_dialog", "textKey": "events.dwarf_soldier.bag_full" },
+    { "type": "end" },
+    
+    { "label": "waiting", "type": "show_dialog", "textKey": "events.dwarf_soldier.quest_waiting" },
+    { "type": "end" },
+    
+    { "label": "after_complete", "type": "show_dialog", "textKey": "events.dwarf_soldier.after" }
+  ],
+  "dwarf_blacksmith": [
+    { "type": "check_item", "itemId": "corrada", "if_false": "busy" },
+    { "type": "check_item", "itemId": "dragon_armor", "if_true": "wearing" },
+    { "type": "check_flag", "flag": "receivedDragonArmor", "if_true": "wearing" },
+    { "type": "check_flag", "flag": "blackLizardQuestCompleted", "if_false": "need_trust" },
+    { "type": "check_flag", "flag": "cerberusQuestStarted", "if_false": "ask_quest" },
+    { "type": "check_item", "itemId": "cerberus_mane", "if_true": "craft_armor" },
+    { "label": "quest_waiting", "type": "show_dialog", "textKey": "events.blacksmith.quest_waiting" },
+    { "type": "end" },
+    
+    { "label": "busy", "type": "show_dialog", "textKey": "events.blacksmith.busy" },
+    { "type": "end" },
+    
+    { "label": "wearing", "type": "show_dialog", "textKey": "events.blacksmith.wearing" },
+    { "type": "end" },
+    
+    { "label": "need_trust", "type": "show_dialog", "textKey": "events.blacksmith.need_trust" },
+    { "type": "end" },
+    
+    { "label": "ask_quest", "type": "set_flag", "flag": "cerberusQuestStarted", "value": true },
+    { "type": "show_dialog", "textKey": "events.blacksmith.ask_quest" },
+    { "type": "end" },
+    
+    { "label": "craft_armor", "type": "check_inventory_full", "additional": 0, "if_true": "bag_full" },
+    { "type": "remove_item", "itemId": "cerberus_mane", "count": 1 },
+    { "type": "give_item", "itemId": "dragon_armor", "count": 1 },
+    { "type": "set_flag", "flag": "receivedDragonArmor", "value": true },
+    { "type": "play_sound", "se": "victory" },
+    { "type": "show_dialog", "textKey": "events.blacksmith.craft_success", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "bag_full", "type": "show_dialog", "textKey": "events.blacksmith.bag_full" }
+  ],
+  "elf": [
+    { "type": "check_flag", "flag": "heardOfTizona", "if_false": "dummy" },
+    { "type": "check_flag", "flag": "returnedLoversRing", "if_true": "check_shield" },
+    { "type": "check_item", "itemId": "lovers_ring", "if_true": "return_ring" },
+    { "type": "check_flag", "flag": "elfQuestStarted", "if_true": "quest_waiting" },
+    { "label": "quest_start", "type": "set_flag", "flag": "elfQuestStarted", "value": true },
+    { "type": "show_dialog", "textKey": "events.elf.quest_start", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "dummy", "type": "show_dialog", "textKey": "events.elf.dummy" },
+    { "type": "end" },
+    
+    { "label": "check_shield", "type": "check_flag", "flag": "receivedWaterShield", "if_true": "has_shield_flow", "if_false": "need_shield" },
+    
+    { "label": "has_shield_flow", "type": "check_item", "itemId": "corrada", "if_true": "has_corrada" },
+    { "type": "show_dialog", "textKey": "events.elf.has_shield" },
+    { "type": "end" },
+    
+    { "label": "has_corrada", "type": "set_flag", "flag": "heardOfDwarf", "value": true },
+    { "type": "show_dialog", "textKey": "events.elf.has_corrada" },
+    { "type": "end" },
+    
+    { "label": "need_shield", "type": "show_dialog", "textKey": "events.elf.need_shield" },
+    { "type": "end" },
+    
+    { "label": "return_ring", "type": "remove_item", "itemId": "lovers_ring", "count": 1 },
+    { "type": "give_item", "itemId": "forest_guide", "count": 1 },
+    { "type": "set_flag", "flag": "returnedLoversRing", "value": true },
+    { "type": "play_sound", "se": "victory" },
+    { "type": "show_dialog", "textKey": "events.elf.return_ring", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "quest_waiting", "type": "show_dialog", "textKey": "events.elf.quest_waiting" }
+  ],
+  "undine": [
+    { "type": "check_flag", "flag": "receivedWaterShield", "if_true": "after" },
+    { "type": "check_inventory_full", "additional": 1, "if_true": "bag_full" },
+    { "type": "set_flag", "flag": "receivedWaterShield", "value": true },
+    { "type": "give_item", "itemId": "water_shield", "count": 1 },
+    { "type": "play_sound", "se": "victory" },
+    { "type": "show_dialog", "textKey": "events.undine.give_shield", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "after", "type": "show_dialog", "textKey": "events.undine.after" },
+    { "type": "end" },
+    
+    { "label": "bag_full", "type": "show_dialog", "textKey": "events.undine.bag_full" }
+  ],
+  "lighthousekeeper": [
+    { "type": "check_flag", "flag": "talkedToSister", "if_true": "after" },
+    { "type": "show_dialog", "textKey": "events.lighthousekeeper.initial" },
+    { "type": "end" },
+    { "label": "after", "type": "show_dialog", "textKey": "events.lighthousekeeper.after" }
+  ],
+  "old_man": [
+    { "type": "check_map", "mapId": "port_town", "if_true": "port_town_logic" },
+    { "type": "check_flag", "flag": "talkedToSister", "if_false": "dummy" },
+    { "type": "check_item", "itemId": "antique_key", "if_true": "reported" },
+    { "type": "check_item", "itemId": "key", "if_true": "reported" },
+    { "type": "check_flag", "flag": "talkedToScholar", "if_true": "cave_waiting" },
+    { "type": "set_flag", "flag": "talkedToScholar", "value": true },
+    { "type": "show_dialog", "textKey": "events.scholar.cave_initial", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "port_town_logic", "type": "set_flag", "flag": "heardOfTizona", "value": true },
+    { "type": "check_item", "itemId": "corrada", "if_true": "port_corrada" },
+    { "type": "show_dialog", "textKey": "events.scholar.port_initial" },
+    { "type": "end" },
+    
+    { "label": "port_corrada", "type": "set_flag", "flag": "heardOfDwarf", "value": true },
+    { "type": "show_dialog", "textKey": "events.scholar.port_corrada" },
+    { "type": "end" },
+    
+    { "label": "dummy", "type": "show_dialog", "textKey": "events.scholar.dummy" },
+    { "type": "end" },
+    
+    { "label": "reported", "type": "set_flag", "flag": "reportedMonumentToScholar", "value": true },
+    { "type": "show_dialog", "textKey": "events.scholar.cave_reported", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "cave_waiting", "type": "show_dialog", "textKey": "events.scholar.cave_waiting" }
+  ],
+  "guard_port": [
+    { "type": "check_flag", "flag": "hasPass", "if_true": "pass_ok" },
+    { "type": "set_flag", "flag": "heardPassRequirement", "value": true },
+    { "type": "show_dialog", "textKey": "events.guard.pass_ng" },
+    { "type": "end" },
+    
+    { "label": "pass_ok", "type": "show_dialog", "textKey": "events.guard.pass_ok" },
+    { "type": "set_npc_position", "gridX": 29, "gridY": 14 }
+  ],
+  "town_mayor": [
+    { "type": "check_flag", "flag": "hasPass", "if_true": "has_pass" },
+    { "type": "check_flag", "flag": "rescuedGirl", "if_true": "give_pass" },
+    { "type": "check_flag", "flag": "kidnappingEventStarted", "if_true": "waiting_rescue" },
+    { "type": "check_flag", "flag": "heardPassRequirement", "if_true": "quest_start" },
+    { "type": "show_dialog", "textKey": "events.mayor.default" },
+    { "type": "end" },
+    
+    { "label": "has_pass", "type": "show_dialog", "textKey": "events.mayor.has_pass" },
+    { "type": "end" },
+    
+    { "label": "give_pass", "type": "check_inventory_full", "additional": 1, "if_true": "bag_full" },
+    { "type": "set_flag", "flag": "hasPass", "value": true },
+    { "type": "give_item", "itemId": "pass", "count": 1 },
+    { "type": "play_sound", "se": "victory" },
+    { "type": "show_dialog", "textKey": "events.mayor.give_pass", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "bag_full", "type": "show_dialog", "textKey": "events.mayor.bag_full" },
+    { "type": "end" },
+    
+    { "label": "waiting_rescue", "type": "show_dialog", "textKey": "events.mayor.waiting_rescue" },
+    { "type": "end" },
+    
+    { "label": "quest_start", "type": "set_flag", "flag": "kidnappingEventStarted", "value": true },
+    { "type": "show_dialog", "textKey": "events.mayor.quest_start", "onComplete": "refresh_map" }
+  ],
+  "girl": [
+    { "type": "check_map", "mapId": "first_dungeon2", "if_true": "dungeon_logic" },
+    { "type": "check_flag", "flag": "hasPass", "if_true": "town_rescued" },
+    { "type": "show_dialog", "textKey": "events.girl.in_town_default" },
+    { "type": "end" },
+    
+    { "label": "dungeon_logic", "type": "check_npc_exists", "npcId": ["dungeon_boss", "troll"], "if_true": "scared" },
+    { "type": "set_flag", "flag": "rescuedGirl", "value": true },
+    { "type": "play_sound", "se": "victory" },
+    { "type": "show_dialog", "textKey": "events.girl.in_dungeon_rescued", "onComplete": "refresh_map" },
+    { "type": "end" },
+    
+    { "label": "scared", "type": "show_dialog", "textKey": "events.girl.in_dungeon_scared" },
+    { "type": "end" },
+    
+    { "label": "town_rescued", "type": "show_dialog", "textKey": "events.girl.in_town_rescued" }
+  ]
+}

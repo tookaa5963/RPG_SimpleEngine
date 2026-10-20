@@ -1,0 +1,26 @@
+{
+  "id": "ghost",
+  "level": 4,
+  "hp": 14,
+  "maxHp": 14,
+  "atk": 13,
+  "def": 8,
+  "spd": 7,
+  "exp": 7,
+  "gold": 8,
+  "color": "#bdc3c7",
+  "imageSrc": "images/ghost.png",
+  "spells": [
+    {
+      "id": "mera",
+      "chance": 0.35,
+      "minDmg": 6,
+      "maxDmg": 12
+    }
+  ],
+  "name": {
+    "ja": "ゴースト",
+    "en": "Ghost",
+    "es": "Fantasma"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "id": "leather_shield",
+  "type": "shield",
+  "def": 2,
+  "price": 40,
+  "name": {
+    "ja": "皮の盾",
+    "en": "Leather Shield",
+    "es": "Escudo de cuero"
+  }
+}

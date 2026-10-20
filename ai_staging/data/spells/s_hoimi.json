@@ -1,0 +1,13 @@
+{
+  "id": "hoimi",
+  "cost": 3,
+  "type": "heal",
+  "fieldUsable": true,
+  "battleUsable": true,
+  "learnLevel": 3,
+  "name": {
+    "ja": "ホイミ",
+    "en": "Heal",
+    "es": "Cura"
+  }
+}

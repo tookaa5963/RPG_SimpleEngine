@@ -1,0 +1,30 @@
+{
+  "id": "gargoyle",
+  "level": 7,
+  "hp": 65,
+  "maxHp": 65,
+  "atk": 22,
+  "def": 16,
+  "spd": 12,
+  "exp": 90,
+  "gold": 90,
+  "color": "#c0392b",
+  "imageSrc": "images/gargoyle.png",
+  "noEscape": true,
+  "sleepResist": 1,
+  "sealResist": 1,
+  "dropItem": "antique_key",
+  "spells": [
+    {
+      "id": "gira",
+      "chance": 0.4,
+      "minDmg": 12,
+      "maxDmg": 20
+    }
+  ],
+  "name": {
+    "ja": "ガーゴイル",
+    "en": "Gargoyle",
+    "es": "Gárgola"
+  }
+}

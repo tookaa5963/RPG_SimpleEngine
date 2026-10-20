@@ -1,0 +1,113 @@
+{
+  "name": "始まりの町の武器屋",
+  "bgm": "field",
+  "encounterRate": 0,
+  "monsters": [],
+  "backgroundImage": "images/maps/armor_shop_bg.png",
+  "data": [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      9,
+      9,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  ],
+  "warps": [
+    {
+      "gridX": 3,
+      "gridY": 5,
+      "targetMap": "first_town",
+      "targetX": 18,
+      "targetY": 13,
+      "direction": "down"
+    }
+  ],
+  "interactables": [],
+  "npcs": [
+    {
+      "id": "weapon_shop_keeper",
+      "sprite": "weapon_merchant",
+      "type": "human",
+      "name": "武器屋のオヤジ",
+      "gridX": 3,
+      "gridY": 2,
+      "pixelX": 192,
+      "pixelY": 128,
+      "targetPixelX": 192,
+      "targetPixelY": 128,
+      "direction": "down",
+      "animFrame": 0,
+      "isMoving": false,
+      "color": "#d35400",
+      "walkTimer": 999999,
+      "isShop": true,
+      "greeting": "いらっしゃい！\n武器や防具を買っていくかい？",
+      "shopItems": [
+        "copper_sword",
+        "iron_sword",
+        "cloth_armor",
+        "leather_armor",
+        "iron_armor",
+        "leather_shield",
+        "iron_shield"
+      ]
+    }
+  ]
+}

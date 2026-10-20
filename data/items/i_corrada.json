@@ -1,0 +1,11 @@
+{
+  "id": "corrada",
+  "type": "weapon",
+  "atk": 38,
+  "price": 0,
+  "name": {
+    "ja": "コラーダ",
+    "en": "Colada",
+    "es": "Colada"
+  }
+}

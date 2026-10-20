@@ -1,0 +1,10 @@
+{
+  "id": "fire_charm",
+  "type": "charm",
+  "price": 3500,
+  "name": {
+    "ja": "火炎の護符",
+    "en": "Fire Ward",
+    "es": "Talismán ígneo"
+  }
+}

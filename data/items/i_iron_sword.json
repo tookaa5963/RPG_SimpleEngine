@@ -1,0 +1,11 @@
+{
+  "id": "iron_sword",
+  "type": "weapon",
+  "atk": 12,
+  "price": 150,
+  "name": {
+    "ja": "鉄の剣",
+    "en": "Iron Sword",
+    "es": "Espada de hierro"
+  }
+}

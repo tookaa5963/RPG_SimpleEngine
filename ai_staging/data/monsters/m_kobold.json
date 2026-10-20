@@ -1,0 +1,18 @@
+{
+  "id": "kobold",
+  "level": 8,
+  "hp": 44,
+  "maxHp": 44,
+  "atk": 27,
+  "def": 17,
+  "spd": 11,
+  "exp": 33,
+  "gold": 30,
+  "color": "#d35400",
+  "imageSrc": "images/kobold.png",
+  "name": {
+    "ja": "コボルト",
+    "en": "Kobold",
+    "es": "Kobold"
+  }
+}

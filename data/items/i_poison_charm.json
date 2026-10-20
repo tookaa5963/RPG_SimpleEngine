@@ -1,0 +1,10 @@
+{
+  "id": "poison_charm",
+  "type": "charm",
+  "price": 2000,
+  "name": {
+    "ja": "防疫の護符",
+    "en": "Poison Ward",
+    "es": "Talismán antitoxina"
+  }
+}

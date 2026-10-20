@@ -1,0 +1,18 @@
+{
+  "id": "slime",
+  "level": 1,
+  "hp": 6,
+  "maxHp": 6,
+  "atk": 6,
+  "def": 3,
+  "spd": 3,
+  "exp": 3,
+  "gold": 3,
+  "color": "#1abc9c",
+  "imageSrc": "images/slime.png",
+  "name": {
+    "ja": "スライム",
+    "en": "Slime",
+    "es": "Limos"
+  }
+}

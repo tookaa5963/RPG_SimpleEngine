@@ -1,0 +1,11 @@
+{
+  "id": "steel_shield",
+  "type": "shield",
+  "def": 10,
+  "price": 400,
+  "name": {
+    "ja": "鋼鉄の盾",
+    "en": "Steel Shield",
+    "es": "Escudo de acero"
+  }
+}

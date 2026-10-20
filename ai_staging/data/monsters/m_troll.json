@@ -1,0 +1,21 @@
+{
+  "id": "troll",
+  "level": 10,
+  "hp": 200,
+  "maxHp": 200,
+  "atk": 45,
+  "def": 22,
+  "spd": 18,
+  "exp": 250,
+  "gold": 200,
+  "color": "#e67e22",
+  "imageSrc": "images/troll.png",
+  "noEscape": true,
+  "criticalChance": 0.1,
+  "sleepResist": 1,
+  "name": {
+    "ja": "トロール",
+    "en": "Troll",
+    "es": "Trol"
+  }
+}

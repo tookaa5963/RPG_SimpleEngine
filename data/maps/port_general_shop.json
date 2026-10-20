@@ -1,0 +1,116 @@
+{
+  "name": "港町の道具屋",
+  "bgm": "field",
+  "encounterRate": 0,
+  "monsters": [],
+  "backgroundImage": "images/maps/item_shop_bg.png",
+  "data": [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      9,
+      9,
+      9,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      1
+    ]
+  ],
+  "warps": [
+    {
+      "gridX": 3,
+      "gridY": 6,
+      "targetMap": "port_town",
+      "targetX": 19,
+      "targetY": 12,
+      "direction": "down"
+    }
+  ],
+  "interactables": [],
+  "npcs": [
+    {
+      "id": "port_general_shop_keeper",
+      "sprite": "item_merchant",
+      "type": "human",
+      "name": "雑貨屋のオヤジ",
+      "gridX": 3,
+      "gridY": 2,
+      "pixelX": 192,
+      "pixelY": 128,
+      "targetPixelX": 192,
+      "targetPixelY": 128,
+      "direction": "down",
+      "animFrame": 0,
+      "isMoving": false,
+      "color": "#f39c12",
+      "walkTimer": 999999,
+      "isShop": true,
+      "greeting": "いらっしゃい！\n旅の道具を揃えているよ。",
+      "shopItems": [
+        "torch",
+        "lantern",
+        "herb",
+        "strong_herb",
+        "special_herb",
+        "magic_water",
+        "sage_water",
+        "holy_water",
+        "antidote",
+        "poison_charm"
+      ]
+    }
+  ]
+}

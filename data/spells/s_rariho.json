@@ -1,0 +1,13 @@
+{
+  "id": "rariho",
+  "cost": 3,
+  "type": "sleep",
+  "fieldUsable": false,
+  "battleUsable": true,
+  "learnLevel": 7,
+  "name": {
+    "ja": "ラリホー",
+    "en": "Snooze",
+    "es": "Sueño"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "antidote",
+  "type": "item",
+  "price": 6,
+  "name": {
+    "ja": "毒消し草",
+    "en": "Antidotal Herb",
+    "es": "Hierba amarga"
+  }
+}

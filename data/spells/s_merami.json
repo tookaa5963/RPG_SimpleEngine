@@ -1,0 +1,13 @@
+{
+  "id": "merami",
+  "cost": 10,
+  "type": "damage",
+  "fieldUsable": false,
+  "battleUsable": true,
+  "learnLevel": 20,
+  "name": {
+    "ja": "メラミ",
+    "en": "Frizzle",
+    "es": "Superígneo"
+  }
+}

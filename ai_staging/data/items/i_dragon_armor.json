@@ -1,0 +1,11 @@
+{
+  "id": "dragon_armor",
+  "type": "armor",
+  "def": 28,
+  "price": 0,
+  "name": {
+    "ja": "竜鱗の鎧",
+    "en": "Dragon Scale Armor",
+    "es": "Armadura de escamas de dragón"
+  }
+}

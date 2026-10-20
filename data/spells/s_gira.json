@@ -1,0 +1,13 @@
+{
+  "id": "gira",
+  "cost": 4,
+  "type": "damage",
+  "fieldUsable": false,
+  "battleUsable": true,
+  "learnLevel": 8,
+  "name": {
+    "ja": "ギラ",
+    "en": "Sizz",
+    "es": "Chispa"
+  }
+}

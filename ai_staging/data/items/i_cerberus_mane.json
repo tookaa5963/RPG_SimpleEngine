@@ -1,0 +1,15 @@
+{
+  "id": "cerberus_mane",
+  "type": "keyItem",
+  "price": 0,
+  "name": {
+    "ja": "ケルベロスの鬣",
+    "en": "Cerberus Mane",
+    "es": "Melena de cerbero"
+  },
+  "description": {
+    "ja": "灼熱の炎に耐えるケルベロスの鬣。黒竜の剥落鱗鎧の調整に不可欠な素材",
+    "en": "Mane resistant to scorching heat. Essential to fit the dragon armor.",
+    "es": "Melena resistente al fuego abrasador. Necesaria para ajustar la armadura de dragón."
+  }
+}
