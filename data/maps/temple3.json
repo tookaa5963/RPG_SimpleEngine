@@ -1,5 +1,9 @@
 {
-  "name": "地下神殿",
+  "name": {
+    "ja": "地下神殿",
+    "en": "Underground Temple",
+    "es": "Templo Subterráneo"
+  },
   "bgm": "dungeon",
   "isDark": true,
   "encounterRate": 0.15,
@@ -475,19 +479,7 @@
       "isOpen": false,
       "itemId": "corrada",
       "requiredKey": "antique_key",
-      "consumeKey": true,
-      "pagesLocked": [
-        "祭壇の長櫃には 二つの鍵穴がある。"
-      ],
-      "pagesClosed": [
-        "勇者は 【古びた鍵】と【青銅の鍵】を差し込んだ！",
-        "カチャリ……！ 長櫃の重厚な封印が解かれた！",
-        "祭壇の長櫃を開けた！\nなんと 名剣【コラーダ】を手に入れた！",
-        "剣を手にした瞬間、緑竜の刻印が淡い光を放った……！\n（身体の奥底から 懐かしい力が湧き上がるようだ）"
-      ],
-      "pagesOpened": [
-        "しかし 長櫃は\nからっぽだった。"
-      ]
+      "consumeKey": true
     }
   ],
   "npcs": [

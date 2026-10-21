@@ -1,5 +1,9 @@
 {
-  "name": "港町の教会",
+  "name": {
+    "ja": "港町の教会",
+    "en": "Port: Church",
+    "es": "Puerto: Iglesia"
+  },
   "bgm": "church",
   "encounterRate": 0,
   "monsters": [],

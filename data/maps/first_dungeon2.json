@@ -1,5 +1,9 @@
 {
-  "name": "ダンジョン2",
+  "name": {
+    "ja": "ダンジョン2",
+    "en": "Eastern Dungeon B2",
+    "es": "Mazmorra Oriental S2"
+  },
   "bgm": "dungeon",
   "encounterRate": 0.08,
   "monsters": [
@@ -475,65 +479,35 @@
       "gridX": 11,
       "gridY": 2,
       "isOpen": false,
-      "itemId": "lantern",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと ランタンを手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "lantern"
     },
     {
       "type": "chest",
       "gridX": 14,
       "gridY": 1,
       "isOpen": false,
-      "itemId": "magic_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 魔法の聖水を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "magic_water"
     },
     {
       "type": "chest",
       "gridX": 15,
       "gridY": 7,
       "isOpen": false,
-      "itemId": "magic_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 魔法の聖水を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "magic_water"
     },
     {
       "type": "chest",
       "gridX": 7,
       "gridY": 13,
       "isOpen": false,
-      "itemId": "strong_herb",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 上薬草を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "strong_herb"
     },
     {
       "type": "chest",
       "gridX": 5,
       "gridY": 12,
       "isOpen": false,
-      "itemId": "strong_herb",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 上薬草を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "strong_herb"
     }
   ],
   "npcs": [

@@ -1,5 +1,9 @@
 {
-  "name": "始まりの町",
+  "name": {
+    "ja": "始まりの町",
+    "en": "Starting Town",
+    "es": "Pueblo del Inicio"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],
@@ -1059,7 +1063,6 @@
       "color": "#e67e22",
       "walkTimer": 90,
       "isShop": true,
-      "greeting": "いらっしゃい！\n武器や道具を扱っているよ。",
       "shopItems": [
         "herb",
         "copper_sword",
@@ -1081,10 +1084,20 @@
       "isMoving": false,
       "color": "#e74c3c",
       "walkTimer": 60,
-      "pages": [
-        "こんにちは！\nここは始まりの町よ。",
-        "気をつけて旅を続けてね。"
-      ]
+      "pages": {
+        "ja": [
+          "こんにちは！\nここは始まりの町よ。",
+          "気をつけて旅を続けてね。"
+        ],
+        "en": [
+          "Hello!\nThis is the starting town.",
+          "Take care on your journey."
+        ],
+        "es": [
+          "¡Hola!\nEste es el pueblo de inicio.",
+          "Ten cuidado en tu viaje."
+        ]
+      }
     },
     {
       "id": "girl",
@@ -1100,11 +1113,7 @@
       "animFrame": 0,
       "isMoving": false,
       "color": "#e74c3c",
-      "walkTimer": 60,
-      "pages": [
-        "こんにちは！\nお兄さん、かっこいいね。",
-        "気をつけて旅を続けてね。"
-      ]
+      "walkTimer": 60
     },
     {
       "id": "port_youth",
@@ -1122,11 +1131,23 @@
       "isMoving": false,
       "color": "#2ecc71",
       "walkTimer": 90,
-      "pages": [
-        "最近はモンスターが増えて",
-        "おちおち外に出られないよ",
-        "特に森は危ないから注意しろよ"
-      ]
+      "pages": {
+        "ja": [
+          "最近はモンスターが増えて",
+          "おちおち外に出られないよ",
+          "特に森は危ないから注意しろよ"
+        ],
+        "en": [
+          "Monsters have been increasing lately.",
+          "We can barely step outside.",
+          "The forest is especially dangerous, watch out!"
+        ],
+        "es": [
+          "Los monstruos aumentan últimamente.",
+          "Apenas podemos salir fuera.",
+          "¡El bosque es muy peligroso, ten cuidado!"
+        ]
+      }
     },
     {
       "id": "town_man",
@@ -1144,9 +1165,17 @@
       "isMoving": false,
       "color": "#3498db",
       "walkTimer": 80,
-      "pages": [
-        "ここは平和な町だよ。\n外には魔物が出るから気をつけな。"
-      ]
+      "pages": {
+        "ja": [
+          "ここは平和な町だよ。\n外には魔物が出るから気をつけな。"
+        ],
+        "en": [
+          "This is a peaceful town.\nMonsters roam outside, so be careful."
+        ],
+        "es": [
+          "Este es un pueblo pacífico.\nHay monstruos afuera, así que ten cuidado."
+        ]
+      }
     }
   ]
 }

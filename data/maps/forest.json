@@ -1,5 +1,9 @@
 {
-  "name": "迷いの森",
+  "name": {
+    "ja": "迷いの森",
+    "en": "Lost Forest",
+    "es": "Bosque Perdido"
+  },
   "bgm": "field",
   "encounterRate": 0.08,
   "monsters": [
@@ -1162,26 +1166,14 @@
       "gridX": 15,
       "gridY": 30,
       "isOpen": false,
-      "itemId": "sage_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 賢者の聖水を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "sage_water"
     },
     {
       "type": "chest",
       "gridX": 22,
       "gridY": 16,
       "isOpen": false,
-      "itemId": "steel_shield",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと鋼鉄の盾を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "steel_shield"
     }
   ],
   "npcs": []

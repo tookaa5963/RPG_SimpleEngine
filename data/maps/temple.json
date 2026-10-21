@@ -1,5 +1,9 @@
 {
-  "name": "神殿跡",
+  "name": {
+    "ja": "神殿跡",
+    "en": "Temple Ruins",
+    "es": "Ruinas del Templo"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],

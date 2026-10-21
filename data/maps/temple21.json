@@ -1,5 +1,9 @@
 {
-  "name": "地下墓地 地下2階",
+  "name": {
+    "ja": "地下墓地 地下2階",
+    "en": "Catacombs B2",
+    "es": "Catacumbas S2"
+  },
   "bgm": "dungeon",
   "encounterRate": 0.06,
   "monsters": [
@@ -725,13 +729,7 @@
       "gridX": 16,
       "gridY": 23,
       "isOpen": false,
-      "itemId": "sage_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 【賢者の聖水】を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "sage_water"
     }
   ],
   "npcs": []

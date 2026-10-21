@@ -1,5 +1,9 @@
 {
-  "name": "ドワーフ村の道具屋",
+  "name": {
+    "ja": "ドワーフ村の道具屋",
+    "en": "Dwarf: Item Shop",
+    "es": "Enanos: Tienda"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],
@@ -98,7 +102,6 @@
       "color": "#f39c12",
       "walkTimer": 999999,
       "isShop": true,
-      "greeting": "いらっしゃい！\n旅の道具を揃えているよ。",
       "shopItems": [
         "torch",
         "lantern",

@@ -1,5 +1,9 @@
 {
-  "name": "始まりの町の武器屋",
+  "name": {
+    "ja": "始まりの町の武器屋",
+    "en": "Start: Armory",
+    "es": "Inicio: Armería"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],
@@ -98,7 +102,6 @@
       "color": "#d35400",
       "walkTimer": 999999,
       "isShop": true,
-      "greeting": "いらっしゃい！\n武器や防具を買っていくかい？",
       "shopItems": [
         "copper_sword",
         "iron_sword",

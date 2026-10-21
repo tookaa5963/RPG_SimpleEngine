@@ -398,7 +398,7 @@ export class FieldManager {
     if (targetObj) {
       if (this.onStateChange) this.onStateChange('MESSAGE');
       if (targetObj.type === 'sign' || targetObj.type === 'monument' || targetObj.type === 'bookshelf' || targetObj.type === 'notebook') {
-        const localizedObjText = i18n.getInteractableText(this.currentMapId, targetObj);
+        const localizedObjText = targetObj.pages;
         this.messageWindow.open(localizedObjText || targetObj.pages);
 } else if (targetObj.type === 'chest') {
         if (!targetObj.isOpen) {

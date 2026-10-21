@@ -1,5 +1,9 @@
 {
-  "name": "ドラゴネーラ島",
+  "name": {
+    "ja": "ドラゴネーラ島",
+    "en": "Dragonera Island",
+    "es": "Isla Dragonera"
+  },
   "bgm": "dragons_cave",
   "encounterRate": 0.2,
   "monsters": [

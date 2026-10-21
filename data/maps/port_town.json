@@ -1,5 +1,9 @@
 {
-  "name": "港町",
+  "name": {
+    "ja": "港町",
+    "en": "Port Town",
+    "es": "Pueblo Costero"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],
@@ -744,11 +748,23 @@
       "type": "bookshelf",
       "gridX": 14,
       "gridY": 14,
-      "pages": [
-        "本棚には 古びた記録が 並んでいる……\n【島の古文書：白銀の記録】",
-        "『……かつて海を越え 大陸より訪れし騎士、\n緑竜の加護を帯びて黒竜を討ち滅ぼす。\n騎士は自らの剣「コラーダ」と「水霊の盾」を\nこの地に託し 再び大陸へと去りぬ。』",
-        "『……追記：大陸の記録によれば、\nかの騎士の家系は 後の戦乱にて後継者を失い、\nその血脈は すでに途絶えたと伝えられる。』"
-      ]
+      "pages": {
+        "ja": [
+          "本棚には 古びた記録が 並んでいる……\n【島の古文書：白銀の記録】",
+          "『……かつて海を越え 大陸より訪れし騎士、\n緑竜の加護を帯びて黒竜を討ち滅ぼす。\n騎士は自らの剣「コラーダ」と「水霊の盾」を\nこの地に託し 再び大陸へと去りぬ。』",
+          "『……追記：大陸の記録によれば、\nかの騎士の家系は 後の戦乱にて後継者を失い、\nその血脈は すでに途絶えたと伝えられる。』"
+        ],
+        "en": [
+          "Old records line the bookshelf...\n[Island Chronicle: The Silver Record]",
+          "'...A knight once crossed the sea from the continent,\nbearing the Green Dragon's blessing to slay the Black Dragon.\nThe knight entrusted his sword Colada and the Water Spirit Shield\nto this land before returning to the continent.'",
+          "'...Postscript: According to continental records,\nthat knight's house lost its heir in subsequent wars,\nand the bloodline is said to have perished.'"
+        ],
+        "es": [
+          "Viejos registros llenan la estantería...\n[Crónica de la isla: El registro plateado]",
+          "'...Un caballero cruzó una vez el mar desde el continente,\ncon la bendición del Dragón verde para derrotar al Dragón negro.\nEl caballero confió su espada Colada y el Escudo del espíritu\na esta tierra antes de regresar al continente.'",
+          "'...Posdata: Según los registros del continente,\nel linaje de dicho caballero perdió a su heredero en guerras posteriores,\ny se dice que su sangre se extinguió por completo.'"
+        ]
+      }
     }
   ],
   "npcs": [
@@ -768,10 +784,20 @@
       "isMoving": false,
       "color": "#e67e22",
       "walkTimer": 80,
-      "pages": [
-        "ドラゴンのせいで船が出せないんだよ。\n荷が運べなきゃ、仕事もお手上げだ。",
-        "あんな怪物を倒せる奴なんて、\nこの島にいるわけねぇだろ……"
-      ]
+      "pages": {
+        "ja": [
+          "ドラゴンのせいで船が出せないんだよ。\n荷が運べなきゃ、仕事もお手上げだ。",
+          "あんな怪物を倒せる奴なんて、\nこの島にいるわけねぇだろ……"
+        ],
+        "en": [
+          "Can't sail the ships thanks to the dragon.\nCan't haul cargo, so we're out of work.",
+          "Ain't nobody on this island who could\ntake down a monster like that..."
+        ],
+        "es": [
+          "No podemos zarpar por culpa del dragón.\nSin cargar mercancías, no hay trabajo.",
+          "Nadie en esta isla es capaz de derrotar a un monstruo semejante..."
+        ]
+      }
     },
     {
       "id": "port_woman",
@@ -789,10 +815,20 @@
       "isMoving": false,
       "color": "#e74c3c",
       "walkTimer": 70,
-      "pages": [
-        "大陸との交易が途絶えてから、\n町に入ってくる物資が減る一方よ……",
-        "昔みたいに平和な港町に戻ってほしいわ。"
-      ]
+      "pages": {
+        "ja": [
+          "大陸との交易が途絶えてから、\n町に入ってくる物資が減る一方よ……",
+          "昔みたいに平和な港町に戻ってほしいわ。"
+        ],
+        "en": [
+          "Since trade with the continent ceased,\nsupplies coming into town keep dwindling...",
+          "I wish we could return to being\na peaceful port town like before."
+        ],
+        "es": [
+          "Desde que cesó el comercio con el continente,\nlas provisiones no hacen más que escasear...",
+          "Ojalá volviéramos a ser un pueblo costero pacífico como antes."
+        ]
+      }
     },
     {
       "id": "port_youth",
@@ -810,10 +846,20 @@
       "isMoving": false,
       "color": "#2ecc71",
       "walkTimer": 90,
-      "pages": [
-        "こんなちっぽけな島の港町だけど、\n立派な図書館がこの町の誇りさ。",
-        "昔の英雄の記録や、島の古い歴史が\nたくさん眠ってるらしいぜ。\nあんたも読んでみたらどうだ？"
-      ]
+      "pages": {
+        "ja": [
+          "こんなちっぽけな島の港町だけど、\n立派な図書館がこの町の誇りさ。",
+          "昔の英雄の記録や、島の古い歴史が\nたくさん眠ってるらしいぜ。\nあんたも読んでみたらどうだ？"
+        ],
+        "en": [
+          "It may be a small port town,\nbut our grand library is our pride.",
+          "Ancient tales of heroes and island lore\nare said to rest there.\nWhy don't you have a look?"
+        ],
+        "es": [
+          "Puede que sea un pueblo costero pequeño,\npero nuestra gran biblioteca es nuestro orgullo.",
+          "Dicen que guarda relatos de antiguos héroes y la historia de esta isla.\n¿Por qué no le echas un vistazo?"
+        ]
+      }
     },
     {
       "id": "port_old_woman",
@@ -831,10 +877,20 @@
       "isMoving": false,
       "color": "#95a5a6",
       "walkTimer": 100,
-      "pages": [
-        "黒竜が海を塞いでから、もうどれくらい経つかねぇ……",
-        "かつて大陸から来た英雄様のように、\n海を切り拓く者が現れてくれんものかね。"
-      ]
+      "pages": {
+        "ja": [
+          "黒竜が海を塞いでから、もうどれくらい経つかねぇ……",
+          "かつて大陸から来た英雄様のように、\n海を切り拓く者が現れてくれんものかね。"
+        ],
+        "en": [
+          "How long has it been since the Black Dragon blocked the seas...?",
+          "I wonder if someone will appear to open the waters,\njust like the hero who came from the continent long ago."
+        ],
+        "es": [
+          "¿Cuánto tiempo habrá pasado desde que el Dragón negro bloqueó el mar...?",
+          "¿No aparecerá alguien que despeje las aguas,\nigual que aquel héroe venido del continente en el pasado?"
+        ]
+      }
     },
     {
       "id": "captain",
@@ -852,11 +908,23 @@
       "isMoving": false,
       "color": "#2980b9",
       "walkTimer": 100,
-      "pages": [
-        "大陸へ向かう定期船を出したいのは山々だが、\n沖合のドラゴネーラ島に陣取る黒竜のせいで船が出せん。",
-        "あの黒竜の灼熱の炎は、船の甲板どころか\n鋼鉄の鎧すら一瞬で焼き溶かす。\n生身で近づけば 船ごと灰にされるのがオチだ。",
-        "黒竜を討ち果たすか、あるいは炎を防ぐ\n手立てでもなければ 出航はできんよ。"
-      ]
+      "pages": {
+        "ja": [
+          "大陸へ向かう定期船を出したいのは山々だが、\n沖合のドラゴネーラ島に陣取る黒竜のせいで船が出せん。",
+          "あの黒竜の灼熱の炎は、船の甲板どころか\n鋼鉄の鎧すら一瞬で焼き溶かす。\n生身で近づけば 船ごと灰にされるのがオチだ。",
+          "黒竜を討ち果たすか、あるいは炎を防ぐ\n手立てでもなければ 出航はできんよ。"
+        ],
+        "en": [
+          "I'd love to sail the regular ship to the continent,\nbut that Black Dragon perched on Dragonera Island won't let us.",
+          "Its searing flames can melt iron armor in an instant,\nnot to mention the wooden decks.\nGo near it, and ship and crew turn to ash.",
+          "Unless that dragon is slain or we find a way\nto withstand the fire, we can't set sail."
+        ],
+        "es": [
+          "Quisiera zarpar hacia el continente,\npero el Dragón negro apostado en Dragonera nos lo impide.",
+          "Sus llamas ardientes derriten una armadura de hierro en un instante,\npor no hablar de la cubierta.\nAcercarse es convertirse en cenizas con el barco.",
+          "A menos que alguien lo derrote o hallemos forma de resistir el fuego, no podemos partir."
+        ]
+      }
     },
     {
       "id": "old_man",

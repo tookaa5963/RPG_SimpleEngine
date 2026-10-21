@@ -1,5 +1,9 @@
 {
-  "name": "港町の宿屋",
+  "name": {
+    "ja": "港町の宿屋",
+    "en": "Port: Inn",
+    "es": "Puerto: Posada"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],
@@ -211,10 +215,20 @@
       "isMoving": false,
       "color": "#3498db",
       "walkTimer": 120,
-      "pages": [
-        "島の中央にある迷いの森は木が生い茂り真っ暗だぞ。\n行くなら雑貨屋で【ランタン】と【毒消し草】を\nしっかり揃えてから向かうんだな。",
-        "あの森は木が勝手に動き回るから、\n奥へ行くなら神殿の地下にあるという\n【森の道標】がないと迷子になるぜ。"
-      ]
+      "pages": {
+        "ja": [
+          "島の中央にある迷いの森は木が生い茂り真っ暗だぞ。\n行くなら雑貨屋で【ランタン】と【毒消し草】を\nしっかり揃えてから向かうんだな。",
+          "あの森は木が勝手に動き回るから、\n奥へ行くなら神殿の地下にあるという\n【森の道標】がないと迷子になるぜ。"
+        ],
+        "en": [
+          "The Lost Forest in the center of the island is pitch black with dense trees.\nIf you go, make sure you buy a Lantern and Antidotal Herb at the shop.",
+          "The trees shift on their own in that forest.\nTo reach the depths, you'll need the Forest Guide\nresting beneath the temple, or you'll be lost forever."
+        ],
+        "es": [
+          "El Bosque Perdido en el centro de la isla está a oscuras por la maleza.\nSi vas, asegúrate de llevar un Farol y Hierba amarga de la tienda.",
+          "Los árboles se mueven por sí mismos en ese bosque.\nPara adentrarte, necesitarás la Guía del bosque oculta bajo el templo, o te perderás para siempre."
+        ]
+      }
     },
     {
       "id": "bard",
@@ -232,11 +246,23 @@
       "isMoving": false,
       "color": "#3498db",
       "walkTimer": 120,
-      "pages": [
-        "わたくしは吟遊詩人です。\nこの島に伝わる古い詩を ご存じですか？",
-        "『波間に消えし黄金の盾、緑の竜は誰を待つ。\n絶えたるはずの血脈が、黒き災厄を再び祓わん……』",
-        "島の中央、動く木々の奥深くに眠る古き遺産……\n大陸へと続く航路を閉ざす黒竜に、\n立ち向かう鍵が そこにあると歌われています。"
-      ]
+      "pages": {
+        "ja": [
+          "わたくしは吟遊詩人です。\nこの島に伝わる古い詩を ご存じですか？",
+          "『波間に消えし黄金の盾、緑の竜は誰を待つ。\n絶えたるはずの血脈が、黒き災厄を再び祓わん……』",
+          "島の中央、動く木々の奥深くに眠る古き遺産……\n大陸へと続く航路を閉ざす黒竜に、\n立ち向かう鍵が そこにあると歌われています。"
+        ],
+        "en": [
+          "I am a wandering minstrel.\nDo you know the ancient ballad of this island?",
+          "'A golden shield lost to the waves, for whom does the green dragon wait.\nA bloodline thought severed shall banish the dark calamity once more...'",
+          "An ancient relic sleeping deep within the shifting trees...\nIt is sung that the key to confronting the Black Dragon\nwho blocks the sea lies there."
+        ],
+        "es": [
+          "Soy un bardo errante.\n¿Conoces la antigua balada de esta isla?",
+          "'El escudo dorado perdido entre las olas, a quién aguarda el dragón verde.\nLa estirpe que se creía extinta purgará la oscura calamidad una vez más...'",
+          "Una antigua reliquia que duerme en lo profundo de los árboles móviles...\nSe canta que la clave para desafiar al Dragón negro que bloquea el mar descansa allí."
+        ]
+      }
     }
   ]
 }

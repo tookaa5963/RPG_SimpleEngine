@@ -11,25 +11,21 @@
   "color": "#cd7f32",
   "imageSrc": "images/talos.png",
   "noEscape": true,
-  "sleepResist": 1.0,
+  "sleepResist": 1,
   "dropItem": "bronze_key",
   "physicalDamageRate": 0.8,
-  "name": {
-    "ja": "タロス",
-    "en": "Talos",
-    "es": "Talos"
-  },
   "spells": [
     {
       "id": "bronze_wind",
-      "name": {
-        "ja": "青銅の熱風",
-        "en": "Bronze Wind",
-        "es": "Viento de bronce"
-      },
+      "nameKey": "spells.bronze_wind.name",
       "chance": 0.35,
       "isBreath": true,
       "baseDmg": 85
     }
-  ]
+  ],
+  "name": {
+    "ja": "タロス",
+    "en": "Talos",
+    "es": "Talos"
+  }
 }

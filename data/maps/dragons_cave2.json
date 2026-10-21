@@ -1,5 +1,9 @@
 {
-  "name": "竜の洞窟",
+  "name": {
+    "ja": "竜の洞窟",
+    "en": "Dragon's Cave 2",
+    "es": "Cueva del Dragón 2"
+  },
   "bgm": "dragons_cave",
   "encounterRate": 0,
   "monsters": [],

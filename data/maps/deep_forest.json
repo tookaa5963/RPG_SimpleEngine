@@ -1,5 +1,9 @@
 {
-  "name": "迷いの森深部",
+  "name": {
+    "ja": "迷いの森深部",
+    "en": "Deep Forest",
+    "es": "Bosque Profundo"
+  },
   "bgm": "field",
   "isDark": true,
   "encounterRate": 0.08,

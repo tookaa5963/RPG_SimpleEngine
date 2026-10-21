@@ -1,60 +1,101 @@
-export const MAP_LIST = [
-  'first_island',
-  'lighthousekeeper_cottage',
-  'cave',
-  'dungeon',
-  'first_dungeon2',
-  'first_town',
-  'first_church',
-  'inn',
-  'armor_shop',
-  'general_shop',
-  'port_town',
-  'port_church',
-  'port_inn',
-  'port_armor_shop',
-  'port_general_shop',
-  'forest',
-  'forest2',
-  'forest3',
-  'temple',
-  'deep_forest',
-  'temple11',
-  'temple21',
-  'temple22',
-  'temple3',
-  'undersea_tunnel1',
-  'undersea_tunnel2',
-  'undersea_tunnel3',
-  'dwarf_village',
-  'dwarf_village_general_shop',
-  'dragonera_island',
-  'dragons_cave1',
-  'dragons_cave2'
-];
+// FILE_ENTRY: js/maps.js
+import { i18n } from './i18n.js';
 
-export let maps = {};
+export const maps = {};
+let isLoaded = false;
 
-export async function initMapData() {
-  try {
-    const mapPromises = MAP_LIST.map(async (mapId) => {
-      const response = await fetch(`data/maps/${mapId}.json`);
-      if (!response.ok) {
-        throw new Error(`マップデータ ${mapId}.json の取得に失敗しました (ステータスコード: ${response.status})`);
-      }
-      const data = await response.json();
-      return { id: mapId, data: data };
+/**
+ * プロパティに対して i18n.resolve を動的バインドするユーティリティ
+ */
+function bindI18nGetter(target, propKey) {
+  if (target[propKey] && typeof target[propKey] === 'object' && !Array.isArray(target[propKey])) {
+    const rawData = target[propKey];
+    Object.defineProperty(target, propKey, {
+      get: () => i18n.resolve(rawData),
+      enumerable: true,
+      configurable: true
     });
-
-    const loadedMaps = await Promise.all(mapPromises);
-    loadedMaps.forEach(map => {
-      maps[map.id] = map.data;
-    });
-
-    console.log("マップデータのロードが完了しました。");
-
-  } catch (error) {
-    console.error("マップデータの初期化中に致命的なエラーが発生しました:", error);
-    throw new Error("マップデータの初期化に失敗したため、エンジンを停止します。");
   }
 }
+
+/**
+ * マップデータ内の多言語オブジェクトに動的ゲッターを再帰的に適用
+ */
+function applyI18nGetters(mapData) {
+  if (mapData.name) bindI18nGetter(mapData, 'name');
+
+  if (Array.isArray(mapData.npcs)) {
+    mapData.npcs.forEach(npc => {
+      if (npc.pages) bindI18nGetter(npc, 'pages');
+      if (npc.greeting) bindI18nGetter(npc, 'greeting');
+    });
+  }
+
+  if (Array.isArray(mapData.interactables)) {
+    mapData.interactables.forEach(obj => {
+      if (obj.pages) bindI18nGetter(obj, 'pages');
+    });
+  }
+}
+
+/**
+ * 全マップデータのロードと初期化を実行する外部公開API
+ */
+export async function initMapData() {
+  if (isLoaded) return maps;
+
+  try {
+    const manifestRes = await fetch('data/maps/index.json');
+    if (!manifestRes.ok) {
+      throw new Error(`[DataValidationError] maps.js: マップマニフェスト取得失敗 (status: ${manifestRes.status})`);
+    }
+
+    const manifest = await manifestRes.json();
+    if (!manifest || !Array.isArray(manifest.maps)) {
+      throw new Error(`[DataValidationError] maps.js: マニフェスト形式が不正です (型: ${typeof manifest})`);
+    }
+
+    const loadPromises = manifest.maps.map(async (entry) => {
+      const mapId = typeof entry === 'string' ? entry : entry.id;
+      const mapFile = typeof entry === 'string' ? `${entry}.json` : entry.file;
+
+      if (!mapId || typeof mapId !== 'string') {
+        throw new Error(`[DataValidationError] maps.js: マップIDが不正です (値: ${mapId})`);
+      }
+
+      const mapUrl = `data/maps/${mapFile}`;
+      const res = await fetch(mapUrl);
+      if (!res.ok) {
+        throw new Error(`[DataValidationError] maps.js: マップデータ取得失敗: ${mapId} (status: ${res.status})`);
+      }
+      
+      const rawMapData = await res.json();
+      
+      const requiredProps = ['data', 'warps', 'npcs', 'interactables'];
+      for (const prop of requiredProps) {
+        if (!rawMapData[prop]) {
+          throw new Error(`[DataValidationError] maps.js: ${mapId} に必須プロパティ "${prop}" が存在しません。`);
+        }
+      }
+
+      applyI18nGetters(rawMapData);
+
+      return { mapId, rawMapData };
+    });
+
+    const loadedMaps = await Promise.all(loadPromises);
+    loadedMaps.forEach(({ mapId, rawMapData }) => {
+      maps[mapId] = rawMapData;
+    });
+
+    isLoaded = true;
+    return maps;
+
+  } catch (err) {
+    console.error('[MapManager] 初期化中に致命的エラーを検知しました:', err);
+    throw err;
+  }
+}
+
+// 念のためトップレベルでも初期化を実行しておく
+await initMapData();

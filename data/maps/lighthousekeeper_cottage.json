@@ -1,5 +1,9 @@
 {
-  "name": "灯台守の小屋",
+  "name": {
+    "ja": "灯台守の小屋",
+    "en": "Lighthouse Cottage",
+    "es": "Cabaña del Farero"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],

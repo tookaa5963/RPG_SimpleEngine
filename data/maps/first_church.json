@@ -1,5 +1,9 @@
 {
-  "name": "始まりの町の教会",
+  "name": {
+    "ja": "始まりの町の教会",
+    "en": "Start: Church",
+    "es": "Inicio: Iglesia"
+  },
   "bgm": "church",
   "encounterRate": 0,
   "monsters": [],
@@ -165,9 +169,17 @@
       "isMoving": false,
       "color": "#3498db",
       "walkTimer": 120,
-      "pages": [
-        "復活の祈りをしておきなよ。"
-      ]
+      "pages": {
+        "ja": [
+          "復活の祈りをしておきなよ。"
+        ],
+        "en": [
+          "Make sure to pray for revival."
+        ],
+        "es": [
+          "Asegúrate de rezar por tu resurrección."
+        ]
+      }
     },
     {
       "id": "inn_keeper",
@@ -183,10 +195,7 @@
       "animFrame": 0,
       "isMoving": false,
       "color": "#3498db",
-      "walkTimer": 120,
-      "pages": [
-        "神様が救ってくれますよ。"
-      ]
+      "walkTimer": 120
     }
   ]
 }

@@ -58,11 +58,7 @@ export class EventManager {
     }
 
     const currentMapId = this.getCurrentMapId ? this.getCurrentMapId() : '';
-    const localizedNpcText = i18n.getNpcText(currentMapId, npc.id);
-    if (localizedNpcText) {
-      this.msgWin.open(localizedNpcText);
-      return 'MESSAGE';
-    }
+    // モブ会話は maps.js のゲッターにより npc.pages で直接多言語解決される
 
     if (npc.pages && npc.pages.length > 0) {
       this.msgWin.open(npc.pages);

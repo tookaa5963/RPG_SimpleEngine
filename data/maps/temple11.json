@@ -1,5 +1,9 @@
 {
-  "name": "地下墓地 地下1階",
+  "name": {
+    "ja": "地下墓地 地下1階",
+    "en": "Catacombs B1",
+    "es": "Catacumbas S1"
+  },
   "bgm": "dungeon",
   "encounterRate": 0.08,
   "monsters": [
@@ -717,24 +721,32 @@
       "gridX": 15,
       "gridY": 23,
       "isOpen": false,
-      "itemId": "sage_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 【賢者の聖水】を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "sage_water"
     },
     {
       "type": "notebook",
       "gridX": 7,
       "gridY": 23,
-      "pages": [
-        "ボロボロの古びたノートが落ちている。",
-        "「……主はこの不気味な古代神殿の最奥を、剣の封印地とお決めになった。",
-        "騎士様はあの恐ろしい青銅の巨兵と刃を交え、ついにこれを沈黙させられた……」",
-        "他は読むことが出来なかった。"
-      ]
+      "pages": {
+        "ja": [
+          "ボロボロの古びたノートが落ちている。",
+          "「……主はこの不気味な古代神殿の最奥を、剣の封印地とお決めになった。",
+          "騎士様はあの恐ろしい青銅の巨兵と刃を交え、ついにこれを沈黙させられた……」",
+          "他は読むことが出来なかった。"
+        ],
+        "en": [
+          "A tattered old notebook lies on the ground.",
+          "'...My lord chose the deepest reaches of this eerie ancient temple as the sword's resting place.",
+          "The knight crossed blades with that dreadful bronze colossus, finally silencing it at last...'",
+          "The rest is illegible."
+        ],
+        "es": [
+          "Un viejo cuaderno destrozado yace en el suelo.",
+          "'...Mi señor eligió las profundidades de este lúgubre templo antiguo para sellar la espada.",
+          "El caballero cruzó aceros con ese temible coloso de bronce, logrando silenciarlo al fin...'",
+          "El resto es ilegible."
+        ]
+      }
     }
   ],
   "npcs": [

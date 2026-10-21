@@ -1,5 +1,9 @@
 {
-  "name": "ドワーフ村",
+  "name": {
+    "ja": "ドワーフ村",
+    "en": "Dwarven Village",
+    "es": "Aldea de los Enanos"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],
@@ -396,10 +400,7 @@
         "minY": 12,
         "maxY": 13
       },
-      "walkTimer": 120,
-      "pages": [
-        "何か用か！\n今忙しいんじゃ！！"
-      ]
+      "walkTimer": 120
     },
     {
       "id": "dwarf_soldier",
@@ -416,10 +417,7 @@
       "animFrame": 0,
       "isMoving": false,
       "color": "#3498db",
-      "walkTimer": 120,
-      "pages": [
-        "リザードマンなんざ、俺がやっつけてやる\nでも、黒竜はちょっと無理だ。"
-      ]
+      "walkTimer": 120
     }
   ]
 }

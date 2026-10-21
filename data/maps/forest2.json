@@ -1,5 +1,9 @@
 {
-  "name": "迷いの森",
+  "name": {
+    "ja": "迷いの森",
+    "en": "Lost Forest",
+    "es": "Bosque Perdido"
+  },
   "bgm": "field",
   "encounterRate": 0.05,
   "monsters": [
@@ -1218,26 +1222,14 @@
       "gridX": 11,
       "gridY": 30,
       "isOpen": false,
-      "itemId": "sage_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 賢者の聖水を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "sage_water"
     },
     {
       "type": "chest",
       "gridX": 20,
       "gridY": 20,
       "isOpen": false,
-      "itemId": "strong_herb",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと上薬草を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "strong_herb"
     }
   ],
   "npcs": []

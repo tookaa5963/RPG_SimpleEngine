@@ -1,5 +1,9 @@
 {
-  "name": "始まりの島",
+  "name": {
+    "ja": "始まりの島",
+    "en": "Starting Island",
+    "es": "Isla del Inicio"
+  },
   "bgm": "field",
   "backgroundImage": "images/maps/first_island_bg.png",
   "data": [

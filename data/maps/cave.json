@@ -1,5 +1,9 @@
 {
-  "name": "北の遺跡",
+  "name": {
+    "ja": "北の遺跡",
+    "en": "Northern Cave",
+    "es": "Cueva del Norte"
+  },
   "bgm": "dungeon",
   "encounterRate": 0.08,
   "monsters": [
@@ -521,36 +525,36 @@
       "gridX": 1,
       "gridY": 1,
       "isOpen": false,
-      "itemId": "herb",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと やくそうを手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "herb"
     },
     {
       "type": "chest",
       "gridX": 9,
       "gridY": 18,
       "isOpen": false,
-      "itemId": "herb",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと やくそうを手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "herb"
     },
     {
       "type": "monument",
       "gridX": 5,
       "gridY": 13,
-      "pages": [
-        "石碑には 盾と竜の紋章が 刻まれている……\nさらに 短い碑文が 彫られている。",
-        "『古の緑竜より授かりし\n我が剣を長櫃に収めた\n資格持ちし者あらわれし時\n再びその使命を果たさん\n船出の前に…』",
-        "この先は かすれて 良く読めない。"
-      ]
+      "pages": {
+        "ja": [
+          "石碑には 盾と竜の紋章が 刻まれている……\nさらに 短い碑文が 彫られている。",
+          "『古の緑竜より授かりし\n我が剣を長櫃に収めた\n資格持ちし者あらわれし時\n再びその使命を果たさん\n船出の前に…』",
+          "この先は かすれて 良く読めない。"
+        ],
+        "en": [
+          "A shield and dragon crest are carved into the monument...\nBelow it, a short inscription is etched.",
+          "'Bestowed by the ancient Green Dragon,\nI sealed my sword within the coffer.\nWhen one worthy appears,\nmay it fulfill its duty once more\nbefore setting sail...'",
+          "The rest is worn away and unreadable."
+        ],
+        "es": [
+          "Un blasón de escudo y dragón está grabado en el monumento...\nDebajo, hay una breve inscripción esculpida.",
+          "'Otorgada por el antiguo Dragón verde,\nhe sellado mi espada en el arca.\nCuando aparezca aquel digno,\nque cumpla su misión una vez más\nantes de zarpar...'",
+          "El resto está desgastado y no se puede leer."
+        ]
+      }
     }
   ],
   "npcs": [
@@ -568,10 +572,7 @@
       "animFrame": 0,
       "isMoving": false,
       "color": "#9b59b6",
-      "walkTimer": 60,
-      "pages": [
-        "ほほほ、わしはこの遺跡を\n調査しておる学者じゃ。"
-      ]
+      "walkTimer": 60
     },
     {
       "id": "gargoyle",

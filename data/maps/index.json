@@ -1,0 +1,132 @@
+{
+  "maps": [
+    {
+      "id": "armor_shop",
+      "file": "armor_shop.json"
+    },
+    {
+      "id": "cave",
+      "file": "cave.json"
+    },
+    {
+      "id": "deep_forest",
+      "file": "deep_forest.json"
+    },
+    {
+      "id": "dragonera_island",
+      "file": "dragonera_island.json"
+    },
+    {
+      "id": "dragons_cave1",
+      "file": "dragons_cave1.json"
+    },
+    {
+      "id": "dragons_cave2",
+      "file": "dragons_cave2.json"
+    },
+    {
+      "id": "dungeon",
+      "file": "dungeon.json"
+    },
+    {
+      "id": "dwarf_village",
+      "file": "dwarf_village.json"
+    },
+    {
+      "id": "dwarf_village_general_shop",
+      "file": "dwarf_village_general_shop.json"
+    },
+    {
+      "id": "first_church",
+      "file": "first_church.json"
+    },
+    {
+      "id": "first_dungeon2",
+      "file": "first_dungeon2.json"
+    },
+    {
+      "id": "first_island",
+      "file": "first_island.json"
+    },
+    {
+      "id": "first_town",
+      "file": "first_town.json"
+    },
+    {
+      "id": "forest",
+      "file": "forest.json"
+    },
+    {
+      "id": "forest2",
+      "file": "forest2.json"
+    },
+    {
+      "id": "forest3",
+      "file": "forest3.json"
+    },
+    {
+      "id": "general_shop",
+      "file": "general_shop.json"
+    },
+    {
+      "id": "inn",
+      "file": "inn.json"
+    },
+    {
+      "id": "lighthousekeeper_cottage",
+      "file": "lighthousekeeper_cottage.json"
+    },
+    {
+      "id": "port_armor_shop",
+      "file": "port_armor_shop.json"
+    },
+    {
+      "id": "port_church",
+      "file": "port_church.json"
+    },
+    {
+      "id": "port_general_shop",
+      "file": "port_general_shop.json"
+    },
+    {
+      "id": "port_inn",
+      "file": "port_inn.json"
+    },
+    {
+      "id": "port_town",
+      "file": "port_town.json"
+    },
+    {
+      "id": "temple",
+      "file": "temple.json"
+    },
+    {
+      "id": "temple11",
+      "file": "temple11.json"
+    },
+    {
+      "id": "temple21",
+      "file": "temple21.json"
+    },
+    {
+      "id": "temple22",
+      "file": "temple22.json"
+    },
+    {
+      "id": "temple3",
+      "file": "temple3.json"
+    },
+    {
+      "id": "undersea_tunnel1",
+      "file": "undersea_tunnel1.json"
+    },
+    {
+      "id": "undersea_tunnel2",
+      "file": "undersea_tunnel2.json"
+    },
+    {
+      "id": "undersea_tunnel3",
+      "file": "undersea_tunnel3.json"
+    }
+  ]
+}

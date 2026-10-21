@@ -1,5 +1,9 @@
 {
-  "name": "地下墓地2階",
+  "name": {
+    "ja": "地下墓地2階",
+    "en": "Catacombs B3",
+    "es": "Catacumbas S3"
+  },
   "bgm": "dungeon",
   "encounterRate": 0.06,
   "monsters": [
@@ -725,52 +729,52 @@
       "gridX": 15,
       "gridY": 23,
       "isOpen": false,
-      "itemId": "sage_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 【賢者の聖水】を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "sage_water"
     },
     {
       "type": "chest",
       "gridX": 4,
       "gridY": 15,
       "isOpen": false,
-      "itemId": "sage_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 【賢者の聖水】を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "sage_water"
     },
     {
       "type": "chest",
       "gridX": 11,
       "gridY": 18,
       "isOpen": false,
-      "itemId": "sage_water",
-      "pagesClosed": [
-        "宝箱を開けた！\nなんと 【賢者の聖水】を手に入れた！"
-      ],
-      "pagesOpened": [
-        "しかし 宝箱は\nからっぽだった。"
-      ]
+      "itemId": "sage_water"
     },
     {
       "type": "notebook",
       "gridX": 10,
       "gridY": 18,
-      "pages": [
-        "血に染まった 古い手記が落ちている。",
-        "「……主は祭壇の長櫃に細工を施し、二重の鍵をかけられた。",
-        "一つは、主がお持ちになったあの鉄の鍵だ。",
-        "だが、もう一つの青銅の鍵は……再び動き出したあの巨兵の体内に、戻されてしまった。",
-        "二つの鍵が揃わぬ限り、剣が……」",
-        "（文字は ここで途切れている……）"
-      ]
+      "pages": {
+        "ja": [
+          "血に染まった 古い手記が落ちている。",
+          "「……主は祭壇の長櫃に細工を施し、二重の鍵をかけられた。",
+          "一つは、主がお持ちになったあの鉄の鍵だ。",
+          "だが、もう一つの青銅の鍵は……再び動き出したあの巨兵の体内に、戻されてしまった。",
+          "二つの鍵が揃わぬ限り、剣が……」",
+          "（文字は ここで途切れている……）"
+        ],
+        "en": [
+          "A bloodstained old journal lies on the ground.",
+          "'...My lord modified the altar's coffer with a double lock.",
+          "One key was the iron key held by my lord.",
+          "However, the other bronze key... was placed back inside that giant when it began moving once more.",
+          "Unless both keys are gathered, the sword cannot...'",
+          "(The writing cuts off here...)"
+        ],
+        "es": [
+          "Un viejo diario manchado de sangre yace en el suelo.",
+          "'...Mi señor modificó el arca del altar con una cerradura doble.",
+          "Una llave era la de hierro que custodiaba mi señor.",
+          "Sin embargo, la otra llave de bronce... fue devuelta al interior de ese coloso cuando volvió a moverse.",
+          "A menos que se reúnan ambas llaves, la espada no...'",
+          "(El texto se corta aquí...)"
+        ]
+      }
     }
   ],
   "npcs": []

@@ -1,5 +1,9 @@
 {
-  "name": "始まりの町の道具屋",
+  "name": {
+    "ja": "始まりの町の道具屋",
+    "en": "Start: Item Shop",
+    "es": "Inicio: Tienda"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],
@@ -98,7 +102,6 @@
       "color": "#f39c12",
       "walkTimer": 999999,
       "isShop": true,
-      "greeting": "いらっしゃい！\n旅の道具を揃えているよ。",
       "shopItems": [
         "torch",
         "lantern",

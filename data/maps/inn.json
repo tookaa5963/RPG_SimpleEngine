@@ -1,5 +1,9 @@
 {
-  "name": "始まりの町の宿屋",
+  "name": {
+    "ja": "始まりの町の宿屋",
+    "en": "Start: Inn",
+    "es": "Inicio: Posada"
+  },
   "bgm": "field",
   "encounterRate": 0,
   "monsters": [],
@@ -210,9 +214,17 @@
       "isMoving": false,
       "color": "#3498db",
       "walkTimer": 120,
-      "pages": [
-        "ふう、ベッドで寝ると\n傷がすっかり治るよ。"
-      ]
+      "pages": {
+        "ja": [
+          "ふう、ベッドで寝ると\n傷がすっかり治るよ。"
+        ],
+        "en": [
+          "Whew, sleeping in a bed\nheals wounds completely."
+        ],
+        "es": [
+          "Uff, dormir en una cama sana todas las heridas por completo."
+        ]
+      }
     }
   ]
 }

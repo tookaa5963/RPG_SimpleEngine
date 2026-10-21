@@ -13,22 +13,18 @@
   "poisonChance": 0.3,
   "sleepResist": 0.5,
   "sealResist": 0.5,
-  "name": {
-    "ja": "ゴーゴン",
-    "en": "Gorgon",
-    "es": "Gorgona"
-  },
   "spells": [
     {
-      "id": "petrifying_gaze",
-      "name": {
-        "ja": "石化の熱視線",
-        "en": "Petrifying Gaze",
-        "es": "Mirada petrificante"
-      },
+      "id": "gira",
+      "nameKey": "spells.petrifying_gaze.name",
       "chance": 0.35,
       "minDmg": 16,
       "maxDmg": 24
     }
-  ]
+  ],
+  "name": {
+    "ja": "ゴーゴン",
+    "en": "Gorgon",
+    "es": "Gorgona"
+  }
 }

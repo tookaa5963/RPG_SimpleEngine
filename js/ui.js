@@ -1,3 +1,4 @@
+import { maps } from './maps.js';
 // FILE_ENTRY: js/ui.js
 import { i18n } from './i18n.js';
 import { ITEM_DB } from './items.js';
@@ -107,7 +108,7 @@ export class UIManager {
     }
     if (this.elements.returnPointName) {
       const mapId = playerStats.returnPoint ? playerStats.returnPoint.mapId : null;
-      this.elements.returnPointName.textContent = mapId ? (i18n.getMapName(mapId) || mapId) : i18n.t('ui.none');
+      this.elements.returnPointName.textContent = mapId ? ((maps[mapId]?.name || mapId) || mapId) : i18n.t('ui.none');
     }
     if (this.elements.controlsText) {
       this.elements.controlsText.innerHTML = i18n.t('ui.controls').replace(/\n/g, '<br>');

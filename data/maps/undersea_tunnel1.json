@@ -1,5 +1,9 @@
 {
-  "name": "海底トンネル",
+  "name": {
+    "ja": "海底トンネル",
+    "en": "Undersea Tunnel 1",
+    "es": "Túnel Submarino 1"
+  },
   "bgm": "dungeon",
   "encounterRate": 0.08,
   "monsters": [

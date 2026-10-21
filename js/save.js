@@ -1,3 +1,4 @@
+import { maps } from './maps.js';
 // FILE_ENTRY: js/save.js
 import { i18n } from './i18n.js';
 
@@ -29,7 +30,7 @@ export class SaveManager {
 
       const data = JSON.parse(raw);
       const lv = data.playerStats?.level ?? 1;
-      const place = i18n.getMapName(data.location?.mapId) || i18n.t('ui.none');
+      const place = (maps[data.location?.mapId]?.name || data.location?.mapId) || i18n.t('ui.none');
       const dateStr = this.formatDateTime(data.savedAt);
       return `${dateStr}  Lv.${lv} ${place}`;
     } catch (e) {
@@ -45,7 +46,7 @@ export class SaveManager {
         playerStats: player.serialize(),
         location: {
           mapId: currentMapId,
-          mapName: i18n.getMapName(currentMapId) || maps[currentMapId]?.name || currentMapId,
+          mapName: (maps[currentMapId]?.name || currentMapId) || maps[currentMapId]?.name || currentMapId,
           gridX: player.gridX,
           gridY: player.gridY,
           direction: player.direction
