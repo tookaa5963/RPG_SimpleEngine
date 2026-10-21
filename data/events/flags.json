@@ -1,0 +1,183 @@
+{
+  "hasPass": {
+    "description": "町長から関所通行手形を受領・所持している状態（Ch1→Ch2導線）",
+    "set_by": [
+      "chapter1_first_island (town_mayor)"
+    ],
+    "checked_by": [
+      "chapter1_first_island (town_mayor)",
+      "chapter1_first_island (girl)",
+      "chapter1_first_island (guard_port)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "rescuedGirl": {
+    "description": "洞窟で娘を救出完了した状態",
+    "set_by": [
+      "chapter1_first_island (girl)"
+    ],
+    "checked_by": [
+      "chapter1_first_island (town_mayor)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "kidnappingEventStarted": {
+    "description": "町長からの娘救出依頼を受諾した状態",
+    "set_by": [
+      "chapter1_first_island (town_mayor)"
+    ],
+    "checked_by": [
+      "chapter1_first_island (town_mayor)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "heardPassRequirement": {
+    "description": "関所の通行条件の確認（関所兵との会話で成立）",
+    "set_by": [
+      "chapter1_first_island (guard_port)"
+    ],
+    "checked_by": [
+      "chapter1_first_island (town_mayor)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "talkedToScholar": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter2_port_and_sea (old_man)"
+    ],
+    "checked_by": [
+      "chapter1_first_island (sister)",
+      "chapter2_port_and_sea (old_man)"
+    ],
+    "scope": "章横断 (Cross-Chapter)"
+  },
+  "receivedSisterHerb": {
+    "description": "シスターから初期支援の薬草を受け取った状態",
+    "set_by": [
+      "chapter1_first_island (sister)"
+    ],
+    "checked_by": [
+      "chapter1_first_island (sister)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "talkedToSister": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter1_first_island (sister)"
+    ],
+    "checked_by": [
+      "chapter2_port_and_sea (old_man)",
+      "chapter2_port_and_sea (lighthousekeeper)"
+    ],
+    "scope": "章横断 (Cross-Chapter)"
+  },
+  "heardOfTizona": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter2_port_and_sea (old_man)"
+    ],
+    "checked_by": [
+      "chapter4_elf_and_spirit (elf)"
+    ],
+    "scope": "章横断 (Cross-Chapter)"
+  },
+  "heardOfDwarf": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter2_port_and_sea (old_man)",
+      "chapter4_elf_and_spirit (elf)"
+    ],
+    "checked_by": [],
+    "scope": "章横断 (Cross-Chapter)"
+  },
+  "reportedMonumentToScholar": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter2_port_and_sea (old_man)"
+    ],
+    "checked_by": [],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "blackLizardQuestCompleted": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter3_dwarf_village (dwarf_soldier)"
+    ],
+    "checked_by": [
+      "chapter3_dwarf_village (dwarf_soldier)",
+      "chapter3_dwarf_village (dwarf_blacksmith)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "blackLizardDefeated": {
+    "description": "未定義のフラグ説明",
+    "set_by": [],
+    "checked_by": [
+      "chapter3_dwarf_village (dwarf_soldier)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "blackLizardQuestStarted": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter3_dwarf_village (dwarf_soldier)"
+    ],
+    "checked_by": [
+      "chapter3_dwarf_village (dwarf_soldier)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "receivedDragonArmor": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter3_dwarf_village (dwarf_blacksmith)"
+    ],
+    "checked_by": [
+      "chapter3_dwarf_village (dwarf_blacksmith)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "cerberusQuestStarted": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter3_dwarf_village (dwarf_blacksmith)"
+    ],
+    "checked_by": [
+      "chapter3_dwarf_village (dwarf_blacksmith)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "returnedLoversRing": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter4_elf_and_spirit (elf)"
+    ],
+    "checked_by": [
+      "chapter4_elf_and_spirit (elf)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "elfQuestStarted": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter4_elf_and_spirit (elf)"
+    ],
+    "checked_by": [
+      "chapter4_elf_and_spirit (elf)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  },
+  "receivedWaterShield": {
+    "description": "未定義のフラグ説明",
+    "set_by": [
+      "chapter4_elf_and_spirit (undine)"
+    ],
+    "checked_by": [
+      "chapter4_elf_and_spirit (elf)",
+      "chapter4_elf_and_spirit (undine)"
+    ],
+    "scope": "章内完結 (Chapter-Local)"
+  }
+}
