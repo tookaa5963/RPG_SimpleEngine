@@ -1,0 +1,339 @@
+{
+  "elf": [
+    {
+      "type": "check_flag",
+      "flag": "heardOfTizona",
+      "if_false": "dummy"
+    },
+    {
+      "type": "check_flag",
+      "flag": "returnedLoversRing",
+      "if_true": "check_shield"
+    },
+    {
+      "type": "check_item",
+      "itemId": "lovers_ring",
+      "if_true": "return_ring"
+    },
+    {
+      "type": "check_flag",
+      "flag": "elfQuestStarted",
+      "if_true": "quest_waiting"
+    },
+    {
+      "label": "quest_start",
+      "type": "set_flag",
+      "flag": "elfQuestStarted",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "この神殿は 遥か昔に建てられたものさ。\nかつては僕たちエルフが 守護していたが、\n大戦乱の時代に 皆この島を去ってしまった。",
+          "僕だけが この島に残り、\n今もこの神殿に 居続けているというわけさ。\nなぜって？……ここは、僕の恋人が眠る場所だからね。",
+          "だが……地下墓地の魔物に、\n僕の恋人が大事にしていた指輪を\n奪われてしまったんだ。",
+          "お願いだ。地下墓地の魔物から\n【恋人の指輪】を 取り戻してもらえないかい？",
+          "取り戻してくれたら、【森の道標】を君にあげるよ。\nエルフの僕には もう必要のないものだからね。",
+          "地下神殿には 今は直接入れないけれど、\n地下墓地から 入る道があるはずだ。\n地下墓地は 神殿の西に入口があるよ。"
+        ],
+        "en": [
+          "This temple was built long ago.\nWe elves once guarded it, but during the great wars,\nmy kin left this island.",
+          "I alone remained behind, staying in this temple.\nWhy? ...Because this is where my beloved rests.",
+          "Yet... the monsters in the catacombs stole the ring\nthat meant the world to her.",
+          "Please, I beg of you.\nCould you recover my Lover's Ring from the monsters?",
+          "If you bring it back, I will grant you the Forest Guide.\nAn elf no longer has any use for it.",
+          "You cannot enter the underground temple directly,\nbut there is a passage from the catacombs to the west."
+        ],
+        "es": [
+          "Este templo fue erigido hace eones.\nLos elfos lo protegíamos, pero durante la gran guerra\ntodos abandonaron esta isla.",
+          "Solo yo me quedé en este templo solitario.\n¿Por qué? ...Porque aquí descansa mi amada.",
+          "Sin embargo... los monstruos de las catacumbas\nle arrebataron el anillo que tanto apreciaba.",
+          "Te lo ruego. ¿Podrías recuperar el Anillo de amantes\nde las garras de esas bestias?",
+          "Si me lo traes, te daré la Guía del bosque.\nUn elfo como yo ya no la necesita.",
+          "No puedes entrar directamente al templo subterráneo,\npero hay un pasaje desde las catacumbas al oeste."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "dummy",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "僕はエルフ。この神殿の守り手さ。",
+          "森の奥へは行かない方がいいよ。危険な魔物がいるからね。"
+        ],
+        "en": [
+          "I am an elf. I watch over this temple.",
+          "You shouldn't venture deeper into the forest. Dangerous monsters lurk there."
+        ],
+        "es": [
+          "Soy un elfo. Cuido de este templo.",
+          "No deberías adentrarte más en el bosque. Hay monstruos peligrosos."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "check_shield",
+      "type": "check_flag",
+      "flag": "receivedWaterShield",
+      "if_true": "has_shield_flow",
+      "if_false": "need_shield"
+    },
+    {
+      "label": "has_shield_flow",
+      "type": "check_item",
+      "itemId": "corrada",
+      "if_true": "has_corrada"
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "ウンディーネから【水霊の盾】を授かったんだね！\nその盾があれば、黒竜の灼熱の炎をも\n防ぐことができるはずだ。",
+          "地下神殿への入口は、この神殿の西にある\n地下墓地の奥深くから通じているよ。",
+          "地下神殿の奥には、かつて緑竜が授けたという\n伝説の剣【コラーダ】が眠っている。",
+          "地下神殿には恐ろしい魔物たちが蠢いている。\nくれぐれも気をつけて行くんだよ。"
+        ],
+        "en": [
+          "You received the Water Spirit Shield from Undine!\nWith that shield, you can ward off even the dragon's searing breath.",
+          "The entrance to the underground temple lies deep within\nthe catacombs to the west of this temple.",
+          "In the depths of the underground temple rests Colada,\nthe legendary blade bestowed by the Green Dragon.",
+          "Fearsome monsters lurk within. Tread with utmost caution."
+        ],
+        "es": [
+          "¡Has recibido el Escudo del espíritu del agua de Ondina!\nCon él podrás contener el aliento abrasador del dragón.",
+          "La entrada al templo subterráneo está en lo profundo\nde las catacumbas, al oeste de este templo.",
+          "Allí descansa Colada, la espada legendaria concedida\npor el Dragón verde en el pasado.",
+          "Dentro habitan criaturas temibles. Ten mucho cuidado."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "has_corrada",
+      "type": "set_flag",
+      "flag": "heardOfDwarf",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "ついに 伝説の剣【コラーダ】を手に入れたんだね！\n君のその指輪の紋章と共鳴しているように見えるよ。",
+          "でも、黒竜の恐ろしい爪撃を防ぐには\n今の防具では まだ耐えきれないだろう。",
+          "島の北東の海岸から、ドワーフの隠れ里へ続く\n【海底トンネル】に入ることができるはずだ。",
+          "彼らなら、太古の黒竜の剥落鱗から作られた\n強固な鎧を持っていると聞いたことがある。\n北東の海岸へ向かってみて！"
+        ],
+        "en": [
+          "You have finally obtained the legendary sword Colada!\nIt seems to resonate with the crest upon your ring.",
+          "However, your current armor will never withstand\nthe ferocious claws of the Black Dragon.",
+          "From the northeast coast of this island, you should find\nthe Undersea Tunnel leading to the hidden dwarven village.",
+          "I hear they possess armor forged from ancient dragon scales.\nHead toward the northeast coast!"
+        ],
+        "es": [
+          "¡Por fin has obtenido la legendaria Colada!\nParece resonar con el blasón de tu anillo.",
+          "Sin embargo, con tu armadura actual jamás soportarás\nlos zarpazos atroces del Dragón negro.",
+          "Desde la costa noreste de la isla podrás entrar\nal Túnel submarino que lleva a la aldea oculta de los enanos.",
+          "He oído que poseen una armadura hecha de escamas del dragón ancestral.\n¡Dirígete a la costa noreste!"
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "need_shield",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "その装備で地下神殿の化け物や\n黒竜と戦うのは無謀だよ。",
+          "森の最深部の祠にいるウンディーネに\n会いに行ってごらん。\n彼女が【水霊の盾】を持っているはずだ。",
+          "森の最深部へは、この神殿の北東の森から\n行くことができるよ。"
+        ],
+        "en": [
+          "Challenging the underground temple or the Black Dragon\nwith your current gear is reckless.",
+          "Go meet Undine at the shrine in the deepest part of the forest.\nShe should possess the Water Spirit Shield.",
+          "You can reach the deep forest from the woods\nnortheast of this temple."
+        ],
+        "es": [
+          "Ir al templo subterráneo o luchar contra el dragón\ncon tu equipo actual es un suicidio.",
+          "Ve a ver a Ondina al santuario en lo más profundo del bosque.\nElla custodia el Escudo del espíritu del agua.",
+          "Puedes llegar al bosque profundo por el camino al noreste."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "return_ring",
+      "type": "remove_item",
+      "itemId": "lovers_ring",
+      "count": 1
+    },
+    {
+      "type": "give_item",
+      "itemId": "forest_guide",
+      "count": 1
+    },
+    {
+      "type": "set_flag",
+      "flag": "returnedLoversRing",
+      "value": true
+    },
+    {
+      "type": "play_sound",
+      "se": "victory"
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "あっ……！ その指輪は、彼女の……！\n地下墓地の魔物から 取り戻してくれたんだね！",
+          "ありがとう……！ 本当にありがとう！\n約束通り、この【森の道標】を君にあげよう。\n（【森の道標】を手に入れた！）",
+          "……君は、本当に黒竜を倒すつもりなんだね。",
+          "その装備で地下神殿の恐ろしい化け物とは戦えないよ。\nまして黒竜とは なおさらだ。",
+          "森の最深部の祠に ウンディーネがいる。\n彼女が【水霊の盾】を持っているはずだから、\nまず会いに行ってみて。",
+          "森の最深部へは、この神殿の北東の森から\n入ることができるよ。"
+        ],
+        "en": [
+          "Ah...! That ring, it belonged to her...!\nYou retrieved it from the beasts in the catacombs!",
+          "Thank you...! Thank you so much!\nAs promised, take this Forest Guide.\n(Acquired Forest Guide!)",
+          "...You truly intend to slay the Black Dragon, don't you?",
+          "Your current equipment will not hold against the horrors below,\nmuch less the Black Dragon itself.",
+          "Undine rests at the shrine in the deepest forest.\nShe holds the Water Spirit Shield. Meet her first.",
+          "You can enter the deep forest through the woods northeast of here."
+        ],
+        "es": [
+          "¡Ah...! ¡Ese anillo, es el de ella...!\n¡Lo recuperaste de las criaturas de las catacumbas!",
+          "¡Gracias...! ¡Muchísimas gracias!\nComo prometí, te entrego esta Guía del bosque.\n(¡Conseguiste Guía del bosque!)",
+          "...De verdad pretendes matar al Dragón negro, ¿verdad?",
+          "No resistirás a los horrores subterráneos con tu equipo,\ny mucho menos al Dragón negro.",
+          "Ondina aguarda en el santuario del bosque profundo.\nTiene el Escudo del espíritu del agua. Ve a verla primero.",
+          "Entra al bosque profundo por el camino al noreste."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "quest_waiting",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "地下墓地は この神殿の西に入口があるよ。\nどうか 魔物から【恋人の指輪】を\n取り戻してほしいんだ。",
+          "指輪を取り戻してくれたら、\n約束通り【森の道標】を渡すよ。"
+        ],
+        "en": [
+          "The catacombs lie to the west of this temple.\nPlease recover the Lover's Ring from the monsters.",
+          "Bring the ring back, and I will grant you the Forest Guide as promised."
+        ],
+        "es": [
+          "Las catacumbas están al oeste de este templo.\nPor favor, recupera el Anillo de amantes de los monstruos.",
+          "Tráeme el anillo y te entregaré la Guía del bosque tal como prometí."
+        ]
+      }
+    }
+  ],
+  "undine": [
+    {
+      "type": "check_flag",
+      "flag": "receivedWaterShield",
+      "if_true": "after"
+    },
+    {
+      "type": "check_inventory_full",
+      "additional": 1,
+      "if_true": "bag_full"
+    },
+    {
+      "type": "set_flag",
+      "flag": "receivedWaterShield",
+      "value": true
+    },
+    {
+      "type": "give_item",
+      "itemId": "water_shield",
+      "count": 1
+    },
+    {
+      "type": "play_sound",
+      "se": "victory"
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "ウンディーネ「エルフから もう話は聞きました。\n緑竜より預かりし【水霊の盾】をお貸ししましょう。」",
+          "（【水霊の盾】を手に入れた！）",
+          "ウンディーネ「その盾は 古の加護を帯び、\n黒竜の灼熱の炎をも 払い除ける力を宿しています。」",
+          "ウンディーネ「黒竜に立ち向かう勇気ある者よ、\nどうかご無事で……」"
+        ],
+        "en": [
+          "Undine: \"I have heard your tale from the elf.\nI shall grant you the Water Spirit Shield entrusted by the Green Dragon.\"",
+          "(Acquired Water Spirit Shield!)",
+          "Undine: \"Carrying an ancient blessing, this shield holds the power\nto repel the Black Dragon's searing flames.\"",
+          "Undine: \"Brave soul confronting the dragon, may fortune guide you...\""
+        ],
+        "es": [
+          "Ondina: \"Ya he oído la historia del elfo.\nTe confiaré el Escudo del espíritu del agua del Dragón verde.\"",
+          "(¡Conseguiste Escudo del espíritu del agua!)",
+          "Ondina: \"Con una bendición antigua, este escudo tiene el poder\nde repeler las llamas abrasadoras del Dragón negro.\"",
+          "Ondina: \"Valiente que desafía al dragón, que las aguas te guíen...\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "after",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "ウンディーネ「【水霊の盾】が あなたの力となりますように。\nエルフの待つ神殿へ戻り、\nどうかご無事で 旅をお続けください。」"
+        ],
+        "en": [
+          "Undine: \"May the Water Spirit Shield serve as your strength.\nReturn to the temple where the elf awaits, and travel safely.\""
+        ],
+        "es": [
+          "Ondina: \"Que el Escudo del espíritu del agua te dé fuerza.\nRegresa al templo donde aguarda el elfo y viaja a salvo.\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "bag_full",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "ウンディーネ「エルフから もう話は聞きました。\n【水霊の盾】をお渡ししたいのですが、\n荷物がいっぱいのようです。」",
+          "ウンディーネ「持ち物を整理してから\n再び 訪れてください。」"
+        ],
+        "en": [
+          "Undine: \"I have heard your tale from the elf.\nI wish to grant you the Water Spirit Shield, but your bag is full.\"",
+          "Undine: \"Please return after sorting your belongings.\""
+        ],
+        "es": [
+          "Ondina: \"Ya he oído la historia del elfo.\nQuisiera entregarte el escudo, pero tu bolsa está llena.\"",
+          "Ondina: \"Por favor, ordena tus pertenencias y regresa.\""
+        ]
+      }
+    }
+  ]
+}

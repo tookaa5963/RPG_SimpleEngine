@@ -1,0 +1,280 @@
+{
+  "old_man": [
+    {
+      "type": "check_map",
+      "mapId": "port_town",
+      "if_true": "port_town_logic"
+    },
+    {
+      "type": "check_flag",
+      "flag": "talkedToSister",
+      "if_false": "dummy"
+    },
+    {
+      "type": "check_item",
+      "itemId": "antique_key",
+      "if_true": "reported"
+    },
+    {
+      "type": "check_item",
+      "itemId": "key",
+      "if_true": "reported"
+    },
+    {
+      "type": "check_flag",
+      "flag": "talkedToScholar",
+      "if_true": "cave_waiting"
+    },
+    {
+      "type": "set_flag",
+      "flag": "talkedToScholar",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "ほほほ、わしはこの遺跡を\n調査しておる学者じゃ。",
+          "ほう、指輪の紋章を見てほしいと？\nどれどれ・・・。",
+          "……むむ！？ この紋章の指輪をどこで？！\n異国の者がこの紋章を・・・",
+          "・・・ ・・・ ・・・\n・・・ ・・・ ・・・",
+          "実はこの遺跡の奥に同じ紋章が刻まれた石碑がある\n儂も若いころに一度見たきりじゃが・・・。",
+          "今ではこの遺跡には魔物たちが住み着いてしまって\n奥の様子を調査することが出来ぬのじゃ",
+          "特に奥の方には像の魔物が住んでおり\n遺跡の奥を調べることはもはやできん。",
+          "おぬしの素性を知りたいのなら、\nこの遺跡の奥の石碑を調べてみるがよい。\nなにか手掛かりが分かるかもしれん",
+          "もし、像の魔物を倒し石碑を調べたならば\n儂の所に戻ってくるのじゃ、なにか出来るかもしれん。"
+        ],
+        "en": [
+          "Hohoho! I am a scholar investigating these ruins.",
+          "Oh? You wish for me to examine your ring's crest?\nLet me take a look...",
+          "...What?! Where did you get a ring with this crest?!\nA foreigner bearing this emblem...",
+          "... ... ...\n... ... ...",
+          "Truth be told, a monument bearing this exact crest lies deep within these ruins.\nI only saw it once in my youth...",
+          "Alas, monsters have nested here now,\nmaking it impossible to explore the interior.",
+          "A gargoyle blocks the path further in,\npreventing any investigation.",
+          "If you seek your identity, investigate the monument beyond that beast.\nYou may find a clue to who you are.",
+          "Should you fell the gargoyle and inspect the stone, return to me.\nI may be able to shed light on your lineage."
+        ],
+        "es": [
+          "¡Jajaja! Soy un erudito que investiga estas ruinas.",
+          "¿Quieres que examine el blasón de tu anillo?\nA ver, déjame mirar...",
+          "...¡¿Qué?! ¡¿Dónde conseguiste un anillo con este blasón?!\nUn extranjero con este emblema...",
+          "... ... ...\n... ... ...",
+          "A decir verdad, en lo profundo de estas ruinas hay un monumento con este mismo blasón.\nSolo lo vi una vez en mi juventud...",
+          "Pero ahora las bestias han anidado aquí\ny es imposible investigar el interior.",
+          "Una gárgola bloquea el camino,\nimpidiendo cualquier avance.",
+          "Si deseas conocer tu identidad, examina el monumento más allá de ese monstruo.\nPodrías encontrar una pista de tu origen.",
+          "Si vences a la gárgola y miras la piedra, vuelve a verme.\nQuizá pueda ayudarte."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "port_town_logic",
+      "type": "set_flag",
+      "flag": "heardOfTizona",
+      "value": true
+    },
+    {
+      "type": "check_item",
+      "itemId": "corrada",
+      "if_true": "port_corrada"
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "おお、無事に来てくれたな！\n儂はこの図書館で、あの石碑と指輪の紋章について\n古文書を調べておったところじゃ。",
+          "古文書によれば、かつて大陸より訪れた英雄が\n緑竜の加護を受け、災厄の黒竜を討伐したとある。\nそして英雄は二つの遺産を島に残したそうじゃ。",
+          "黒竜の炎を遮る【水霊の盾】と、\n竜の強固な鱗を貫く名剣【コラーダ】じゃ。\nどちらも島の中央、迷いの森と神殿の奥に眠っておる。",
+          "……それにしても、おぬしの指輪の紋章は\nかの英雄のものとあまりに酷似しておる。\nだが大陸の記録では、英雄の直系は途絶えたはず……",
+          "おぬしが何者なのか、儂にもまだ分からん。\nだが、迷いの森の遺産を手にすることができれば、\nその答えは海の向こうの大陸で見つかるかもしれんな。"
+        ],
+        "en": [
+          "Ah, you made it safely!\nI have been examining ancient texts here in the library\nregarding the stone monument and your ring's crest.",
+          "The records state that a hero from the continent once arrived with the Green Dragon's blessing,\nslew the calamitous Black Dragon, and left two relics behind.",
+          "The Water Spirit Shield to ward off dragon flames, and Colada to pierce dragon scales.\nBoth rest within the central Lost Forest and temple.",
+          "...However, your ring's crest is nearly identical to that hero's.\nYet continental records claim the hero's direct line died out long ago...",
+          "Who you truly are, I still cannot say.\nYet if you claim the relics of the Lost Forest,\nyour answers may await across the sea on the continent."
+        ],
+        "es": [
+          "¡Ah, has llegado sano y salvo!\nHe estado investigando textos antiguos en esta biblioteca\nacerca del monumento de piedra y el blasón de tu anillo.",
+          "Cuentan que un héroe del continente llegó con la bendición del Dragón verde,\nderrotó al funesto Dragón negro y dejó dos reliquias en la isla.",
+          "El Escudo del espíritu para frenar sus llamas y la espada Colada para quebrar sus escamas.\nAmbos yacen en el Bosque Perdido y el templo.",
+          "...Sin embargo, el blasón de tu anillo es casi idéntico al del héroe.\nAunque los anales afirman que su linaje se extinguió hace mucho...",
+          "Aún no puedo afirmar quién eres en realidad.\nPero si obtienes las reliquias del bosque,\ntus respuestas podrían aguardar al otro lado del mar."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "port_corrada",
+      "type": "set_flag",
+      "flag": "heardOfDwarf",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "おお！ その手に輝くのは 名剣【コラーダ】！\nついに 神殿の遺産を手にしたのじゃな！",
+          "じゃが 古文書の記述によれば、黒竜の猛撃を\n防ぐには まだ防具が心許ない。",
+          "島の北東の海岸に、海底深くへと続く\n【海底トンネル】の入口があるそうじゃ。",
+          "その先にある ドワーフの隠れ里へ行けば、\n竜の爪を弾く【竜鱗の鎧】が 手に入るやもしれん。\n北東の海岸へ向かうのじゃ！"
+        ],
+        "en": [
+          "Oho! That gleaming blade in your hand is Colada!\nYou finally claimed the temple's legacy!",
+          "Yet according to ancient texts, your armor is still insufficient\nto weather the Black Dragon's ferocious onslaught.",
+          "On the northeast coast of this island lies the entrance\nto an Undersea Tunnel leading into the abyss.",
+          "Beyond it, in the hidden dwarven village,\nyou may find Dragon Scale Armor that deflects dragon claws.\nMake haste to the northeast coast!"
+        ],
+        "es": [
+          "¡Oh! ¡Esa espada resplandeciente es Colada!\n¡Por fin obtuviste el legado del templo!",
+          "Sin embargo, según los textos antiguos, tu armadura\naún no bastará contra los ataques del dragón.",
+          "En la costa noreste de la isla se encuentra la entrada\na un Túnel submarino que desciende al abismo.",
+          "Más allá, en la aldea oculta de los enanos,\npodrías conseguir la armadura que repele sus garras.\n¡Ve de inmediato a la costa noreste!"
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "dummy",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "ほほほ、わしはこの遺跡を\n調査しておる学者じゃ。",
+          "この遺跡は かなり古い時代のものでな。\n奥には 貴重な碑文があるらしいのじゃが……",
+          "魔物が住み着いてしまって、\n調査が進まんのじゃよ。"
+        ],
+        "en": [
+          "Hohoho! I am a scholar investigating these ruins.",
+          "These ruins are quite ancient. I believe there is a valuable inscription deep within...",
+          "But monsters have settled in, so my investigation has stalled."
+        ],
+        "es": [
+          "¡Jajaja! Soy un erudito que investiga estas ruinas.",
+          "Estas ruinas son muy antiguas. Creo que hay una inscripción valiosa en lo más profundo...",
+          "Pero los monstruos se han instalado, así que mi investigación está paralizada."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "reported",
+      "type": "set_flag",
+      "flag": "reportedMonumentToScholar",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "おお、あの魔物を倒し、\n碑文を調べたのか！",
+          "ふむふむ。。。\n・・・・ ・・・・ ・・・・",
+          "やはり、石碑にも盾と竜の紋章が刻まれておったか\nこれは更なる調査が必要なようじゃ・・・。",
+          "自身のことが知りたければ\nまた港町の図書館で会おうではないか\n儂は先に北東の港町の図書館へ向かうぞ",
+          "学者は慌てた様子で去って行ってしまった。"
+        ],
+        "en": [
+          "Oho, you defeated the beast and investigated the monument!",
+          "Hmm, let me see... Hmm, hmm...",
+          "As I thought, the shield and dragon crest were engraved upon it.\nThis warrants further investigation...",
+          "If you wish to discover your origins, meet me at the library in the port town.\nI shall head to the port town in the northeast ahead of you.",
+          "The scholar hurried away in excitement."
+        ],
+        "es": [
+          "¡Oh, derrotaste a la bestia e investigaste la inscripción!",
+          "Mmm, déjame ver... Ya veo, ya veo...",
+          "Como pensaba, el escudo y el dragón estaban grabados allí.\nEsto requiere una investigación más profunda...",
+          "Si deseas conocer tu origen, búscame en la biblioteca del pueblo costero.\nMe adelantaré hacia el noreste.",
+          "El erudito se marchó apresuradamente."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "cave_waiting",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "おぬしの素性を知りたいのなら、\nこの遺跡の奥の石碑を調べてみるがよい。\nなにか手掛かりが分かるかもしれん",
+          "もし、像の魔物を倒し石碑を調べたならば\n儂の所に戻ってくるのじゃ、なにか出来るかもしれん。"
+        ],
+        "en": [
+          "If you seek your identity, investigate the monument deep within.\nYou may find a clue to your origins.",
+          "Should you defeat the gargoyle and inspect the stone, return to me."
+        ],
+        "es": [
+          "Si deseas conocer tu identidad, examina el monumento en las profundidades.\nPodrías hallar pistas sobre tus orígenes.",
+          "Si derrotas a la gárgola y miras la inscripción, regresa a verme."
+        ]
+      }
+    }
+  ],
+  "lighthousekeeper": [
+    {
+      "type": "check_flag",
+      "flag": "talkedToSister",
+      "if_true": "after"
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "目が覚めたかい？\nこのまま起きないのじゃないかと思ったよ……\nお前はタフな男だな。\nあんな嵐で生き残るなんて。",
+          "何も覚えていないのか？\n海岸で倒れていたから助けたが……\nまずは、元気になってよかった。",
+          "しかし、記憶がないってのは困ったものだな\n俺のような一介の灯台守では、何もしてやれない",
+          "そうだ\nとりあえず教会へ行って\n相談してみたらどうだ？",
+          "それとその指輪、\n何か身元の手がかりになりそうじゃないか。\n金色の盾に緑の竜の紋章。",
+          "外に出ればすぐに町は見えるから\n気を付けて行くんだぞ。"
+        ],
+        "en": [
+          "You're awake? I almost thought you wouldn't open your eyes...\nYou're a tough one, surviving a storm like that.",
+          "You don't remember anything? I rescued you after finding you collapsed on the shore...\nWell, glad to see you're on your feet.",
+          "Still, losing your memories is quite a predicament.\nA humble lighthouse keeper like me can't do much for you.",
+          "I know. Why not visit the church in town\nand ask for advice?",
+          "Besides, that ring might hold a clue to your identity.\nA golden shield with a green dragon crest.",
+          "Step outside and you'll see the town right away.\nTake care out there."
+        ],
+        "es": [
+          "¿Despertaste? Temía que no volvieras a abrir los ojos...\nEres un tipo duro para sobrevivir a semejante tormenta.",
+          "¿No recuerdas nada? Te encontré desplomado en la orilla...\nEn fin, me alegro de que estés bien.",
+          "Pero no tener memoria es un grave problema.\nUn simple farero como yo poco puede hacer por ti.",
+          "Ya sé. ¿Por qué no vas a la iglesia del pueblo\ny pides consejo?",
+          "Además, ese anillo podría ser una pista sobre quién eres.\nUn escudo dorado con el blasón de un dragón verde.",
+          "Sal y verás el pueblo enseguida.\nTen mucho cuidado."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "after",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "まずは、元気になってよかった。\nなにか思い出したかい？"
+        ],
+        "en": [
+          "Glad to see you up and about.\nRemembered anything yet?"
+        ],
+        "es": [
+          "Me alegra verte bien.\n¿Has recordado algo ya?"
+        ]
+      }
+    }
+  ]
+}

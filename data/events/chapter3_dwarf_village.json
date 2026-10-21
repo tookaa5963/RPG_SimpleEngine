@@ -1,0 +1,375 @@
+{
+  "dwarf_soldier": [
+    {
+      "type": "check_flag",
+      "flag": "blackLizardQuestCompleted",
+      "if_true": "after_complete"
+    },
+    {
+      "type": "check_flag",
+      "flag": "blackLizardDefeated",
+      "if_true": "check_quest_started"
+    },
+    {
+      "type": "check_flag",
+      "flag": "blackLizardQuestStarted",
+      "if_true": "waiting"
+    },
+    {
+      "label": "start_quest",
+      "type": "set_flag",
+      "flag": "blackLizardQuestStarted",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "守備兵「最近見かけるようになった黒いリザードマンが、\nトンネル内の魔物たちを統率し始めて 手を焼いているんだ。",
+          "守備兵「海底トンネルの中腹あたりで、\n待ち伏せしているという報告がある。",
+          "守備兵「腕に自信があるなら、そいつを仕留めてきてくれないか？\n成功したら俺の【火炎の護符】をくれてやるし、\n鍛冶屋の親父にも 宝の鎧を貸してもらえるよう頼んでやる！」"
+        ],
+        "en": [
+          "Guard: \"A black lizardman has appeared lately,\nrallying the monsters in the tunnel and causing us trouble.",
+          "Guard: \"Reports say it's lying in ambush around the middle\nof the Undersea Tunnel.",
+          "Guard: \"If you're confident in your skills, will you take it down?\nSucceed, and I'll give you my Fire Ward,\nand convince the blacksmith to lend you the treasure armor!\""
+        ],
+        "es": [
+          "Guardia: \"Últimamente ha aparecido un hombre lagarto negro\nque lidera a los monstruos del túnel y nos causa problemas.",
+          "Guardia: \"Dicen los informes que tiende emboscadas a mitad\ndel Túnel Submarino.",
+          "Guardia: \"Si confías en tu fuerza, ¿podrías acabar con él?\n¡Si lo logras, te daré mi Talismán ígneo y convenceré al herrero\npara que te preste la armadura del tesoro!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "check_quest_started",
+      "type": "check_flag",
+      "flag": "blackLizardQuestStarted",
+      "if_true": "give_reward",
+      "if_false": "start_quest"
+    },
+    {
+      "label": "give_reward",
+      "type": "check_inventory_full",
+      "additional": 1,
+      "if_true": "bag_full"
+    },
+    {
+      "type": "give_item",
+      "itemId": "fire_charm",
+      "count": 1
+    },
+    {
+      "type": "set_flag",
+      "flag": "blackLizardQuestCompleted",
+      "value": true
+    },
+    {
+      "type": "play_sound",
+      "se": "victory"
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "守備兵「おお！ あの黒いリザードマンを討ち取ったか！\nこれでトンネルの安全も 保たれるというものだ。",
+          "守備兵「約束通り、俺の【火炎の護符】をくれてやる！\n（【火炎の護符】を手に入れた！）",
+          "守備兵「お前なら黒竜にも立ち向かえるかもしれんな。\n鍛冶屋の親父にも 話を通しておいてやるよ！」"
+        ],
+        "en": [
+          "Guard: \"Oho! You felled that black lizardman!\nWith this, the tunnel's safety is secured.",
+          "Guard: \"As promised, take my Fire Ward!\n(Acquired Fire Ward!)",
+          "Guard: \"With strength like yours, you might even stand a chance against the Black Dragon.\nI'll put in a good word with the blacksmith!\""
+        ],
+        "es": [
+          "Guardia: \"¡Oh! ¡Derrotaste a ese hombre lagarto negro!\nCon esto la seguridad del túnel queda restablecida.",
+          "Guardia: \"¡Tal como prometí, toma mi Talismán ígneo!\n(¡Conseguiste Talismán ígneo!)",
+          "Guardia: \"Con tu fuerza, tal vez puedas enfrentarte al Dragón negro.\n¡Hablaré con el herrero en tu favor!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "bag_full",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "守備兵「おお！ あの黒いリザードマンを討ち取ったか！\n約束通り【火炎の護符】を渡したいが、荷物がいっぱいだな。\n整理してから また来てくれ！」"
+        ],
+        "en": [
+          "Guard: \"Oho! You felled that black lizardman!\nI'd like to hand over the Fire Ward as promised, but your pack is full.\nMake room and come back!\""
+        ],
+        "es": [
+          "Guardia: \"¡Oh! ¡Derrotaste a ese hombre lagarto negro!\nQuisiera darte el Talismán ígneo como prometí, pero tu bolsa está llena.\n¡Haz espacio y regresa!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "waiting",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "守備兵「たった今、報告が入った！\n毒の沼を４つ越えたところで 見かけたと！",
+          "守備兵「そいつを仕留めてきてくれたら、\n俺の【火炎の護符】をくれてやるし、\n鍛冶屋の親父にも 宝の鎧を貸すよう頼んでやる！\n急いで急行するんだ！」"
+        ],
+        "en": [
+          "Guard: \"A report just came in!\nIt was sighted just past 4 tiles of poison swamp!",
+          "Guard: \"Defeat it, and I'll grant you my Fire Ward\nand ask the blacksmith to lend you the treasure armor!\nMake haste!\""
+        ],
+        "es": [
+          "Guardia: \"¡Acaba de llegar un informe!\n¡Lo vieron justo después de cruzar 4 ciénagas venenosas!",
+          "Guardia: \"¡Derrótalo y te entregaré mi Talismán ígneo,\ny le pediré al herrero que te preste la armadura sagrada!\n¡Ve de inmediato!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "after_complete",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "守備兵「お前の強さなら、黒竜にも立ち向かえるかもしれんな。\n鍛冶屋の親父のところで 鎧を仕立ててもらうんだな！」"
+        ],
+        "en": [
+          "Guard: \"With your strength, you might even face the Black Dragon.\nGo have the blacksmith tailor that armor for you!\""
+        ],
+        "es": [
+          "Guardia: \"Con tu fuerza, quizá puedas desafiar al Dragón negro.\n¡Ve con el herrero para que te ajuste la armadura!\""
+        ]
+      }
+    }
+  ],
+  "dwarf_blacksmith": [
+    {
+      "type": "check_item",
+      "itemId": "corrada",
+      "if_false": "busy"
+    },
+    {
+      "type": "check_item",
+      "itemId": "dragon_armor",
+      "if_true": "wearing"
+    },
+    {
+      "type": "check_flag",
+      "flag": "receivedDragonArmor",
+      "if_true": "wearing"
+    },
+    {
+      "type": "check_flag",
+      "flag": "blackLizardQuestCompleted",
+      "if_false": "need_trust"
+    },
+    {
+      "type": "check_flag",
+      "flag": "cerberusQuestStarted",
+      "if_false": "ask_quest"
+    },
+    {
+      "type": "check_item",
+      "itemId": "cerberus_mane",
+      "if_true": "craft_armor"
+    },
+    {
+      "label": "quest_waiting",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "鍛冶屋「どうした！ 【ケルベロスの鬣】はまだか！",
+          "鍛冶屋「竜の洞窟へ向かい、【ケルベロス】を倒して\n【ケルベロスの鬣】を持ち帰るんじゃ！"
+        ],
+        "en": [
+          "Blacksmith: \"What is it! Have you not brought the Cerberus Mane yet?",
+          "Blacksmith: \"Head to the dragon's cavern, defeat Cerberus,\nand bring back its mane!\""
+        ],
+        "es": [
+          "Herrero: \"¡¿Qué pasa?! ¡¿Aún no has traído la Melena de cerbero?!",
+          "Herrero: \"¡Ve a la cueva del dragón, derrota a Cerbero\ny trae su melena!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "busy",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "鍛冶屋「何か用か！\n今忙しいんじゃ！！"
+        ],
+        "en": [
+          "Blacksmith: \"What do you want!\nI'm busy right now!!\""
+        ],
+        "es": [
+          "Herrero: \"¡¿Qué quieres?!\n¡¡Ahora estoy ocupado!!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "wearing",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "鍛冶屋「太古の黒竜の剥落鱗で作った【竜鱗の鎧】、\nその着心地はどうじゃ？",
+          "鍛冶屋「黒竜を討ち果たしたら、\n我がドワーフの神体、必ず返しに来るんじゃぞ！」"
+        ],
+        "en": [
+          "Blacksmith: \"How does the Dragon Scale Armor feel?\nCrafted from the molted scales of the ancient black dragon!",
+          "Blacksmith: \"Once you have vanquished the Black Dragon,\nbe sure to return our sacred relic!\""
+        ],
+        "es": [
+          "Herrero: \"¿Qué tal sienta la Armadura de escamas de dragón?\n¡Forjada con escamas mudadas del dragón negro ancestral!",
+          "Herrero: \"¡Cuando derrotes al dragón,\nasegúrate de devolver nuestra reliquia sagrada!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "need_trust",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "鍛冶屋「ん？ なんだおぬし。\nよそ者に村の宝を 易々と貸せるわけがなかろう。",
+          "鍛冶屋「村の守備兵が トンネルの魔物に手を焼いておる。\nまずは腕っぷしを証明し、信頼を勝ち取ってくるんじゃな！」"
+        ],
+        "en": [
+          "Blacksmith: \"Hmm? Who do you think you are?\nI won't lend our village treasure to an outsider so easily.",
+          "Blacksmith: \"Our guard is having trouble with the monsters in the tunnel.\nProve your mettle to him first and earn our trust!\""
+        ],
+        "es": [
+          "Herrero: \"¿Mmm? ¿Quién te crees que eres?\nNo prestaré el tesoro de la aldea a un forastero tan fácilmente.",
+          "Herrero: \"Nuestro guardia tiene problemas con los monstruos del túnel.\n¡Demuéstrale tu valía primero y gánate nuestra confianza!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "ask_quest",
+      "type": "set_flag",
+      "flag": "cerberusQuestStarted",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "鍛冶屋「……むむ！？ おぬしが手挟んでいるその剣は、\nかつて英雄が振るった名剣【コラーダ】ではないか！",
+          "鍛冶屋「その剣の主ならば、黒竜を倒す資格がある。\n我が里の神体『太古の黒竜の剥落鱗』で作られた\n最高硬度の【竜鱗の鎧】を貸してやりたいところじゃが……",
+          "鍛冶屋「ドワーフ規格の鎧は幅広・短身ゆえ、\nそのままでは人間の体格に合わんのじゃ。",
+          "鍛冶屋「切削不能な外殻の隙間を埋め、かつ高熱を防ぐ\n緩衝ライナーとして、竜の洞窟の入口を塞ぐ魔獣\n【ケルベロス】の鬣が必要じゃ！",
+          "鍛冶屋「竜の洞窟へ向かい、【ケルベロス】を倒して\n【ケルベロスの鬣】を持ち帰ってくだされ！\n突貫でおぬし専用のサイズに仕立て直してやろう！」"
+        ],
+        "en": [
+          "Blacksmith: \"...What's this!? That blade at your hip...\nIs that not the legendary Colada once wielded by the hero?!",
+          "Blacksmith: \"If you are master of that sword, you have the right to challenge the dragon.\nI'd lend you our village's sacred Dragon Scale Armor, but...\"",
+          "Blacksmith: \"Dwarven armor is broad and short.\nIt will not fit a human's build as it is.",
+          "Blacksmith: \"To cushion the unworkable outer shell and protect from extreme heat,\nwe need the mane of the beast Cerberus guarding the entrance of the dragon's cavern!",
+          "Blacksmith: \"Head to the cavern, defeat Cerberus, and bring back its mane!\nI shall tailor it specifically for your size!\""
+        ],
+        "es": [
+          "Herrero: \"...¡¿Qué?! Esa espada que llevas al cinto...\n¡¿No es la legendaria Colada blandida por el héroe?!",
+          "Herrero: \"Si eres su dueño, tienes derecho a desafiar al dragón.\nTe prestaría la sagrada armadura de escamas de nuestra aldea, pero...\"",
+          "Herrero: \"La talla enana es ancha y baja.\nNo le quedará a un humano tal como está.",
+          "Herrero: \"Para rellenar el interior y soportar el calor abrasador,\n¡necesito la melena de Cerbero, la bestia de la cueva del dragón!",
+          "Herrero: \"¡Ve a la cueva, derrota a Cerbero y trae su melena!\n¡La adaptaré a tu medida inmediatamente!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "craft_armor",
+      "type": "check_inventory_full",
+      "additional": 0,
+      "if_true": "bag_full"
+    },
+    {
+      "type": "remove_item",
+      "itemId": "cerberus_mane",
+      "count": 1
+    },
+    {
+      "type": "give_item",
+      "itemId": "dragon_armor",
+      "count": 1
+    },
+    {
+      "type": "set_flag",
+      "flag": "receivedDragonArmor",
+      "value": true
+    },
+    {
+      "type": "play_sound",
+      "se": "victory"
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "鍛冶屋「おお！ 竜の洞窟の門番たる\n灼熱の【ケルベロス】を 討ち果たしてくれたか！",
+          "鍛冶屋「よし！ この鬣を耐火インナーとして織り込み、\n黒竜の剥落鱗をおぬしの体格に合わせて\n突貫で仕立て直してやるぞ！",
+          "カン！ カン！ カン！ ……ジューッ！！",
+          "鍛冶屋「完成じゃ！ 最高硬度の物理防御と耐火性を誇る\nドワーフ秘伝の【竜鱗の鎧】を受け取るがよい！\n（【竜鱗の鎧】を手に入れた！）」",
+          "鍛冶屋「よいか、黒竜を討ち倒したあかつきには、\n必ず儂のところへ返しに来るんじゃぞ！」"
+        ],
+        "en": [
+          "Blacksmith: \"Superb! You brought back the searing Cerberus Mane\nfrom the fierce beast guarding the dragon's cavern!",
+          "Blacksmith: \"Right then! I will weave this mane as a heat-resistant liner,\nand refit the dragon scale armor to your frame in a flash!",
+          "*Clang! Clang! Clang! ...Sssssssss!!*",
+          "Blacksmith: \"It is finished! Behold the secret dwarven Dragon Scale Armor,\nboasting the highest physical defense and heat resistance!\n(Acquired Dragon Scale Armor!)\"",
+          "Blacksmith: \"Remember, once the Black Dragon is slain,\nyou must return it to my forge!\""
+        ],
+        "es": [
+          "Herrero: \"¡Magnífico! ¡Has traído la ardiente Melena de cerbero\nde la feroz bestia que guardaba la cueva del dragón!",
+          "Herrero: \"¡Bien! ¡Usaré esta melena como forro aislante\ny ajustaré las escamas de dragón a tu complexión en un santiamén!",
+          "*¡Clang! ¡Clang! ¡Clang! ...¡¡Fssssss!!*",
+          "Herrero: \"¡Terminado! ¡Toma la Armadura de escamas secreta de los enanos,\ncon la más alta defensa y resistencia al fuego!\n(¡Conseguiste Armadura de escamas de dragón!)\"",
+          "Herrero: \"¡Recuerda que cuando el dragón caiga,\ndebes volver para devolvérmela!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "bag_full",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "鍛冶屋「おお！ その【ケルベロスの鬣】を\n持ち帰ってくれたのか！",
+          "鍛冶屋「すぐに鎧を仕立て直したいが、\n荷物がいっぱいのようじゃな。\n道具を整理してから また来なさい！」"
+        ],
+        "en": [
+          "Blacksmith: \"Oh! You brought back the Cerberus Mane!",
+          "Blacksmith: \"I'd like to tailor the armor right away,\nbut your bag is completely full.\nSort your gear and come back!\""
+        ],
+        "es": [
+          "Herrero: \"¡Oh! ¡Has traído la Melena de cerbero!",
+          "Herrero: \"Quisiera forjar la armadura ahora mismo,\npero tu bolsa está llena.\n¡Organiza tus cosas y vuelve!\""
+        ]
+      }
+    }
+  ]
+}

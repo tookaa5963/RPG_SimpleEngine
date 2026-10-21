@@ -4,14 +4,41 @@ import { i18n } from './i18n.js';
 
 export let EVENT_DB = {};
 
+let isLoaded = false;
+
 export async function initEventData() {
+  if (isLoaded) return EVENT_DB;
+
   try {
-    const res = await fetch('data/events.json');
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status} on events.json`);
-    EVENT_DB = await res.json();
-    console.log("EVENT_DB initialized successfully from JSON.");
+    const manifestRes = await fetch('data/events/index.json');
+    if (!manifestRes.ok) {
+      throw new Error(`[DataValidationError] events.js: イベントマニフェスト取得失敗 (status: ${manifestRes.status})`);
+    }
+
+    const manifest = await manifestRes.json();
+    if (!manifest || !Array.isArray(manifest.chapters)) {
+      throw new Error(`[DataValidationError] events.js: マニフェスト形式が不正です (chapters 配列が存在しません)`);
+    }
+
+    const loadPromises = manifest.chapters.map(async (filename) => {
+      const res = await fetch(`data/events/${filename}`);
+      if (!res.ok) {
+        throw new Error(`[DataValidationError] events.js: 章データ取得失敗: ${filename} (status: ${res.status})`);
+      }
+      return await res.json();
+    });
+
+    const chapters = await Promise.all(loadPromises);
+    EVENT_DB = {};
+    chapters.forEach(chapterData => {
+      Object.assign(EVENT_DB, chapterData);
+    });
+
+    isLoaded = true;
+    console.log("EVENT_DB initialized successfully from chapters.");
+    return EVENT_DB;
   } catch (error) {
-    console.error("Failed to fetch event data:", error);
+    console.error("[EventManager] イベントデータ初期化中に致命的エラー:", error);
     throw error;
   }
 }
@@ -100,10 +127,15 @@ export class EventManager {
     switch (cmd.type) {
       case 'show_dialog':
         let text = [];
-        if (cmd.textKey) {
+        if (cmd.text) {
+          const resolved = (typeof cmd.text === 'object' && !Array.isArray(cmd.text))
+            ? i18n.resolve(cmd.text)
+            : cmd.text;
+          text = Array.isArray(resolved) ? resolved : [resolved];
+        } else if (cmd.textKey) {
           text = i18n.tArray(cmd.textKey);
-        } else if (cmd.text) {
-          text = [cmd.text];
+        } else {
+          throw new Error(`[DataValidationError] events.js: show_dialog に text が定義されていません。`);
         }
         
         // メッセージ終了後に次のコマンドへ進むようコールバック設定

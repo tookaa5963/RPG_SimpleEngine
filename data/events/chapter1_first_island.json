@@ -1,0 +1,435 @@
+{
+  "town_mayor": [
+    {
+      "type": "check_flag",
+      "flag": "hasPass",
+      "if_true": "has_pass"
+    },
+    {
+      "type": "check_flag",
+      "flag": "rescuedGirl",
+      "if_true": "give_pass"
+    },
+    {
+      "type": "check_flag",
+      "flag": "kidnappingEventStarted",
+      "if_true": "waiting_rescue"
+    },
+    {
+      "type": "check_flag",
+      "flag": "heardPassRequirement",
+      "if_true": "quest_start"
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "わしがこの町の町長じゃ。\n何か用かね？\n……特に用がないなら、\n町でゆっくり休んでいくがよい。"
+        ],
+        "en": [
+          "I am the mayor of this town.\nDo you need something?\n...If not, feel free to rest your weary feet."
+        ],
+        "es": [
+          "Soy el alcalde de este pueblo.\n¿Necesitas algo?\n...Si no es así, descansa cuanto gustes."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "has_pass",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "町の女の子を助けてくれたこと、\n決して忘れんぞ。\n港町への旅、道中気をつけるのじゃぞ。"
+        ],
+        "en": [
+          "I will never forget how you saved our little girl.\nTake care on your journey to the port town."
+        ],
+        "es": [
+          "Jamás olvidaré cómo salvaste a la niña.\nQue tengas un buen viaje al pueblo costero."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "give_pass",
+      "type": "check_inventory_full",
+      "additional": 1,
+      "if_true": "bag_full"
+    },
+    {
+      "type": "set_flag",
+      "flag": "hasPass",
+      "value": true
+    },
+    {
+      "type": "give_item",
+      "itemId": "pass",
+      "count": 1
+    },
+    {
+      "type": "play_sound",
+      "se": "victory"
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "町長「旅の者よ！\n連れ去られた女の子を無事に助け出してくれたのか！\n本当によかった……！」",
+          "町長「町の者を救ってくれたおぬしを見直したぞ。\n約束通り、これを受け取るがよい！\n（【通行手形】を手に入れた！）」",
+          "町長「これがあれば、港町への関所を通れるはずじゃ。\n道中くれぐれも気をつけてな。」"
+        ],
+        "en": [
+          "Mayor: \"Traveler! You safely rescued the kidnapped girl!\nThank goodness... thank goodness!\"",
+          "Mayor: \"You have proven your valor and heart to our town.\nAs promised, take this!\n(Acquired Travel Pass!)\"",
+          "Mayor: \"With this, you can pass the checkpoint to the port town.\nTravel safely on your road.\""
+        ],
+        "es": [
+          "Alcalde: \"¡Viajero! ¡Has rescatado a salvo a la pequeña!\n¡Qué bendición... qué alivio...!\"",
+          "Alcalde: \"Has demostrado tu valor y nobleza al pueblo.\n¡Tal como prometí, toma esto!\n(¡Conseguiste Salvoconducto!)\"",
+          "Alcalde: \"Con esto podrás cruzar el puesto hacia el pueblo costero.\nTen mucho cuidado en tu camino.\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "bag_full",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "町長「町の女の子を助けてくれたこと、\n本当に感謝しておる！",
+          "町長「約束の【通行手形】を渡したいが、\n荷物がいっぱいのようじゃな。\n持ち物を整理してから 来てくだされ。」"
+        ],
+        "en": [
+          "Mayor: \"I am truly grateful to you for saving our girl!",
+          "Mayor: \"I wish to grant you the promised Travel Pass, but your bag is full.\nPlease make room in your pack and return.\""
+        ],
+        "es": [
+          "Alcalde: \"¡Agradezco de todo corazón que salvaras a la niña!",
+          "Alcalde: \"Deseo darte el Salvoconducto prometido, pero tu bolsa está llena.\nHaz sitio y regresa a verme.\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "waiting_rescue",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "東のダンジョンへ向かい、\nどうか町の女の子を助けてくだされ……！\n無事に戻ったあかつきには、\n必ず【手形】をお渡しする！"
+        ],
+        "en": [
+          "Head to the eastern dungeon and rescue our town's little girl...!\nOnce she returns safely, I shall grant you the Travel Pass without fail!"
+        ],
+        "es": [
+          "¡Ve a la mazmorra del este y salva a la niña por favor...!\n¡Cuando vuelva a salvo, te entregaré el salvoconducto sin falta!"
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "quest_start",
+      "type": "set_flag",
+      "flag": "kidnappingEventStarted",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "なに？ 港町へ行くための【手形】が欲しいと？\n……ふむ、おぬしは見慣れぬ異国人じゃな。\n身元も定かでない者に、\n手形を発行するわけにはいかんのじゃ。",
+          "・・・ ・・・・ ・・・\n・・・ ・・・ ・・・",
+          "……なにっ！？\n\n た、大変じゃ！\nたった今、町の者が知らせに来たのじゃが……",
+          "町の小さな女の子が東のダンジョンの\nモンスターに連れ去られてしまったのじゃ！",
+          "頼む！ 旅の者よ！\nあの子を無事に助け出してくれ！\n連れ戻してくれたなら、\n礼として【手形】を発行しよう！"
+        ],
+        "en": [
+          "What? You desire a Travel Pass to the port town?\n...Hmm, you are an unfamiliar traveler.\nI cannot issue a pass to someone of unknown background.",
+          "... ... ...\n... ... ...",
+          "...What?! S-Something terrible has happened!\nA townsman just delivered grave news...",
+          "A young girl from town was abducted by monsters\nand dragged into the eastern dungeon!",
+          "I beg you, traveler! Rescue that child safely!\nIf you bring her back, I shall grant you the Travel Pass as a reward!"
+        ],
+        "es": [
+          "¿Dices que quieres un salvoconducto para ir al pueblo costero?\n...Mmm, eres un forastero desconocido.\nNo puedo emitir un pase a alguien de origen incierto.",
+          "... ... ...\n... ... ...",
+          "¡¿Q-Qué?! ¡Ha ocurrido una tragedia!\nUn vecino acaba de traerme una terrible noticia...",
+          "¡Una niña del pueblo fue raptada por monstruos\ny arrastrada a la mazmorra del este!",
+          "¡Te lo suplico, viajero! ¡Salva a esa niña!\n¡Si la traes de vuelta, te daré el salvoconducto en agradecimiento!"
+        ]
+      }
+    }
+  ],
+  "girl": [
+    {
+      "type": "check_map",
+      "mapId": "first_dungeon2",
+      "if_true": "dungeon_logic"
+    },
+    {
+      "type": "check_flag",
+      "flag": "hasPass",
+      "if_true": "town_rescued"
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "こんにちは！\nお兄さん、かっこいいね。\n気をつけて旅を続けてね。"
+        ],
+        "en": [
+          "Hello, traveler!\nYou look very cool.\nHave a safe journey!"
+        ],
+        "es": [
+          "¡Hola, viajero!\nTe ves muy fuerte.\n¡Buen viaje!"
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "dungeon_logic",
+      "type": "check_npc_exists",
+      "npcId": [
+        "dungeon_boss",
+        "troll"
+      ],
+      "if_true": "scared"
+    },
+    {
+      "type": "set_flag",
+      "flag": "rescuedGirl",
+      "value": true
+    },
+    {
+      "type": "play_sound",
+      "se": "victory"
+    },
+    {
+      "type": "show_dialog",
+      "onComplete": "refresh_map",
+      "text": {
+        "ja": [
+          "女の子「助けてくれてありがとう！\n町の町長さんのところまで、\nおねがいします。一緒に連れて帰って！」",
+          "（町の女の子が同行することになった！\n無事に始まりの町へ送り届けよう）"
+        ],
+        "en": [
+          "Girl: \"Thank you for saving me!\nPlease take me back to the Mayor in town!\"",
+          "(The town girl joined your company!\nEscort her safely back to the starting town.)"
+        ],
+        "es": [
+          "Niña: \"¡Gracias por salvarme!\n¡Por favor, llévame de vuelta con el alcalde!\"",
+          "(¡La niña se unió a ti!\nLlévala a salvo al pueblo de inicio.)"
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "scared",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "女の子「きゃあっ！ 助けて！\nあっちの魔物が怖くて動けないの！」"
+        ],
+        "en": [
+          "Girl: \"Eek! Help me!\nThat monster over there is terrifying, I can't move!\""
+        ],
+        "es": [
+          "Niña: \"¡Aaah! ¡Ayuda!\n¡Ese monstruo da mucho miedo, no puedo moverme!\""
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "town_rescued",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "あっ、助けてくれたお兄ちゃん！\n無事におうちに帰れたよ、ありがとう！"
+        ],
+        "en": [
+          "Ah, you're the one who saved me!\nI'm safely back home, thank you so much!"
+        ],
+        "es": [
+          "¡Ah, fuiste tú quien me salvó!\n¡Ya estoy en casa sana y salva, gracias!"
+        ]
+      }
+    }
+  ],
+  "guard_port": [
+    {
+      "type": "check_flag",
+      "flag": "hasPass",
+      "if_true": "pass_ok"
+    },
+    {
+      "type": "set_flag",
+      "flag": "heardPassRequirement",
+      "value": true
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "ここから先は港町だ。\n町長さんの【手形】がないと\n通すわけにはいかないな！"
+        ],
+        "en": [
+          "Beyond here lies the port town.\nI can't let you through without the Mayor's Travel Pass!"
+        ],
+        "es": [
+          "Más allá está el pueblo costero.\n¡No puedo dejarte pasar sin el Salvoconducto del alcalde!"
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "pass_ok",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "町長さんの【手形】を持っているな。\nよし、通っていいぞ！"
+        ],
+        "en": [
+          "You have the Mayor's Travel Pass.\nAll right, you may pass!"
+        ],
+        "es": [
+          "Llevas el Salvoconducto del alcalde.\n¡Bien, puedes pasar!"
+        ]
+      }
+    },
+    {
+      "type": "set_npc_position",
+      "gridX": 29,
+      "gridY": 14
+    }
+  ],
+  "sister": [
+    {
+      "type": "check_flag",
+      "flag": "talkedToScholar",
+      "if_true": "normal_church"
+    },
+    {
+      "type": "check_flag",
+      "flag": "receivedSisterHerb",
+      "if_true": "after_herb"
+    },
+    {
+      "type": "check_inventory_full",
+      "additional": 1,
+      "if_true": "bag_full"
+    },
+    {
+      "type": "set_flag",
+      "flag": "receivedSisterHerb",
+      "value": true
+    },
+    {
+      "type": "set_flag",
+      "flag": "talkedToSister",
+      "value": true
+    },
+    {
+      "type": "give_item",
+      "itemId": "herb",
+      "count": 1
+    },
+    {
+      "type": "set_return_point"
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "異国の方ですね。歓迎いたします。\nその指輪の紋章については\n私にはわかりかねますが……",
+          "北の遺跡を調査している学者様なら\n何か知っているかもしれません。",
+          "旅の安全を祈り、こちらをお持ちください。\n（やくそうを手に入れた！）"
+        ],
+        "en": [
+          "Welcome, traveler from afar.\nThough I cannot recognize\nthe crest on that ring...",
+          "The scholar investigating the ruins to the north\nmight know something about it.",
+          "Please take this for your safe journey.\n(Acquired Medicinal Herb!)"
+        ],
+        "es": [
+          "Bienvenido, forastero.\nAunque desconozco\nel blasón de ese anillo...",
+          "El erudito que investiga las ruinas del norte\npodría saber algo al respecto.",
+          "Lleva esto para tu seguridad en el viaje.\n(¡Conseguiste Planta medicinal!)"
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "bag_full",
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "異国の方ですね。歓迎いたします。\nその指輪の紋章については\n私にはわかりかねますが……",
+          "北の遺跡を調査している学者様なら\n何か知っているかもしれません。",
+          "旅の安全を祈り 薬草をお渡ししたいのですが、\n持ち物がいっぱいのようですね。\n整理してから またお越しください。"
+        ],
+        "en": [
+          "Welcome, traveler from afar.\nThough I cannot recognize\nthe crest on that ring...",
+          "The scholar investigating the ruins to the north\nmight know something about it.",
+          "I wished to offer an herb for your safe journey,\nbut your bag seems full.\nPlease return once you have organized your items."
+        ],
+        "es": [
+          "Bienvenido, forastero.\nAunque desconozco\nel blasón de ese anillo...",
+          "El erudito que investiga las ruinas del norte\npodría saber algo al respecto.",
+          "Deseaba darte una planta medicinal para tu viaje,\npero tu bolsa parece llena.\nOrdénala y regresa."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "after_herb",
+      "type": "set_return_point"
+    },
+    {
+      "type": "show_dialog",
+      "text": {
+        "ja": [
+          "指輪の紋章のことでしたら、\n北の遺跡にいらっしゃる学者様に\n相談してみてくださいね。",
+          "何か手がかりが見つかるよう、\n心よりお祈りしております。"
+        ],
+        "en": [
+          "If it is about the ring's crest,\nplease consult the scholar at the northern ruins.",
+          "I pray with all my heart that\nyou may find a clue."
+        ],
+        "es": [
+          "Si se trata del blasón de tu anillo,\nconsulta al erudito en las ruinas del norte.",
+          "Rezo con el corazón para que encuentres una pista."
+        ]
+      }
+    },
+    {
+      "type": "end"
+    },
+    {
+      "label": "normal_church",
+      "type": "open_church"
+    }
+  ]
+}
