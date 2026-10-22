@@ -4,9 +4,9 @@ import { MessageWindow } from './message.js';
 import { sound } from './sound.js';
 import { BattleManager } from './battle.js';
 import { MenuManager } from './menu.js';
-import { ShopManager } from './shop.js';
-import { InnManager } from './inn.js';
-import { ChurchManager } from './church.js';
+import { ShopManager, initShopData } from './shop.js';
+import { InnManager, initInnData } from './inn.js';
+import { ChurchManager, initChurchData } from './church.js';
 import { InputManager } from './input.js';
 import { SaveManager } from './save.js';
 import { Renderer } from './renderer.js';
@@ -789,11 +789,14 @@ async function bootstrapEngine() {
   try {
     console.log("Starting engine bootstrap...");
     await Promise.all([
-      initItemData(),
-      initMonsterData(),
-      initMapData(),
-      initEventData() // ★ イベントデータの初期化を追加
-    ]);
+    initItemData(),
+    initMonsterData(),
+    initMapData(),
+    initEventData(),
+    initShopData(),
+    initInnData(),
+    initChurchData()
+  ]);
     console.log("JSON data loaded (items, spells, monsters, maps, events). Initializing entities...");
 
     initializeGameEntities();

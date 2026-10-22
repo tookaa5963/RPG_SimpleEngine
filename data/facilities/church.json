@@ -1,0 +1,51 @@
+{
+  "commands": {
+    "talk": {
+      "ja": "話す",
+      "en": "Talk",
+      "es": "Hablar"
+    },
+    "set_return": {
+      "ja": "帰還地登録",
+      "en": "Set Return Point",
+      "es": "Punto de retorno"
+    },
+    "leave": {
+      "ja": "やめる",
+      "en": "Leave",
+      "es": "Salir"
+    }
+  },
+  "messages": {
+    "greeting": {
+      "ja": "神のご加護が あらんことを。\nどのような ご用件でしょうか？",
+      "en": "May the divine blessings be upon you.\nWhat is your request?",
+      "es": "Que las bendiciones divinas te acompañen.\n¿En qué podemos servirte?"
+    },
+    "hint_scholar_1": {
+      "ja": "指輪の紋章のことでしたら、\n北の遺跡を調査している学者様に\n相談してみてください。",
+      "en": "If it is about the ring's crest,\nplease consult the scholar\ninvestigating the northern ruins.",
+      "es": "Si se trata del blasón del anillo,\nconsulta al erudito que investiga\nlas ruinas del norte."
+    },
+    "hint_scholar_2": {
+      "ja": "何か手がかりが見つかるよう、\n心よりお祈りしております。",
+      "en": "I pray with all my heart that\nyou may find a clue.",
+      "es": "Rezo de todo corazón para que\nencuentres alguna pista."
+    },
+    "hint_general": {
+      "ja": "迷った時は光を信じて進みなさい。\n目に見えるものは幻です。\n神のご加護が あらんことを……",
+      "en": "When lost, believe in the light and press forward.\nWhat you see may be an illusion.\nMay the divine blessings be upon you...",
+      "es": "Cuando te pierdas, confía en la luz y avanza.\nLo que ves puede ser una ilusión.\nQue las bendiciones te acompañen..."
+    },
+    "return_registered": {
+      "ja": "帰ってくる場所を\nこの場所に登録しました。\nルーラを唱えれば\nいつでもここへ戻ってこれます。",
+      "en": "This place has been registered\nas your return destination.\nCast Zoom to return here anytime.",
+      "es": "Este lugar ha sido registrado\ncomo tu punto de retorno.\nLanza Teletransporte para volver aquí."
+    },
+    "blessing": {
+      "ja": "神のご加護が\nあらんことを……",
+      "en": "May the divine blessings\nbe upon you...",
+      "es": "Que las bendiciones divinas\nte acompañen..."
+    }
+  }
+}

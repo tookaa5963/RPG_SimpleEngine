@@ -1,4 +1,3 @@
-// FILE_ENTRY: js/i18n.js
 export const I18N_DICT = {
   "ja": {
     "common": {
@@ -177,44 +176,6 @@ export const I18N_DICT = {
       "level_up": "勇者は レベル{level}に 上がった！",
       "stat_gain": "最大ＨＰが {hp}ポイント 上がった！\n最大ＭＰが {mp}ポイント 上がった！\n力が {atk}ポイント 上がった！\n身の守りが {def}ポイント 上がった！\n素早さが {spd}ポイント 上がった！",
       "learned_spell": "勇者は {spell}の呪文を\n覚えた！"
-    },
-    "shop": {
-      "buy": "買う",
-      "sell": "売る",
-      "leave": "やめる",
-      "greetings": {
-        "default": "いらっしゃい！\n何か 用かね？",
-        "weapon": "いらっしゃい！\n武器や防具を買っていくかい？",
-        "item": "いらっしゃい！\n旅の道具を揃えているよ。",
-        "merchant": "いらっしゃい！\n武器や道具を扱っているよ。"
-      },
-      "what_to_buy": "どれを 買うかね？",
-      "what_to_sell": "どれを 売ってくれるのかね？",
-      "anything_else": "他に 何か要るかね？",
-      "buy_confirm": "{name}だね。\n{price}ゴールドになるが 買うかい？",
-      "sell_confirm": "{name}だね。\n{price}ゴールドで 買い取ろう。",
-      "cannot_sell_equipped": "それは 装備しているから\n買い取れないよ！",
-      "inventory_full": "持ち物がいっぱいで\nこれ以上 持てないよ！",
-      "gold_shortage": "お金が 足りないみたいだね。\n他に 何か要るかね？",
-      "thank_you_buy": "毎度あり！\n他に 何か要るかね？",
-      "thank_you_sell": "毎度あり！\n他に 何か売ってくれるかね？"
-    },
-    "inn": {
-      "greeting": "旅の疲れを 癒やしていくかい？\n一晩 {cost}ゴールド だよ。",
-      "gold_shortage": "ゴールドが 足りないようだよ。",
-      "goodbye": "それでは またどうぞ。",
-      "morning": "おはよう！\n昨夜は よくお休みでしたね。"
-    },
-    "church": {
-      "greeting": "神のご加護が あらんことを。\nどのような ご用件でしょうか？",
-      "talk": "話す",
-      "set_return": "帰還地登録",
-      "leave": "やめる",
-      "hint_scholar_1": "指輪の紋章のことでしたら、\n北の遺跡を調査している学者様に\n相談してみてください。",
-      "hint_scholar_2": "何か手がかりが見つかるよう、\n心よりお祈りしております。",
-      "hint_general": "迷った時は光を信じて進みなさい。\n目に見えるものは幻です。\n神のご加護が あらんことを……",
-      "return_registered": "帰ってくる場所を\nこの場所に登録しました。\nルーラを唱えれば\nいつでもここへ戻ってこれます。",
-      "blessing": "神のご加護が\nあらんことを……"
     },
     "slot": {
       "title_save": "冒険の書 - 記録",
@@ -458,44 +419,6 @@ export const I18N_DICT = {
       "stat_gain": "Max HP +{hp}!\nMax MP +{mp}!\nStrength +{atk}!\nResilience +{def}!\nAgility +{spd}!",
       "learned_spell": "The Hero learned\n{spell}!"
     },
-    "shop": {
-      "buy": "Buy",
-      "sell": "Sell",
-      "leave": "Leave",
-      "greetings": {
-        "default": "Welcome!\nHow can I help you?",
-        "weapon": "Welcome!\nLooking to buy weapons or armor?",
-        "item": "Welcome!\nWe've got all the travel supplies you need.",
-        "merchant": "Welcome!\nI deal in weapons and adventuring gear."
-      },
-      "what_to_buy": "What would you like to buy?",
-      "what_to_sell": "What would you like to sell?",
-      "anything_else": "Anything else?",
-      "buy_confirm": "{name}, right?\nThat'll be {price} gold. Buy it?",
-      "sell_confirm": "{name}, right?\nI can buy it for {price} gold.",
-      "cannot_sell_equipped": "You have that equipped!\nI cannot buy it!",
-      "inventory_full": "Your bag is full!\nYou cannot carry any more!",
-      "gold_shortage": "You do not have enough gold.\nNeed anything else?",
-      "thank_you_buy": "Thank you!\nAnything else?",
-      "thank_you_sell": "Thank you!\nAnything else to sell?"
-    },
-    "inn": {
-      "greeting": "Care to rest your weary bones?\nIt's {cost} gold a night.",
-      "gold_shortage": "You do not have enough gold.",
-      "goodbye": "Come back anytime.",
-      "morning": "Good morning!\nDid you rest well last night?"
-    },
-    "church": {
-      "greeting": "May the divine blessings be upon you.\nWhat is your request?",
-      "talk": "Talk",
-      "set_return": "Set Return Point",
-      "leave": "Leave",
-      "hint_scholar_1": "If it is about the ring's crest,\nplease consult the scholar\ninvestigating the northern ruins.",
-      "hint_scholar_2": "I pray with all my heart that\nyou may find a clue.",
-      "hint_general": "When lost, believe in the light and press forward.\nWhat you see may be an illusion.\nMay the divine blessings be upon you...",
-      "return_registered": "This place has been registered\nas your return destination.\nCast Zoom to return here anytime.",
-      "blessing": "May the divine blessings\nbe upon you..."
-    },
     "slot": {
       "title_save": "Log of Adventure - Save",
       "title_load": "Log of Adventure - Load",
@@ -738,44 +661,6 @@ export const I18N_DICT = {
       "stat_gain": "¡PV máx. +{hp}!\n¡PM máx. +{mp}!\n¡Fuerza +{atk}!\n¡Defensa +{def}!\n¡Agilidad +{spd}!",
       "learned_spell": "¡El héroe aprendió\n{spell}!"
     },
-    "shop": {
-      "buy": "Comprar",
-      "sell": "Vender",
-      "leave": "Salir",
-      "greetings": {
-        "default": "¡Bienvenido!\n¿En qué puedo ayudarte?",
-        "weapon": "¡Bienvenido!\n¿Buscas armas o armaduras?",
-        "item": "¡Bienvenido!\nTenemos todo lo necesario para tu viaje.",
-        "merchant": "¡Bienvenido!\nComercio con armas y pertrechos de viaje."
-      },
-      "what_to_buy": "¿Qué deseas comprar?",
-      "what_to_sell": "¿Qué deseas vender?",
-      "anything_else": "¿Algo más?",
-      "buy_confirm": "¿{name}?\nSon {price} monedas de oro. ¿Lo compras?",
-      "sell_confirm": "¿{name}?\nTe lo compro por {price} monedas de oro.",
-      "cannot_sell_equipped": "¡Lo tienes equipado!\n¡No puedo comprarlo!",
-      "inventory_full": "¡Tu bolsa está llena!\n¡No puedes llevar más!",
-      "gold_shortage": "No tienes suficiente oro.\n¿Necesitas algo más?",
-      "thank_you_buy": "¡Gracias!\n¿Algo más?",
-      "thank_you_sell": "¡Gracias!\n¿Algo más que vender?"
-    },
-    "inn": {
-      "greeting": "¿Deseas descansar de tu viaje?\nSon {cost} monedas de oro por noche.",
-      "gold_shortage": "Parece que no tienes suficiente oro.",
-      "goodbye": "Vuelve cuando quieras.",
-      "morning": "¡Buenos días!\n¿Has descansado bien esta noche?"
-    },
-    "church": {
-      "greeting": "Que las bendiciones divinas te acompañen.\n¿En qué podemos servirte?",
-      "talk": "Hablar",
-      "set_return": "Punto de retorno",
-      "leave": "Salir",
-      "hint_scholar_1": "Si se trata del blasón del anillo,\nconsulta al erudito que investiga\nlas ruinas del norte.",
-      "hint_scholar_2": "Rezo de todo corazón para que\nencuentres alguna pista.",
-      "hint_general": "Cuando te pierdas, confía en la luz y avanza.\nLo que ves puede ser una ilusión.\nQue las bendiciones te acompañen...",
-      "return_registered": "Este lugar ha sido registrado\ncomo tu punto de retorno.\nLanza Teletransporte para volver aquí.",
-      "blessing": "Que las bendiciones divinas\nte acompañen..."
-    },
     "slot": {
       "title_save": "Diario de Aventura - Guardar",
       "title_load": "Diario de Aventura - Cargar",
@@ -920,14 +805,6 @@ class I18nManager {
       });
       return s;
     });
-  }
-
-  getShopGreeting(npcId) {
-    let type = 'default';
-    if (npcId === 'weapon_shop_keeper' || npcId === 'port_weapon_shop_keeper') type = 'weapon';
-    else if (npcId === 'general_shop_keeper' || npcId === 'port_general_shop_keeper' || npcId === 'dwarf_village_general_shop_keeper') type = 'item';
-    else if (npcId === 'merchant') type = 'merchant';
-    return this.t(`shop.greetings.${type}`);
   }
 }
 

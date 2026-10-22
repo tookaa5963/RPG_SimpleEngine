@@ -1,0 +1,101 @@
+{
+  "commands": {
+    "buy": {
+      "ja": "買う",
+      "en": "Buy",
+      "es": "Comprar"
+    },
+    "sell": {
+      "ja": "売る",
+      "en": "Sell",
+      "es": "Vender"
+    },
+    "leave": {
+      "ja": "やめる",
+      "en": "Leave",
+      "es": "Salir"
+    }
+  },
+  "messages": {
+    "what_to_buy": {
+      "ja": "どれを 買うかね？",
+      "en": "What would you like to buy?",
+      "es": "¿Qué deseas comprar?"
+    },
+    "what_to_sell": {
+      "ja": "どれを 売ってくれるのかね？",
+      "en": "What would you like to sell?",
+      "es": "¿Qué deseas vender?"
+    },
+    "anything_else": {
+      "ja": "他に 何か要るかね？",
+      "en": "Anything else?",
+      "es": "¿Algo más?"
+    },
+    "buy_confirm": {
+      "ja": "{name}だね。\n{price}ゴールドになるが 買うかい？",
+      "en": "{name}, right?\nThat'll be {price} gold. Buy it?",
+      "es": "¿{name}?\nSon {price} monedas de oro. ¿Lo compras?"
+    },
+    "sell_confirm": {
+      "ja": "{name}だね。\n{price}ゴールドで 買い取ろう。",
+      "en": "{name}, right?\nI can buy it for {price} gold.",
+      "es": "¿{name}?\nTe lo compro por {price} monedas de oro."
+    },
+    "cannot_sell_equipped": {
+      "ja": "それは 装備しているから\n買い取れないよ！",
+      "en": "You have that equipped!\nI cannot buy it!",
+      "es": "¡Lo tienes equipado!\n¡No puedo comprarlo!"
+    },
+    "inventory_full": {
+      "ja": "持ち物がいっぱいで\nこれ以上 持てないよ！",
+      "en": "Your bag is full!\nYou cannot carry any more!",
+      "es": "¡Tu bolsa está llena!\n¡No puedes llevar más!"
+    },
+    "gold_shortage": {
+      "ja": "お金が 足りないみたいだね。\n他に 何か要るかね？",
+      "en": "You do not have enough gold.\nNeed anything else?",
+      "es": "No tienes suficiente oro.\n¿Necesitas algo más?"
+    },
+    "thank_you_buy": {
+      "ja": "毎度あり！\n他に 何か要るかね？",
+      "en": "Thank you!\nAnything else?",
+      "es": "¡Gracias!\n¿Algo más?"
+    },
+    "thank_you_sell": {
+      "ja": "毎度あり！\n他に 何か売ってくれるかね？",
+      "en": "Thank you!\nAnything else to sell?",
+      "es": "¡Gracias!\n¿Algo más que vender?"
+    }
+  },
+  "greetings": {
+    "default": {
+      "ja": "いらっしゃい！\n何か 用かね？",
+      "en": "Welcome!\nHow can I help you?",
+      "es": "¡Bienvenido!\n¿En qué puedo ayudarte?"
+    },
+    "weapon": {
+      "ja": "いらっしゃい！\n武器や防具を買っていくかい？",
+      "en": "Welcome!\nLooking to buy weapons or armor?",
+      "es": "¡Bienvenido!\n¿Buscas armas o armaduras?"
+    },
+    "item": {
+      "ja": "いらっしゃい！\n旅の道具を揃えているよ。",
+      "en": "Welcome!\nWe've got all the travel supplies you need.",
+      "es": "¡Bienvenido!\nTenemos todo lo necesario para tu viaje."
+    },
+    "merchant": {
+      "ja": "いらっしゃい！\n武器や道具を扱っているよ。",
+      "en": "Welcome!\nI deal in weapons and adventuring gear.",
+      "es": "¡Bienvenido!\nComercio con armas y pertrechos de viaje."
+    }
+  },
+  "npcGreetingMapping": {
+    "weapon_shop_keeper": "weapon",
+    "port_weapon_shop_keeper": "weapon",
+    "general_shop_keeper": "item",
+    "port_general_shop_keeper": "item",
+    "dwarf_village_general_shop_keeper": "item",
+    "merchant": "merchant"
+  }
+}

@@ -2,6 +2,20 @@
 import { sound } from './sound.js';
 import { i18n } from './i18n.js';
 
+export let INN_DATA = null;
+
+export async function initInnData() {
+  try {
+    const res = await fetch('data/facilities/inn.json');
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status} on inn.json`);
+    INN_DATA = await res.json();
+    console.log("INN_DATA initialized successfully from inn.json.");
+  } catch (error) {
+    console.error("Failed to fetch inn data:", error);
+    throw error;
+  }
+}
+
 export class InnManager {
   constructor(player, messageWindow, getCurrentMap, onFinish) {
     this.player = player;
@@ -14,26 +28,42 @@ export class InnManager {
     this.FADE_MAX = 150;
   }
 
+  _ensureData() {
+    if (!INN_DATA) throw new Error('[DataValidationError] InnManager: INN_DATA is not initialized.');
+  }
+
+  getMessage(key, params = {}) {
+    this._ensureData();
+    const msgObj = INN_DATA.messages[key];
+    if (!msgObj) throw new Error(`[DataValidationError] InnManager: message key "${key}" not found.`);
+    let text = i18n.resolve(msgObj);
+    for (const [k, v] of Object.entries(params)) {
+      text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+    }
+    return text;
+  }
+
   open(npc) {
-    const cost = npc.cost || 10;
+    this._ensureData();
+    const cost = npc.cost || INN_DATA.defaultCost || 10;
     this.msgWin.openMenu(
-      i18n.t('inn.greeting', { cost: String(cost) }),
+      this.getMessage('greeting', { cost: String(cost) }),
       [i18n.t('common.yes'), i18n.t('common.no')],
       (selectedIndex) => {
         if (selectedIndex === 0) {
           if (!this.player.useGold(cost)) {
             sound.playBump();
-            this.msgWin.open([i18n.t('inn.gold_shortage')]);
+            this.msgWin.open([this.getMessage('gold_shortage')]);
           } else {
             this.msgWin.close();
             this.startStaying();
           }
         } else {
-          this.msgWin.open([i18n.t('inn.goodbye')]);
+          this.msgWin.open([this.getMessage('goodbye')]);
         }
       },
       () => {
-        this.msgWin.open([i18n.t('inn.goodbye')]);
+        this.msgWin.open([this.getMessage('goodbye')]);
       }
     );
   }
@@ -47,7 +77,6 @@ export class InnManager {
 
   update() {
     if (!this.isStaying) return;
-
     this.fadeTimer--;
     if (this.fadeTimer === Math.floor(this.FADE_MAX / 2)) {
       this.player.fullRecovery();
@@ -59,13 +88,12 @@ export class InnManager {
         sound.playBgm(currentMap.bgm);
       }
       if (this.onFinish) this.onFinish();
-      this.msgWin.open([i18n.t('inn.morning')]);
+      this.msgWin.open([this.getMessage('morning')]);
     }
   }
 
   draw(ctx, canvas) {
     if (!this.isStaying) return;
-
     const half = this.FADE_MAX / 2;
     let alpha = 1.0;
     if (this.fadeTimer > half) {

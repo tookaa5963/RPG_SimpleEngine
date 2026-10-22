@@ -1,0 +1,25 @@
+{
+  "defaultCost": 10,
+  "messages": {
+    "greeting": {
+      "ja": "旅の疲れを 癒やしていくかい？\n一晩 {cost}ゴールド だよ。",
+      "en": "Care to rest your weary bones?\nIt's {cost} gold a night.",
+      "es": "¿Deseas descansar de tu viaje?\nSon {cost} monedas de oro por noche."
+    },
+    "gold_shortage": {
+      "ja": "ゴールドが 足りないようだよ。",
+      "en": "You do not have enough gold.",
+      "es": "Parece que no tienes suficiente oro."
+    },
+    "goodbye": {
+      "ja": "それでは またどうぞ。",
+      "en": "Come back anytime.",
+      "es": "Vuelve cuando quieras."
+    },
+    "morning": {
+      "ja": "おはよう！\n昨夜は よくお休みでしたね。",
+      "en": "Good morning!\nDid you rest well last night?",
+      "es": "¡Buenos días!\n¿Has descansado bien esta noche?"
+    }
+  }
+}
