@@ -195,7 +195,18 @@
       "animFrame": 0,
       "isMoving": false,
       "color": "#3498db",
-      "walkTimer": 120
+      "walkTimer": 120,
+      "pages": {
+        "ja": [
+          "神様が救ってくれますよ。"
+        ],
+        "en": [
+          "The divine power shall save you."
+        ],
+        "es": [
+          "Dios te salvará."
+        ]
+      }
     }
   ]
 }
