@@ -1,4 +1,5 @@
 // FILE_ENTRY: js/menu.js
+import { logFormatter } from './logFormatter.js';
 import { sound } from './sound.js';
 import { maps } from './maps.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
@@ -231,12 +232,12 @@ handleKeyDown(key) {
           } else if (this.selectedItem.id === 'broken_corrada_hilt') {
             this.onEnd();
             this.msgWin.open([
-              i18n.t('menu_action.broken_hilt_1'),
-              i18n.t('menu_action.broken_hilt_2')
+              logFormatter.format('menu_action.broken_hilt_1'),
+              logFormatter.format('menu_action.broken_hilt_2')
             ]);
           } else if (this.selectedItem.type === 'charm') {
             this.onEnd();
-            this.msgWin.open([i18n.t('menu_action.charm_passive')]);
+            this.msgWin.open([logFormatter.format('menu_action.charm_passive')]);
           } else if (this.selectedItem.type === 'key' || this.selectedItem.type === 'keyItem') {
             this.onEnd();
             this.msgWin.open([i18n.t('menu.cannot_use_here')]);
@@ -348,7 +349,7 @@ handleKeyDown(key) {
       this.player.heal(30);
       sound.playHeal();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu_action.used_herb_1'), i18n.t('menu_action.used_herb_2')]);
+      this.msgWin.open([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
     } else if (item.id === 'strong_herb') {
       if (this.player.hp >= this.player.maxHp) {
         this.onEnd();
@@ -359,7 +360,7 @@ handleKeyDown(key) {
       this.player.heal(70);
       sound.playHeal();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu_action.used_strong_herb_1'), i18n.t('menu_action.used_strong_herb_2')]);
+      this.msgWin.open([logFormatter.format('menu_action.used_strong_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
     } else if (item.id === 'special_herb') {
       if (this.player.hp >= this.player.maxHp) {
         this.onEnd();
@@ -370,7 +371,7 @@ handleKeyDown(key) {
       this.player.heal(120);
       sound.playHeal();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu_action.used_special_herb_1'), i18n.t('menu_action.used_strong_herb_2')]);
+      this.msgWin.open([logFormatter.format('menu_action.used_special_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
     } else if (item.id === 'magic_water') {
       if (this.player.mp >= this.player.maxMp) {
         this.onEnd();
@@ -381,7 +382,7 @@ handleKeyDown(key) {
       this.player.healMp(15);
       sound.playHeal();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu_action.drank_magic_water_1'), i18n.t('menu_action.drank_magic_water_2')]);
+      this.msgWin.open([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
     } else if (item.id === 'sage_water') {
       if (this.player.mp >= this.player.maxMp) {
         this.onEnd();
@@ -392,27 +393,27 @@ handleKeyDown(key) {
       this.player.healMp(40);
       sound.playHeal();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu_action.drank_sage_water_1'), i18n.t('menu_action.drank_sage_water_2')]);
+      this.msgWin.open([logFormatter.format('menu_action.drank_sage_water_1'), logFormatter.format('menu_action.drank_sage_water_2')]);
     } else if (item.id === 'holy_water') {
       this.player.removeItem('holy_water', 1);
       this.player.holyWaterSteps = 128;
       sound.playMagic();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu_action.holy_water_1'), i18n.t('menu_action.holy_water_2')]);
+      this.msgWin.open([logFormatter.format('menu_action.holy_water_1'), logFormatter.format('menu_action.holy_water_2')]);
     } else if (item.id === 'torch') {
       this.player.removeItem('torch', 1);
       this.player.torchSteps = Math.max(this.player.torchSteps || 0, 60);
       sound.playMagic();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu_action.torch_1'), i18n.t('menu_action.torch_2')]);
+      this.msgWin.open([logFormatter.format('menu_action.torch_1'), logFormatter.format('menu_action.torch_2')]);
     } else if (item.id === 'lantern') {
       this.player.isLanternLit = !this.player.isLanternLit;
       sound.playMagic();
       this.onEnd();
       if (this.player.isLanternLit) {
-        this.msgWin.open([i18n.t('menu_action.lantern_on')]);
+        this.msgWin.open([logFormatter.format('menu_action.lantern_on')]);
       } else {
-        this.msgWin.open([i18n.t('menu_action.lantern_off')]);
+        this.msgWin.open([logFormatter.format('menu_action.lantern_off')]);
       }
     } else if (item.id === 'antidote') {
       this.player.removeItem('antidote', 1);
@@ -420,10 +421,10 @@ handleKeyDown(key) {
       if (this.player.isPoisoned) {
         this.player.curePoison();
         sound.playHeal();
-        this.msgWin.open([i18n.t('menu_action.antidote_1'), i18n.t('menu_action.antidote_2')]);
+        this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_2')]);
       } else {
         sound.playHeal();
-        this.msgWin.open([i18n.t('menu_action.antidote_1'), i18n.t('menu_action.antidote_not_poisoned')]);
+        this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_not_poisoned')]);
       }
     } else if (item.id === 'forest_guide') {
       const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
@@ -437,7 +438,7 @@ handleKeyDown(key) {
 
       sound.playMagic();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu_action.forest_guide')]);
+      this.msgWin.open([logFormatter.format('menu_action.forest_guide')]);
       if (this.changeMap) {
         this.changeMap('temple', 11, 9, 'up', true);
       }
@@ -491,41 +492,41 @@ useMagic(spell) {
     sound.playMagic();
 
     const spellName = SPELL_DB[spell.id]?.name || spell.name;
-    const castMsg = i18n.t('menu_action.spell_cast', { spell: spellName });
+    const castMsg = logFormatter.format('menu_action.spell_cast', { spell: spellName });
 
     if (spell.id === 'hoimi') {
       const healAmount = Math.floor(Math.random() * 8) + 25;
       this.player.heal(healAmount);
       sound.playHeal();
       this.onEnd();
-      this.msgWin.open([castMsg, i18n.t('menu_action.healed')]);
+      this.msgWin.open([castMsg, logFormatter.format('menu_action.healed')]);
     } else if (spell.id === 'behoimi') {
       const healAmount = Math.floor(Math.random() * 16) + 75;
       this.player.heal(healAmount);
       sound.playHeal();
       this.onEnd();
-      this.msgWin.open([castMsg, i18n.t('menu_action.greatly_healed')]);
+      this.msgWin.open([castMsg, logFormatter.format('menu_action.greatly_healed')]);
     } else if (spell.id === 'behoma') {
       this.player.heal(this.player.maxHp);
       sound.playHeal();
       this.onEnd();
-      this.msgWin.open([castMsg, i18n.t('menu_action.fully_healed')]);
+      this.msgWin.open([castMsg, logFormatter.format('menu_action.fully_healed')]);
     } else if (spell.id === 'remira') {
       this.player.remiraSteps = 120;
       this.onEnd();
-      this.msgWin.open([castMsg, i18n.t('menu_action.remira_shine')]);
+      this.msgWin.open([castMsg, logFormatter.format('menu_action.remira_shine')]);
     } else if (spell.id === 'toherosu') {
       this.player.holyWaterSteps = 128;
       this.onEnd();
-      this.msgWin.open([castMsg, i18n.t('menu_action.holy_water_2')]);
+      this.msgWin.open([castMsg, logFormatter.format('menu_action.holy_water_2')]);
     } else if (spell.id === 'kiari') {
       this.onEnd();
       if (this.player.isPoisoned) {
         this.player.curePoison();
         sound.playHeal();
-        this.msgWin.open([castMsg, i18n.t('menu_action.antidote_2')]);
+        this.msgWin.open([castMsg, logFormatter.format('menu_action.antidote_2')]);
       } else {
-        this.msgWin.open([castMsg, i18n.t('menu_action.antidote_not_poisoned')]);
+        this.msgWin.open([castMsg, logFormatter.format('menu_action.antidote_not_poisoned')]);
       }
     } else if (spell.id === 'liremito') {
       const escape = this.getCurrentMap().escapeTarget;

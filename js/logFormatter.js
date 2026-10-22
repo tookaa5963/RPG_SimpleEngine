@@ -92,4 +92,14 @@ export async function initLogData() {
   } catch (error) {
     console.error("Failed to fetch log data (player):", error);
   }
+
+  try {
+    const res = await fetch('data/logs/menu_action.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    const data = await res.json();
+    logFormatter.registerDomain('menu_action', data);
+    console.log("logFormatter: menu_action domain loaded.");
+  } catch (error) {
+    console.error("Failed to fetch log data (menu_action):", error);
+  }
 }

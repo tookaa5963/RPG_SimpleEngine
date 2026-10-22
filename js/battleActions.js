@@ -1,4 +1,5 @@
 // FILE_ENTRY: js/battleActions.js
+import { logFormatter } from './logFormatter.js';
 import { sound } from './sound.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
 import { i18n } from './i18n.js';
@@ -174,9 +175,9 @@ function executeMagicAction(bm, spell) {
     if (player.isPoisoned) {
       player.curePoison();
       sound.playHeal();
-      bm.queueMessages([castMsg, i18n.t('menu_action.antidote_2')], () => { bm.runEnemyTurn(); });
+      bm.queueMessages([castMsg, logFormatter.format('menu_action.antidote_2')], () => { bm.runEnemyTurn(); });
     } else {
-      bm.queueMessages([castMsg, i18n.t('menu_action.antidote_not_poisoned')], () => { bm.runEnemyTurn(); });
+      bm.queueMessages([castMsg, logFormatter.format('menu_action.antidote_not_poisoned')], () => { bm.runEnemyTurn(); });
     }
   }
 }

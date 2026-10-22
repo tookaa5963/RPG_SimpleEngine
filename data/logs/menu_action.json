@@ -1,0 +1,137 @@
+{
+  "used_herb_1": {
+    "ja": "勇者は 薬草を使った！",
+    "en": "Hero used Medicinal Herb!",
+    "es": "¡Héroe usó Planta medicinal!"
+  },
+  "used_herb_2": {
+    "ja": "勇者の傷が 回復した！",
+    "en": "Wounds were healed!",
+    "es": "¡Las heridas sanaron!"
+  },
+  "used_strong_herb_1": {
+    "ja": "勇者は 上薬草を使った！",
+    "en": "Hero used Strong Herb!",
+    "es": "¡Héroe usó Planta fuerte!"
+  },
+  "used_strong_herb_2": {
+    "ja": "勇者の傷が 大きく回復した！",
+    "en": "Wounds were greatly healed!",
+    "es": "¡Gran recuperación de salud!"
+  },
+  "used_special_herb_1": {
+    "ja": "勇者は 特薬草を使った！",
+    "en": "Hero used Special Herb!",
+    "es": "¡Héroe usó Planta especial!"
+  },
+  "drank_magic_water_1": {
+    "ja": "勇者は 魔法の聖水を飲んだ！",
+    "en": "Hero drank Magic Water!",
+    "es": "¡Héroe bebió Agua mágica!"
+  },
+  "drank_magic_water_2": {
+    "ja": "勇者のＭＰが １５回復した！",
+    "en": "Restored 15 MP!",
+    "es": "¡Recuperó 15 PM!"
+  },
+  "drank_sage_water_1": {
+    "ja": "勇者は 賢者の聖水を飲んだ！",
+    "en": "Hero drank Sage's Water!",
+    "es": "¡Héroe bebió Agua de sabio!"
+  },
+  "drank_sage_water_2": {
+    "ja": "勇者のＭＰが ４０回復した！",
+    "en": "Restored 40 MP!",
+    "es": "¡Recuperó 40 PM!"
+  },
+  "holy_water_1": {
+    "ja": "勇者は 聖水をまいた！",
+    "en": "Hero sprinkled Holy Water!",
+    "es": "¡Héroe esparció Agua bendita!"
+  },
+  "holy_water_2": {
+    "ja": "魔物が 近づけなくなった！",
+    "en": "Monsters cannot approach!",
+    "es": "¡Los monstruos no pueden acercarse!"
+  },
+  "torch_1": {
+    "ja": "勇者は たいまつを灯した！",
+    "en": "Hero lit a Torch!",
+    "es": "¡Héroe encendió una Antorcha!"
+  },
+  "torch_2": {
+    "ja": "明かりが あたりを照らし出した！",
+    "en": "Light illuminated the surroundings!",
+    "es": "¡La luz iluminó los alrededores!"
+  },
+  "lantern_on": {
+    "ja": "勇者は ランタンに\n火を灯した！",
+    "en": "Hero lit the Lantern!",
+    "es": "¡Héroe encendió el Farol!"
+  },
+  "lantern_off": {
+    "ja": "勇者は ランタンの\n火を消した！",
+    "en": "Hero put out the Lantern!",
+    "es": "¡Héroe apagó el Farol!"
+  },
+  "antidote_1": {
+    "ja": "勇者は 毒消し草を飲んだ！",
+    "en": "Hero took Antidotal Herb!",
+    "es": "¡Héroe tomó Hierba amarga!"
+  },
+  "antidote_2": {
+    "ja": "体の毒が 消え去った！",
+    "en": "The poison vanished!",
+    "es": "¡El veneno desapareció!"
+  },
+  "antidote_not_poisoned": {
+    "ja": "しかし 毒には冒されていなかった！",
+    "en": "However, was not poisoned!",
+    "es": "¡Sin embargo, no estaba envenenado!"
+  },
+  "forest_guide": {
+    "ja": "森の道標が 神秘的な光を放った！",
+    "en": "The Forest Guide emitted a mystic light!",
+    "es": "¡La Guía del bosque emitió una luz mística!"
+  },
+  "broken_hilt_1": {
+    "ja": "刃の失われた 剣の柄だ。\n緑竜の紋章が 微かに刻まれている。",
+    "en": "A sword hilt without a blade.\nA green dragon crest is faintly engraved.",
+    "es": "Una empuñadura de espada sin hoja.\nTiene grabado el blasón del dragón verde."
+  },
+  "broken_hilt_2": {
+    "ja": "しかし 何も起こらない。",
+    "en": "However, nothing happened.",
+    "es": "Sin embargo, no ocurre nada."
+  },
+  "charm_passive": {
+    "ja": "持っているだけで\n不思議な加護が 働くようだ。",
+    "en": "Carrying it seems to grant\nmysterious protection.",
+    "es": "Llevarlo parece otorgar\nuna misteriosa protección."
+  },
+  "spell_cast": {
+    "ja": "勇者は {spell}を唱えた！",
+    "en": "Hero cast {spell}!",
+    "es": "¡Héroe lanzó {spell}!"
+  },
+  "healed": {
+    "ja": "勇者の傷が 回復した！",
+    "en": "Wounds were healed!",
+    "es": "¡Las heridas sanaron!"
+  },
+  "greatly_healed": {
+    "ja": "勇者の傷が 大きく回復した！",
+    "en": "Wounds were greatly healed!",
+    "es": "¡Gran recuperación de salud!"
+  },
+  "fully_healed": {
+    "ja": "勇者の傷が 完全に回復した！",
+    "en": "Wounds were fully healed!",
+    "es": "¡Heridas completamente sanadas!"
+  },
+  "remira_shine": {
+    "ja": "光が あたりを明るく照らした！",
+    "en": "Light brightly lit the area!",
+    "es": "¡La luz iluminó el área con fuerza!"
+  }
+}
