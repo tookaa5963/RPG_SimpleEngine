@@ -17,10 +17,14 @@
   "spells": [
     {
       "id": "bronze_wind",
-      "nameKey": "spells.bronze_wind.name",
       "chance": 0.35,
       "isBreath": true,
-      "baseDmg": 85
+      "baseDmg": 85,
+      "name": {
+        "ja": "青銅の熱風",
+        "en": "Bronze Wind",
+        "es": "Viento de bronce"
+      }
     }
   ],
   "name": {

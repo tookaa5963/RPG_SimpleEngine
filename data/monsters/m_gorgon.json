@@ -15,11 +15,15 @@
   "sealResist": 0.5,
   "spells": [
     {
-      "id": "gira",
-      "nameKey": "spells.petrifying_gaze.name",
+      "id": "petrifying_gaze",
       "chance": 0.35,
       "minDmg": 16,
-      "maxDmg": 24
+      "maxDmg": 24,
+      "name": {
+        "ja": "石化の熱視線",
+        "en": "Petrifying Gaze",
+        "es": "Mirada petrificante"
+      }
     }
   ],
   "name": {

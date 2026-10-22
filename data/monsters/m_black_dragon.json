@@ -17,17 +17,25 @@
   "spells": [
     {
       "id": "hellfire_breath",
-      "nameKey": "spells.hellfire_breath.name",
       "chance": 0.4,
       "isBreath": true,
-      "baseDmg": 280
+      "baseDmg": 280,
+      "name": {
+        "ja": "黒炎の息",
+        "en": "Hellfire Breath",
+        "es": "Aliento de llamas oscuras"
+      }
     },
     {
       "id": "dragon_claw",
-      "nameKey": "spells.dragon_claw.name",
       "chance": 0.35,
       "isSpecialPhysical": true,
-      "baseDmg": 240
+      "baseDmg": 240,
+      "name": {
+        "ja": "切り裂く爪",
+        "en": "Rending Claw",
+        "es": "Garra desgarradora"
+      }
     }
   ],
   "name": {

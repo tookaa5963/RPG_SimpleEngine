@@ -18,10 +18,14 @@
   "spells": [
     {
       "id": "fire_breath",
-      "nameKey": "spells.fire_breath.name",
       "chance": 0.45,
       "isBreath": true,
-      "baseDmg": 180
+      "baseDmg": 180,
+      "name": {
+        "ja": "炎の息",
+        "en": "Flame Breath",
+        "es": "Aliento de fuego"
+      }
     }
   ],
   "name": {
