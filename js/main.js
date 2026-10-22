@@ -17,6 +17,7 @@ import { SlotDialog } from './slotDialog.js';
 import { TitleScene } from './titleScene.js';
 import { FieldManager } from './fieldManager.js';
 import { i18n } from './i18n.js';
+import { initLogData } from './logFormatter.js';
 import { initItemData } from './items.js';
 import { initMonsterData } from './monsters.js';
 
@@ -796,6 +797,7 @@ async function bootstrapEngine() {
     initShopData(),
     initInnData(),
     initChurchData()
+      , initLogData()
   ]);
     console.log("JSON data loaded (items, spells, monsters, maps, events). Initializing entities...");
 

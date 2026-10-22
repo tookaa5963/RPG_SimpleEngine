@@ -1,0 +1,17 @@
+{
+  "level_up": {
+    "ja": "勇者は レベル{level}に 上がった！",
+    "en": "The Hero reached level {level}!",
+    "es": "¡El héroe ha alcanzado el nivel {level}!"
+  },
+  "stat_gain": {
+    "ja": "最大ＨＰが {hp}ポイント 上がった！\n最大ＭＰが {mp}ポイント 上がった！\n力が {atk}ポイント 上がった！\n身の守りが {def}ポイント 上がった！\n素早さが {spd}ポイント 上がった！",
+    "en": "Max HP +{hp}!\nMax MP +{mp}!\nStrength +{atk}!\nResilience +{def}!\nAgility +{spd}!",
+    "es": "¡PV máx. +{hp}!\n¡PM máx. +{mp}!\n¡Fuerza +{atk}!\n¡Defensa +{def}!\n¡Agilidad +{spd}!"
+  },
+  "learned_spell": {
+    "ja": "勇者は {spell}の呪文を\n覚えた！",
+    "en": "The Hero learned\n{spell}!",
+    "es": "¡El héroe aprendió\n{spell}!"
+  }
+}

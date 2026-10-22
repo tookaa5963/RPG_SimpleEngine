@@ -1,3 +1,5 @@
+import { locale } from './locale.js';
+
 export const I18N_DICT = {
   "ja": {
     "common": {
@@ -171,11 +173,6 @@ export const I18N_DICT = {
       "enemy_spell_sealed": "{name}の呪文を\n封じ込んだ！",
       "enemy_already_sealed": "しかし すでに呪文は\n封じ込まれている！",
       "spell_no_effect": "しかし 効かなかった！"
-    },
-    "player": {
-      "level_up": "勇者は レベル{level}に 上がった！",
-      "stat_gain": "最大ＨＰが {hp}ポイント 上がった！\n最大ＭＰが {mp}ポイント 上がった！\n力が {atk}ポイント 上がった！\n身の守りが {def}ポイント 上がった！\n素早さが {spd}ポイント 上がった！",
-      "learned_spell": "勇者は {spell}の呪文を\n覚えた！"
     },
     "slot": {
       "title_save": "冒険の書 - 記録",
@@ -414,11 +411,6 @@ export const I18N_DICT = {
       "enemy_already_sealed": "But magic is already sealed!",
       "spell_no_effect": "But it had no effect!"
     },
-    "player": {
-      "level_up": "The Hero reached level {level}!",
-      "stat_gain": "Max HP +{hp}!\nMax MP +{mp}!\nStrength +{atk}!\nResilience +{def}!\nAgility +{spd}!",
-      "learned_spell": "The Hero learned\n{spell}!"
-    },
     "slot": {
       "title_save": "Log of Adventure - Save",
       "title_load": "Log of Adventure - Load",
@@ -656,11 +648,6 @@ export const I18N_DICT = {
       "enemy_already_sealed": "¡Pero los hechizos ya están sellados!",
       "spell_no_effect": "¡Pero no tuvo efecto!"
     },
-    "player": {
-      "level_up": "¡El héroe ha alcanzado el nivel {level}!",
-      "stat_gain": "¡PV máx. +{hp}!\n¡PM máx. +{mp}!\n¡Fuerza +{atk}!\n¡Defensa +{def}!\n¡Agilidad +{spd}!",
-      "learned_spell": "¡El héroe aprendió\n{spell}!"
-    },
     "slot": {
       "title_save": "Diario de Aventura - Guardar",
       "title_load": "Diario de Aventura - Cargar",
@@ -728,33 +715,22 @@ export const I18N_DICT = {
 };
 
 class I18nManager {
-  constructor() {
-    this.langs = ['ja', 'en', 'es'];
-    this.currentLang = 'ja';
-    try {
-      const saved = localStorage.getItem('camino_de_leyenda_lang');
-      if (saved && this.langs.includes(saved)) {
-        this.currentLang = saved;
-      }
-    } catch (e) {
-      console.warn('言語設定の読込に失敗しました:', e);
-    }
+  constructor() {}
+
+  get currentLang() {
+    return locale.getLanguage();
   }
 
+  set currentLang(lang) {
+    locale.setLanguage(lang);
+  }
+
+  get langs() {
+    return locale.langs;
+  }
   toggleLang() {
-    const idx = this.langs.indexOf(this.currentLang);
-    this.currentLang = this.langs[(idx + 1) % this.langs.length];
-    try {
-      localStorage.setItem('camino_de_leyenda_lang', this.currentLang);
-    } catch (e) {
-      console.warn('言語設定の保存に失敗しました:', e);
-    }
-    return this.currentLang;
+    return locale.toggleLang();
   }
-
-  /**
-   * カプセル化された多言語オブジェクトから現在言語のテキストを解決するAPI
-   */
   resolve(textObj) {
     if (!textObj || typeof textObj !== 'object') {
       throw new Error(`[DataValidationError] i18n.js:resolve: 翻訳オブジェクトが不正です (値: ${textObj}, 型: ${typeof textObj})`);
@@ -809,3 +785,8 @@ class I18nManager {
 }
 
 export const i18n = new I18nManager();
+
+if (typeof window !== 'undefined') {
+  window.i18n = i18n;
+}
+

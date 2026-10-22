@@ -1,6 +1,6 @@
 // FILE_ENTRY: js/player.js
 import { ITEM_DB, SPELL_DB } from './items.js';
-import { i18n } from './i18n.js';
+import { logFormatter } from './logFormatter.js';
 
 export const MAX_INVENTORY_CAPACITY = 12;
 
@@ -158,9 +158,9 @@ export class Player {
       this.mp = this.maxMp;
       this.curePoison();
 
-      messages.push(i18n.t('player.level_up', { level: String(this.level) }));
+      messages.push(logFormatter.format('player.level_up', { level: String(this.level) }));
       messages.push(
-        i18n.t('player.stat_gain', {
+        logFormatter.format('player.stat_gain', {
           hp: String(this.maxHp - oldMaxHp),
           mp: String(this.maxMp - oldMaxMp),
           atk: String(this.baseAtk - oldAtk),
@@ -169,7 +169,7 @@ export class Player {
         })
       );
       newlyLearnedSpells.forEach(spellName => {
-        messages.push(i18n.t('player.learned_spell', { spell: spellName }));
+        messages.push(logFormatter.format('player.learned_spell', { spell: spellName }));
       });
     }
     return messages;
