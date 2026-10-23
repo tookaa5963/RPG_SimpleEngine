@@ -17,7 +17,7 @@ import { SlotDialog } from './slotDialog.js';
 import { TitleScene } from './titleScene.js';
 import { FieldManager } from './fieldManager.js';
 import { i18n } from './i18n.js';
-import { initLogData } from './logFormatter.js';
+import { initLogData, logFormatter } from './logFormatter.js';
 import { initItemData } from './items.js';
 import { initMonsterData } from './monsters.js';
 
@@ -210,15 +210,15 @@ function handlePlayerDeath(isPoison = false) {
   const rp = player.returnPoint || { mapId: 'lighthousekeeper_cottage', gridX: 3, gridY: 4, direction: 'up' };
 
   let deathMsg = isPoison
-    ? i18n.t('field.death_poison')
-    : i18n.t('field.death_normal');
+    ? logFormatter.format('field.death_poison')
+    : logFormatter.format('field.death_normal');
 
   if (lostExp > 0) {
-    deathMsg += '\n' + i18n.t('field.death_exp_lost', { exp: String(lostExp) });
+    deathMsg += '\n' + logFormatter.format('field.death_exp_lost', { exp: String(lostExp) });
   }
 
   if (lostGirl) {
-    deathMsg += i18n.t('field.death_girl_lost');
+    deathMsg += logFormatter.format('field.death_girl_lost');
   }
 
   messageWindow.open([deathMsg]);
@@ -638,7 +638,7 @@ function initializeGameEntities() {
         menuManager.onEnd();
       }
       currentState = STATE_MESSAGE;
-      messageWindow.open([i18n.t('field.saved_slot', { slot: String(slot) })]);
+      messageWindow.open([logFormatter.format('field.saved_slot', { slot: String(slot) })]);
     },
     onLoad: (slot, mode) => {
       const success = loadGame(slot);
@@ -659,12 +659,12 @@ function initializeGameEntities() {
         }
         input.actionJustPressed = false;
         input._prevAction = true;
-        messageWindow.open([i18n.t('field.loaded_slot', { slot: String(slot) })]);
+        messageWindow.open([logFormatter.format('field.loaded_slot', { slot: String(slot) })]);
       } else {
         sound.playBump();
         const currentInfo = document.getElementById('slot-current-info');
         if (currentInfo) {
-          currentInfo.textContent = i18n.t('field.data_not_found', { slot: String(slot) });
+          currentInfo.textContent = logFormatter.format('field.data_not_found', { slot: String(slot) });
           currentInfo.style.color = '#ff4d4f';
         }
       }
@@ -767,8 +767,8 @@ function initializeGameEntities() {
     onEnterDragonsCave2: () => {
       currentState = STATE_MESSAGE;
       messageWindow.open([
-        i18n.t('field.dragons_cave_warn_1'),
-        i18n.t('field.dragons_cave_warn_2')
+        logFormatter.format('field.dragons_cave_warn_1'),
+        logFormatter.format('field.dragons_cave_warn_2')
       ], () => {
         slotDialog.open('auto_save');
       });

@@ -1,0 +1,117 @@
+{
+  "chest_inventory_full_give_up": {
+    "ja": "しかし 荷物がいっぱいで 持てない！\n勇者は {item} をあきらめた。",
+    "en": "But your bag is full!\nThe Hero gave up on {item}.",
+    "es": "¡Pero tu bolsa está llena!\nEl héroe renunció a {item}."
+  },
+  "chest_give_up": {
+    "ja": "勇者は {item} をあきらめ、\n宝箱をそっと閉じた。",
+    "en": "The Hero gave up on {item}\nand closed the chest.",
+    "es": "El héroe renunció a {item}\ny cerró el cofre."
+  },
+  "death_exp_lost": {
+    "ja": "経験値を {exp}ポイント 失ってしまった！",
+    "en": "Lost {exp} EXP points!",
+    "es": "¡Has perdido {exp} puntos de experiencia!"
+  },
+  "light_expired": {
+    "ja": "明かりが 消えてしまった！",
+    "en": "The light has gone out!",
+    "es": "¡La luz se ha apagado!"
+  },
+  "holy_water_expired": {
+    "ja": "清めの効果が\n切れてしまった！",
+    "en": "The holy protection\nhas worn off!",
+    "es": "¡El efecto de purificación\nse ha desvanecido!"
+  },
+  "dragons_cave_warn_1": {
+    "ja": "洞窟の最奥から 凄まじい邪気が漂ってくる……！\nこの先へ進めば、もはや後戻りはできない。",
+    "en": "A dreadful malice drifts from deep within the cave...!\nOnce you proceed, there is no turning back.",
+    "es": "¡Una densa maldad emana de lo profundo de la cueva...!\nSi avanzas más, ya no habrá vuelta atrás."
+  },
+  "dragons_cave_warn_2": {
+    "ja": "決戦に挑む前に\nこれまでの冒険の記録を 残しておこう。",
+    "en": "Before challenging the final battle,\nlet us record the tale of your journey.",
+    "es": "Antes de desafiar la batalla final,\nguardemos el registro de tu aventura."
+  },
+  "chest_locked_altar": {
+    "ja": "祭壇の長櫃には 二つの鍵穴がある。",
+    "en": "There are two keyholes on the altar's coffer.",
+    "es": "Hay dos cerraduras en el arca del altar."
+  },
+  "chest_locked": {
+    "ja": "鍵がかかっていて 開かない！",
+    "en": "It is locked and will not open!",
+    "es": "¡Está cerrado con llave y no se abre!"
+  },
+  "chest_inventory_full": {
+    "ja": "持ち物がいっぱいで\n宝箱を開けられない！",
+    "en": "Inventory is full!\nCannot open the treasure chest!",
+    "es": "¡Tu bolsa está llena!\n¡No puedes abrir el cofre!"
+  },
+  "chest_open_corrada_1": {
+    "ja": "勇者は 【古びた鍵】と【青銅の鍵】を差し込んだ！",
+    "en": "The Hero inserted the Ancient Key and Bronze Key!",
+    "es": "¡El héroe introdujo la Llave antigua y la Llave de bronce!"
+  },
+  "chest_open_corrada_2": {
+    "ja": "カチャリ……！ 長櫃の重厚な封印が解かれた！",
+    "en": "Click...! The heavy seal of the coffer was undone!",
+    "es": "¡Clic...! ¡El pesado sello del arca fue liberado!"
+  },
+  "chest_open_corrada_3": {
+    "ja": "祭壇の長櫃を開けた！\nなんと 名剣【コラーダ】を手に入れた！",
+    "en": "Opened the altar's coffer!\nAcquired the legendary sword Colada!",
+    "es": "¡Abrió el arca del altar!\n¡Consiguió la espada legendaria Colada!"
+  },
+  "chest_open_corrada_4": {
+    "ja": "剣を手にした瞬間、緑竜の刻印が淡い光を放った……！\n（身体の奥底から 懐かしい力が湧き上がるようだ）",
+    "en": "The moment you held the sword, the green dragon seal radiated light...!\n(A familiar power seems to surge from deep within.)",
+    "es": "¡Al empuñar la espada, el blasón del dragón verde emitió luz...!\n(Un poder nostálgico parece brotar desde lo profundo del cuerpo.)"
+  },
+  "chest_open": {
+    "ja": "宝箱を開けた！\nなんと {item}を手に入れた！",
+    "en": "Opened the treasure chest!\nFound {item}!",
+    "es": "¡Abrió el cofre del tesoro!\n¡Consiguió {item}!"
+  },
+  "chest_empty": {
+    "ja": "しかし 宝箱は\nからっぽだった。",
+    "en": "However, the chest\nwas empty.",
+    "es": "Sin embargo, el cofre\nestaba vacío."
+  },
+  "chest_altar_empty": {
+    "ja": "しかし 長櫃は\nからっぽだった。",
+    "en": "However, the coffer\nwas empty.",
+    "es": "Sin embargo, el arca\nestaba vacía."
+  },
+  "death_poison": {
+    "ja": "勇者は 毒によって\n倒れてしまった……\nゴールドが 半分になった！",
+    "en": "The Hero collapsed\nfrom poison...\nLost half of all gold!",
+    "es": "¡El héroe cayó derrotado\npor el veneno...!\n¡Perdió la mitad del oro!"
+  },
+  "death_normal": {
+    "ja": "勇者は 倒れてしまった！\nゴールドが 半分になった……",
+    "en": "The Hero collapsed!\nLost half of all gold...",
+    "es": "¡El héroe cayó derrotado!\nPerdió la mitad del oro..."
+  },
+  "death_girl_lost": {
+    "ja": "\n（女の子は 再び ダンジョン奥へ\n連れ戻されてしまった！）",
+    "en": "\n(The girl was taken back\ndeep into the dungeon!)",
+    "es": "\n(¡La niña fue llevada de vuelta\na lo profundo de la mazmorra!)"
+  },
+  "saved_slot": {
+    "ja": "冒険の書{slot}に\n記録した！",
+    "en": "Saved to Log {slot}!",
+    "es": "¡Guardado en el diario {slot}!"
+  },
+  "loaded_slot": {
+    "ja": "冒険の書{slot}から\n再開した！",
+    "en": "Resumed from Log {slot}!",
+    "es": "¡Reanudado desde el diario {slot}!"
+  },
+  "data_not_found": {
+    "ja": "冒険の書{slot}は 空っぽです",
+    "en": "Log {slot} is empty.",
+    "es": "El diario {slot} está vacío."
+  }
+}

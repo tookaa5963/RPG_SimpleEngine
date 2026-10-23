@@ -409,7 +409,7 @@ export class FieldManager {
 
             if (!hasAntique || !hasBronze) {
               sound.playBump();
-              this.messageWindow.open([i18n.t('field.chest_locked_altar')]);
+              this.messageWindow.open([logFormatter.format('field.chest_locked_altar')]);
               return;
             }
             this.player.removeItem('antique_key', 1);
@@ -419,10 +419,10 @@ export class FieldManager {
             this.player.addItem(targetObj.itemId, 1);
             sound.playChest();
             this.messageWindow.open([
-              i18n.t('field.chest_open_corrada_1'),
-              i18n.t('field.chest_open_corrada_2'),
-              i18n.t('field.chest_open_corrada_3'),
-              i18n.t('field.chest_open_corrada_4')
+              logFormatter.format('field.chest_open_corrada_1'),
+              logFormatter.format('field.chest_open_corrada_2'),
+              logFormatter.format('field.chest_open_corrada_3'),
+              logFormatter.format('field.chest_open_corrada_4')
             ]);
             return;
           } else {
@@ -434,7 +434,7 @@ export class FieldManager {
               const hasKey = (this.player.inventory[targetObj.requiredKey] || 0) > 0;
               if (!hasKey) {
                 sound.playBump();
-                this.messageWindow.open([i18n.t('field.chest_locked')]);
+                this.messageWindow.open([logFormatter.format('field.chest_locked')]);
                 return;
               }
               if (targetObj.consumeKey) {
@@ -461,8 +461,8 @@ export class FieldManager {
 
               if (candidates.length === 0) {
                 this.messageWindow.open([
-                  i18n.t('field.chest_open', { item: itemName }),
-                  i18n.t('field.chest_inventory_full_give_up', { item: itemName })
+                  logFormatter.format('field.chest_open', { item: itemName }),
+                  logFormatter.format('field.chest_inventory_full_give_up', { item: itemName })
                 ]);
               } else {
                 const promptMsg = i18n.currentLang === 'ja' 
@@ -482,7 +482,7 @@ export class FieldManager {
                         discardNames,
                         (discardIdx) => {
                           if (discardIdx === candidates.length) {
-                            this.messageWindow.open([i18n.t('field.chest_give_up', { item: itemName })]);
+                            this.messageWindow.open([logFormatter.format('field.chest_give_up', { item: itemName })]);
                           } else {
                             const discarded = candidates[discardIdx];
                             this.player.removeItem(discarded.id, 1);
@@ -501,15 +501,15 @@ export class FieldManager {
                           }
                         },
                         () => {
-                          this.messageWindow.open([i18n.t('field.chest_give_up', { item: itemName })]);
+                          this.messageWindow.open([logFormatter.format('field.chest_give_up', { item: itemName })]);
                         }
                       );
                     } else {
-                      this.messageWindow.open([i18n.t('field.chest_give_up', { item: itemName })]);
+                      this.messageWindow.open([logFormatter.format('field.chest_give_up', { item: itemName })]);
                     }
                   },
                   () => {
-                    this.messageWindow.open([i18n.t('field.chest_give_up', { item: itemName })]);
+                    this.messageWindow.open([logFormatter.format('field.chest_give_up', { item: itemName })]);
                   }
                 );
               }
@@ -523,10 +523,10 @@ export class FieldManager {
             this.player.addItem(targetObj.itemId, 1);
             sound.playChest();
             // ★ここでは itemName を再宣言せず、上部で取得したものを使い回す
-            this.messageWindow.open([i18n.t('field.chest_open', { item: itemName })]);
+            this.messageWindow.open([logFormatter.format('field.chest_open', { item: itemName })]);
           }
         } else {
-          const emptyMsg = targetObj.itemId === 'corrada' ? i18n.t('field.chest_altar_empty') : i18n.t('field.chest_empty');
+          const emptyMsg = targetObj.itemId === 'corrada' ? logFormatter.format('field.chest_altar_empty') : logFormatter.format('field.chest_empty');
           this.messageWindow.open([emptyMsg]);
         }
       }
@@ -686,12 +686,12 @@ updatePlayer(input) {
         }
 
         if (stepResults.remiraExpired && this.currentMap.isDark) {
-          this.messageWindow.open([i18n.t('field.light_expired')]);
+          this.messageWindow.open([logFormatter.format('field.light_expired')]);
           if (this.onStateChange) this.onStateChange('MESSAGE');
           return;
         }
         if (stepResults.holyWaterExpired) {
-          this.messageWindow.open([i18n.t('field.holy_water_expired')]);
+          this.messageWindow.open([logFormatter.format('field.holy_water_expired')]);
           if (this.onStateChange) this.onStateChange('MESSAGE');
           return;
         }

@@ -112,4 +112,14 @@ export async function initLogData() {
   } catch (error) {
     console.error("Failed to fetch log data (battle_log):", error);
   }
+
+  try {
+    const res = await fetch('data/logs/field.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    const data = await res.json();
+    logFormatter.registerDomain('field', data);
+    console.log("logFormatter: field domain loaded.");
+  } catch (error) {
+    console.error("Failed to fetch log data (field):", error);
+  }
 }
