@@ -4,6 +4,7 @@ import { i18n } from './i18n.js';
 
 export let EVENT_DB = {};
 export let OBJECTIVES_DB = {};
+export let ENDING_DB = {};
 
 let isLoaded = false;
 
@@ -29,9 +30,10 @@ export async function initEventData() {
       return await res.json();
     });
 
-    const [chapters, objectivesRes] = await Promise.all([
+    const [chapters, objectivesRes, endingRes] = await Promise.all([
       Promise.all(loadPromises),
-      fetch('data/events/objectives.json')
+      fetch('data/events/objectives.json'),
+      fetch('data/events/ending.json')
     ]);
 
     if (!objectivesRes.ok) {
@@ -42,14 +44,23 @@ export async function initEventData() {
       throw new Error(`[DataValidationError] events.js: objectives.json の形式が不正です (型: ${typeof objectivesJson})`);
     }
 
+    if (!endingRes.ok) {
+      throw new Error(`[DataValidationError] events.js: ending.json 取得失敗 (status: ${endingRes.status})`);
+    }
+    const endingJson = await endingRes.json();
+    if (!endingJson || typeof endingJson !== 'object' || Array.isArray(endingJson)) {
+      throw new Error(`[DataValidationError] events.js: ending.json の形式が不正です (型: ${typeof endingJson})`);
+    }
+
     OBJECTIVES_DB = objectivesJson;
+    ENDING_DB = endingJson;
     EVENT_DB = {};
     chapters.forEach(chapterData => {
       Object.assign(EVENT_DB, chapterData);
     });
 
     isLoaded = true;
-    console.log("EVENT_DB and OBJECTIVES_DB initialized successfully.");
+    console.log("EVENT_DB, OBJECTIVES_DB, and ENDING_DB initialized successfully.");
     return EVENT_DB;
   } catch (error) {
     console.error("[EventManager] イベントデータ初期化中に致命的エラー:", error);
@@ -293,6 +304,21 @@ export function getObjectiveText(key) {
   const text = i18n.resolve(entry);
   if (typeof text !== 'string' || text.trim() === '') {
     throw new Error(`[DataValidationError] events.js/getObjectiveText: 目的キー "${key}" の現在言語テキストが不正です (値: ${text}, 型: ${typeof text})`);
+  }
+  return text;
+}
+
+export function getEndingText(key) {
+  if (!isLoaded || !ENDING_DB) {
+    throw new Error(`[DataValidationError] events.js/getEndingText: イベントデータが未ロードです (key: "${key}")`);
+  }
+  const entry = ENDING_DB[key];
+  if (!entry) {
+    throw new Error(`[DataValidationError] events.js/getEndingText: エンディングキー "${key}" が定義されていません`);
+  }
+  const text = i18n.resolve(entry);
+  if (typeof text !== 'string' || text.trim() === '') {
+    throw new Error(`[DataValidationError] events.js/getEndingText: エンディングキー "${key}" の現在言語テキストが不正です (値: ${text}, 型: ${typeof text})`);
   }
   return text;
 }

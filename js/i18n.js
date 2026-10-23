@@ -95,28 +95,7 @@ export const I18N_DICT = {
       "backup_export": "バックアップ出力",
       "backup_import": "バックアップ読込"
     },
-    "ending": {
-      "corrada_broken_1": "黒竜の断末魔とともに 聖剣コラーダは\n眩い光の粒子となって 砕け散った……",
-      "corrada_broken_2": "手元には 【コラーダの折れた柄】と\n緑竜の紋章の指輪のみが 残された。",
-      "dwarf_1": "鍛冶屋「おお！ 戻ったか！\nドラゴネーラ島の黒竜を 討ち果たしたのじゃな！",
-      "dwarf_2": "鍛冶屋「……そして、盟約に従い\n【竜鱗の鎧】を 返しに来てくれたのだな。」",
-      "dwarf_3": "勇者は 鍛冶屋に\n【竜鱗の鎧】を 返却した！",
-      "dwarf_4": "鍛冶屋「うむ、確かに受け取った！\nこの太古の剥落鱗は 我がドワーフの里の誇り。\n大切に守り伝えていこう。」",
-      "dwarf_5": "鍛冶屋「おぬしのおかげで 島と里は救われた。\n海の向こうの大陸へ向かうと聞く……\n大地の加護が あらんことを！」",
-      "undine_1": "ウンディーネ「黒竜の灼熱の瘴気が 晴れ渡りました。\n災厄の火は 消え去ったのですね。」",
-      "undine_2": "ウンディーネ「交わした誓いの通り、\n【水霊の盾】を 泉の祭壇へ奉納してください。」",
-      "undine_3": "勇者は 祭壇へ\n【水霊の盾】を 奉納・返還した！",
-      "undine_4": "ウンディーネ「精霊の守護は 再び島の霊脈へと還り、\n海流の恵みとなって この地を守り続けるでしょう。」",
-      "undine_5": "ウンディーネ「その【折れた柄】と指輪が\nあなたを 遥かなる宿命へと導くはずです。\n旅立ちに 水の恵みがあらんことを……」",
-      "port_1": "船長「おお！ 待ちわびたぜ！\n黒竜が倒れ、沖合を塞いでいた火炎の嵐が\n完全に晴れ渡ったんだ！」",
-      "port_2": "学者「おお、無事であったか！\n黒竜の死によって 封印は役目を終え、\nコラーダは 砕け散ったのじゃな……」",
-      "port_3": "学者「だが、手元に残った【折れた柄】と指輪、\nそしておぬし自身の存在こそが、\n大陸の歴史から消された『不敗の騎士』の真実じゃ。」",
-      "port_4": "町長「島を破滅から救ってくれたおぬしを、\n島民全員が 心から讃えておるぞ！」",
-      "port_5": "女の子「お兄ちゃん、行っちゃうの……？\n行かないで……！ ずっと一緒にいてよぉ……！」",
-      "port_6": "船長「大陸への定期船は すでに抜錨の準備完了だ。\n海を渡り、新しい世界に乗り出す時が来たぜ！」",
-      "port_7": "船長「野郎ども、帆を張れ！ 出航だーーっ！！」"
-    }
-  },
+      },
   "en": {
     "common": {
       "yes": "Yes",
@@ -211,28 +190,7 @@ export const I18N_DICT = {
       "backup_export": "Export Save Data",
       "backup_import": "Import Save Data"
     },
-    "ending": {
-      "corrada_broken_1": "With the Black Dragon's dying curse,\nthe sacred sword Colada shattered into particles of light...",
-      "corrada_broken_2": "In your hands, only the Broken Colada Hilt\nand the ring of the Green Dragon remained.",
-      "dwarf_1": "Blacksmith: \"You returned!\nYou truly vanquished the Black Dragon of Dragonera!\"",
-      "dwarf_2": "Blacksmith: \"...And true to our pact,\nyou have come to return the Dragon Scale Armor.\"",
-      "dwarf_3": "The Hero returned the\nDragon Scale Armor to the blacksmith!",
-      "dwarf_4": "Blacksmith: \"Aye, I have received it!\nThis ancient scale is the pride of our village.\nWe shall protect and pass it down.\"",
-      "dwarf_5": "Blacksmith: \"Thanks to you, our island and village are saved.\nI hear you head across the sea...\nMay the blessing of the earth be with you!\"",
-      "undine_1": "Undine: \"The scorching miasma of the Black Dragon has cleared.\nThe flames of disaster have vanished at last.\"",
-      "undine_2": "Undine: \"As promised in our vow,\nplease offer the Water Spirit Shield upon the spring altar.\"",
-      "undine_3": "The Hero returned and offered\nthe Water Spirit Shield to the altar!",
-      "undine_4": "Undine: \"The spirit's protection returns to the island's veins,\nbecoming oceanic blessings to guard this land.\"",
-      "undine_5": "Undine: \"That broken hilt and ring\nshall lead you toward your distant destiny.\nMay the blessings of water guide your voyage...\"",
-      "port_1": "Captain: \"Ahoy! We've been waiting for ya!\nThe Black Dragon fell, and the storm of fire blocking the sea has vanished!\"",
-      "port_2": "Scholar: \"Oh, you are safe!\nWith the dragon's demise, the seal served its purpose and Colada shattered...\"",
-      "port_3": "Scholar: \"Yet the broken hilt, the ring, and your very presence\nare the living proof of the Undefeated Knight erased from continental history.\"",
-      "port_4": "Mayor: \"You saved our island from ruin!\nEvery resident praises you from the bottom of their heart!\"",
-      "port_5": "Girl: \"Are you leaving...? Please don't go...!\nStay with us forever...!\"",
-      "port_6": "Captain: \"The liner to the continent is ready to set sail.\nTime to cross the waves and head into the new world!\"",
-      "port_7": "Captain: \"All hands, hoist the sails! Set saiiil!!\""
-    }
-  },
+      },
   "es": {
     "common": {
       "yes": "Sí",
@@ -327,28 +285,7 @@ export const I18N_DICT = {
       "backup_export": "Exportar Datos",
       "backup_import": "Importar Datos"
     },
-    "ending": {
-      "corrada_broken_1": "Con el último aliento del Dragón negro,\nla espada Colada se deshizo en partículas de luz...",
-      "corrada_broken_2": "En tus manos, solo quedaron la Empuñadura rota de Colada\ny el anillo del blasón del Dragón verde.",
-      "dwarf_1": "Herrero: \"¡Por fin has vuelto!\n¡Has derrotado al Dragón negro de Dragonera!\"",
-      "dwarf_2": "Herrero: \"...Y según lo pactado,\nvienes a devolver la Armadura de escamas de dragón.\"",
-      "dwarf_3": "¡El héroe devolvió la\nArmadura de escamas de dragón al herrero!",
-      "dwarf_4": "Herrero: \"¡Sí, la recibo con gratitud!\nEsta antigua escama es el orgullo de nuestra aldea.\nLa protegeremos siempre.\"",
-      "dwarf_5": "Herrero: \"Gracias a ti, la isla y la aldea están a salvo.\nHe oído que partes hacia el continente...\n¡Que la bendición de la tierra te acompañe!\"",
-      "undine_1": "Ondina: \"El miasma abrasador del Dragón negro se ha disipado.\nEl fuego del desastre ha desaparecido por fin.\"",
-      "undine_2": "Ondina: \"Tal como juramos,\nofrenda el Escudo del espíritu del agua en el altar del manantial.\"",
-      "undine_3": "¡El héroe ofrendó y devolvió\nel Escudo del espíritu del agua al altar!",
-      "undine_4": "Ondina: \"La protección de los espíritus volverá a las corrientes de la isla\ny cuidará esta tierra por siempre.\"",
-      "undine_5": "Ondina: \"Esa empuñadura rota y el anillo\nte guiarán hacia tu lejano destino.\nQue la bendición del agua acompañe tu viaje...\"",
-      "port_1": "Capitán: \"¡Te estábamos esperando!\n¡El dragón ha caído y la tormenta de fuego que bloqueaba el mar ha desaparecido!\"",
-      "port_2": "Erudito: \"¡Estás a salvo!\nCon la muerte del dragón, el sello cumplió su propósito y Colada se quebró...\"",
-      "port_3": "Erudito: \"Sin embargo, la empuñadura, el anillo y tu existencia misma\nson la prueba viva del Caballero Invicto borrado de los anales del continente.\"",
-      "port_4": "Alcalde: \"¡Salvaste a nuestra isla de la ruina!\n¡Todos los habitantes te aclaman desde el corazón!\"",
-      "port_5": "Niña: \"¿Te vas, hermano...? ¡No te vayas...!\n¡Quédate con nosotros para siempre...!\"",
-      "port_6": "Capitán: \"El barco regular hacia el continente está listo para zarpar.\n¡Ha llegado la hora de cruzar el mar hacia un nuevo mundo!\"",
-      "port_7": "Capitán: \"¡Muchachos, desplegad las velas! ¡¡Zarpamos!!\""
-    }
-  }
+      }
 };
 
 class I18nManager {

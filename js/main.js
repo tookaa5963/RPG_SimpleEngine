@@ -12,7 +12,7 @@ import { SaveManager } from './save.js';
 import { Renderer } from './renderer.js';
 import { UIManager } from './ui.js';
 import { Player } from './player.js';
-import { EventManager, initEventData } from './events.js'; // ★ initEventDataを追加
+import { EventManager, initEventData, getEndingText } from './events.js'; // ★ initEventDataを追加
 import { SlotDialog } from './slotDialog.js';
 import { TitleScene } from './titleScene.js';
 import { FieldManager } from './fieldManager.js';
@@ -267,13 +267,13 @@ function runEndingSequence() {
     currentState = STATE_MESSAGE;
 
     const dwarfMessages = [
-      i18n.t('ending.corrada_broken_1'),
-      i18n.t('ending.corrada_broken_2'),
-      i18n.t('ending.dwarf_1'),
-      i18n.t('ending.dwarf_2'),
-      i18n.t('ending.dwarf_3'),
-      i18n.t('ending.dwarf_4'),
-      i18n.t('ending.dwarf_5')
+      getEndingText('corrada_broken_1'),
+      getEndingText('corrada_broken_2'),
+      getEndingText('dwarf_1'),
+      getEndingText('dwarf_2'),
+      getEndingText('dwarf_3'),
+      getEndingText('dwarf_4'),
+      getEndingText('dwarf_5')
     ];
 
     messageWindow.open(dwarfMessages, () => {
@@ -286,11 +286,11 @@ function runEndingSequence() {
       currentState = STATE_MESSAGE;
 
       const forestMessages = [
-        i18n.t('ending.undine_1'),
-        i18n.t('ending.undine_2'),
-        i18n.t('ending.undine_3'),
-        i18n.t('ending.undine_4'),
-        i18n.t('ending.undine_5')
+        getEndingText('undine_1'),
+        getEndingText('undine_2'),
+        getEndingText('undine_3'),
+        getEndingText('undine_4'),
+        getEndingText('undine_5')
       ];
 
       messageWindow.open(forestMessages, () => {
@@ -353,13 +353,13 @@ function runEndingSequence() {
         }
 
         const portMessages = [
-          i18n.t('ending.port_1'),
-          i18n.t('ending.port_2'),
-          i18n.t('ending.port_3'),
-          i18n.t('ending.port_4'),
-          i18n.t('ending.port_5'),
-          i18n.t('ending.port_6'),
-          i18n.t('ending.port_7')
+          getEndingText('port_1'),
+          getEndingText('port_2'),
+          getEndingText('port_3'),
+          getEndingText('port_4'),
+          getEndingText('port_5'),
+          getEndingText('port_6'),
+          getEndingText('port_7')
         ];
 
         messageWindow.open(portMessages, () => {
