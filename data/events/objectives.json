@@ -1,0 +1,112 @@
+{
+  "talk_sister": {
+    "ja": "【現在の目的】\n始まりの町の 教会へ行き、\nシスターに 指輪について尋ねよう。",
+    "en": "[Current Objective]\nGo to the church in Starting Town\nand ask the sister about the ring.",
+    "es": "[Objetivo actual]\nVe a la iglesia del pueblo de inicio\ny pregunta a la hermana sobre el anillo."
+  },
+  "find_scholar": {
+    "ja": "【現在の目的】\n北の遺跡へ向かい、\n遺跡を調査している 学者に会おう。",
+    "en": "[Current Objective]\nHead to the Northern Cave and meet\nthe scholar investigating the ruins.",
+    "es": "[Objetivo actual]\nDirígete a la Cueva del Norte y busca\nal erudito que investiga las ruinas."
+  },
+  "report_scholar": {
+    "ja": "【現在の目的】\n北の遺跡の入口付近にいる学者に、\n石碑の調査結果を報告しよう。",
+    "en": "[Current Objective]\nReport the findings from the monument\nto the scholar near the cave entrance.",
+    "es": "[Objetivo actual]\nInforma sobre la inscripción del monumento\nal erudito cerca de la entrada de la cueva."
+  },
+  "investigate_monument": {
+    "ja": "【現在の目的】\n北の遺跡の最奥に棲む魔物を倒し、\n古代の石碑を調査しよう。",
+    "en": "[Current Objective]\nDefeat the monster deep in Northern Cave\nand examine the ancient monument.",
+    "es": "[Objetivo actual]\nDerrota a la bestia de la Cueva del Norte\ny examina el monumento antiguo."
+  },
+  "return_girl": {
+    "ja": "【現在の目的】\n救出した女の子を連れて、\n始まりの町の町長のもとへ戻ろう。",
+    "en": "[Current Objective]\nEscort the rescued girl safely back\nto the Mayor of Starting Town.",
+    "es": "[Objetivo actual]\nLleva a la niña rescatada de vuelta\ncon el alcalde del pueblo de inicio."
+  },
+  "rescue_girl": {
+    "ja": "【現在の目的】\n東のダンジョンの最奥へ向かい、\nさらわれた町の女の子を救出しよう。",
+    "en": "[Current Objective]\nHead deep into the Eastern Dungeon\nand rescue the kidnapped girl.",
+    "es": "[Objetivo actual]\nAdéntrate en la Mazmorra Oriental\ny rescata a la niña secuestrada."
+  },
+  "consult_mayor": {
+    "ja": "【現在の目的】\n通行手形を発行してもらうため、\n始まりの町の町長に相談しよう。",
+    "en": "[Current Objective]\nConsult the Mayor of Starting Town\nto obtain a Travel Pass.",
+    "es": "[Objetivo actual]\nHabla con el alcalde del pueblo de inicio\npara conseguir un salvoconducto."
+  },
+  "cross_checkpoint": {
+    "ja": "【現在の目的】\n東の関所を越えて、\n北東の港町を目指そう。",
+    "en": "[Current Objective]\nPass through the eastern checkpoint\nand head toward the Port Town.",
+    "es": "[Objetivo actual]\nCruza el puesto de control del este\ny dirígete al Pueblo Costero."
+  },
+  "go_library": {
+    "ja": "【現在の目的】\n東の関所を通り、\n北東の港町の図書館へ向かおう。",
+    "en": "[Current Objective]\nPass through the eastern checkpoint\nand visit the library in Port Town.",
+    "es": "[Objetivo actual]\nAtraviesa el puesto de control del este\ny ve a la biblioteca del Pueblo Costero."
+  },
+  "find_temple": {
+    "ja": "【現在の目的】\n島中央の迷いの森を抜け、\n奥にあるという 神殿を目指そう。",
+    "en": "[Current Objective]\nTraverse the central Lost Forest\nand find the temple hidden within.",
+    "es": "[Objetivo actual]\nAtraviesa el Bosque Perdido central\ny busca el templo oculto en su interior."
+  },
+  "deliver_ring": {
+    "ja": "【現在の目的】\n神殿跡のエルフに、\n取り戻した【恋人の指輪】を届けよう。",
+    "en": "[Current Objective]\nDeliver the recovered Lover's Ring\nto the elf at the Temple Ruins.",
+    "es": "[Objetivo actual]\nLleva el Anillo de amantes recuperado\nal elfo en las Ruinas del Templo."
+  },
+  "recover_ring": {
+    "ja": "【現在の目的】\n神殿の西にある地下墓地へ潜入し、\n魔物から【恋人の指輪】を奪還しよう。",
+    "en": "[Current Objective]\nInfiltrate the catacombs west of the temple\nand retrieve the Lover's Ring from monsters.",
+    "es": "[Objetivo actual]\nEntra a las catacumbas al oeste del templo\ny recupera el Anillo de amantes de las bestias."
+  },
+  "obtain_water_shield": {
+    "ja": "【現在の目的】\n神殿跡の北東から迷いの森深部へ進み、\nウンディーネから【水霊の盾】を授かろう。",
+    "en": "[Current Objective]\nProceed northeast into the Deep Forest\nand receive the Water Spirit Shield from Undine.",
+    "es": "[Objetivo actual]\nAvanza al Bosque Profundo hacia el noreste\ny recibe el Escudo del espíritu de Ondina."
+  },
+  "obtain_corrada": {
+    "ja": "【現在の目的】\n地下墓地の奥深くから地下神殿へ潜入し、\n祭壇の長櫃から名剣【コラーダ】を手に入れよう。",
+    "en": "[Current Objective]\nInfiltrate the Underground Temple through the catacombs\nand claim the legendary sword Colada.",
+    "es": "[Objetivo actual]\nEntra al Templo Subterráneo por las catacumbas\ny obtén la espada legendaria Colada del arca."
+  },
+  "seek_dwarf_village": {
+    "ja": "【現在の目的】\n島の北東の海岸にある海底トンネルを抜け、\nドワーフの隠れ里を目指そう。",
+    "en": "[Current Objective]\nPass through the Undersea Tunnel on the northeast\ncoast and reach the hidden dwarven village.",
+    "es": "[Objetivo actual]\nCruza el Túnel Submarino en la costa noreste\ny llega a la aldea oculta de los enanos."
+  },
+  "seek_armor_clues": {
+    "ja": "【現在の目的】\n聖剣【コラーダ】を手に入れた！\n神殿跡のエルフか 港町の学者に報告し、\n黒竜に立ち向かうための防具の手がかりを探そう。",
+    "en": "[Current Objective]\nSword Colada obtained! Speak with the elf\nor the scholar to seek clues for dragon-proof armor.",
+    "es": "[Objetivo actual]\n¡Colada obtenida! Habla con el elfo o el\nerudito para hallar pistas de la armadura adecuada."
+  },
+  "defeat_black_lizard": {
+    "ja": "【現在の目的】\n海底トンネル中腹に潜む\n【黒きリザードマン】を討伐しよう。",
+    "en": "[Current Objective]\nDefeat the Black Lizardman lurking\naround the middle of the Undersea Tunnel.",
+    "es": "[Objetivo actual]\nDerrota al Hombre lagarto negro que acecha\na mitad del Túnel Submarino."
+  },
+  "report_black_lizard": {
+    "ja": "【現在の目的】\n黒きリザードマンを討伐した！\nドワーフ村の守備兵に報告しよう。",
+    "en": "[Current Objective]\nBlack Lizardman defeated!\nReport to the guard in the dwarven village.",
+    "es": "[Objetivo actual]\n¡Hombre lagarto negro derrotado!\nInforma al guardia en la aldea de los enanos."
+  },
+  "consult_blacksmith": {
+    "ja": "【現在の目的】\n守備兵の信頼を勝ち取った！\nドワーフ村の鍛冶屋に 鎧の仕立てを頼もう。",
+    "en": "[Current Objective]\nEarned the guard's trust!\nSpeak to the blacksmith in the dwarven village.",
+    "es": "[Objetivo actual]\n¡Te ganaste la confianza del guardia!\nPide al herrero que te ajuste la armadura."
+  },
+  "deliver_mane": {
+    "ja": "【現在の目的】\n手に入れた【ケルベロスの鬣】を\nドワーフ村の鍛冶屋に届けよう。",
+    "en": "[Current Objective]\nDeliver the obtained Cerberus Mane\nto the blacksmith in the dwarven village.",
+    "es": "[Objetivo actual]\nEntrega la Melena de cerbero obtenida\nal herrero de la aldea de los enanos."
+  },
+  "defeat_cerberus": {
+    "ja": "【現在の目的】\n竜の洞窟に潜む【ケルベロス】を倒し、\n鎧の仕立てに必要な【ケルベロスの鬣】を奪取しよう。",
+    "en": "[Current Objective]\nDefeat Cerberus in the dragon's cavern\nand obtain the mane needed for the armor.",
+    "es": "[Objetivo actual]\nDerrota a Cerbero en la cueva del dragón\ny obtén la melena necesaria para la armadura."
+  },
+  "defeat_black_dragon": {
+    "ja": "【現在の目的】\n最終装備が揃った！\nドラゴネーラ島の火口へ向かい、黒竜を討伐しよう。",
+    "en": "[Current Objective]\nFinal equipment gathered! Head to the crater\nof Dragonera Island and vanquish the Black Dragon.",
+    "es": "[Objetivo actual]\n¡Equipo final listo! Ve al cráter de la\nIsla Dragonera y acaba con el Dragón negro."
+  }
+}

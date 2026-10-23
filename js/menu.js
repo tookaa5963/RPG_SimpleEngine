@@ -1,5 +1,6 @@
 // FILE_ENTRY: js/menu.js
 import { logFormatter } from './logFormatter.js';
+import { getObjectiveText } from './events.js';
 import { sound } from './sound.js';
 import { maps } from './maps.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
@@ -107,7 +108,7 @@ export class MenuManager {
       key = 'defeat_black_dragon';
     }
 
-    this.msgWin.open([i18n.t(`objectives.${key}`)]);
+    this.msgWin.open([getObjectiveText(key)]);
   }
 
 handleKeyDown(key) {

@@ -3,6 +3,7 @@ import { sound } from './sound.js';
 import { i18n } from './i18n.js';
 
 export let EVENT_DB = {};
+export let OBJECTIVES_DB = {};
 
 let isLoaded = false;
 
@@ -28,14 +29,27 @@ export async function initEventData() {
       return await res.json();
     });
 
-    const chapters = await Promise.all(loadPromises);
+    const [chapters, objectivesRes] = await Promise.all([
+      Promise.all(loadPromises),
+      fetch('data/events/objectives.json')
+    ]);
+
+    if (!objectivesRes.ok) {
+      throw new Error(`[DataValidationError] events.js: objectives.json 取得失敗 (status: ${objectivesRes.status})`);
+    }
+    const objectivesJson = await objectivesRes.json();
+    if (!objectivesJson || typeof objectivesJson !== 'object' || Array.isArray(objectivesJson)) {
+      throw new Error(`[DataValidationError] events.js: objectives.json の形式が不正です (型: ${typeof objectivesJson})`);
+    }
+
+    OBJECTIVES_DB = objectivesJson;
     EVENT_DB = {};
     chapters.forEach(chapterData => {
       Object.assign(EVENT_DB, chapterData);
     });
 
     isLoaded = true;
-    console.log("EVENT_DB initialized successfully from chapters.");
+    console.log("EVENT_DB and OBJECTIVES_DB initialized successfully.");
     return EVENT_DB;
   } catch (error) {
     console.error("[EventManager] イベントデータ初期化中に致命的エラー:", error);
@@ -266,4 +280,19 @@ export class EventManager {
     this.activeNpc = null;
     this.activeMap = null;
   }
+}
+
+export function getObjectiveText(key) {
+  if (!isLoaded || !OBJECTIVES_DB) {
+    throw new Error(`[DataValidationError] events.js/getObjectiveText: イベントデータが未ロードです (key: "${key}")`);
+  }
+  const entry = OBJECTIVES_DB[key];
+  if (!entry) {
+    throw new Error(`[DataValidationError] events.js/getObjectiveText: 目的キー "${key}" が定義されていません`);
+  }
+  const text = i18n.resolve(entry);
+  if (typeof text !== 'string' || text.trim() === '') {
+    throw new Error(`[DataValidationError] events.js/getObjectiveText: 目的キー "${key}" の現在言語テキストが不正です (値: ${text}, 型: ${typeof text})`);
+  }
+  return text;
 }
