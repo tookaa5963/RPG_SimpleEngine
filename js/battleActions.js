@@ -90,7 +90,7 @@ function executeMagicAction(bm, spell) {
     }
     bm.effects.createSparks(bm.enemyCenter.x, bm.enemyCenter.y, '#ff3838', 14);
     bm.effects.addPopup(magicDmg, bm.enemyPopupPos.x, bm.enemyPopupPos.y, '#ffffff', '#e74c3c', false, 'bounce');
-    bm.queueMessages([castMsg, i18n.t('battle_log.damage_dealt', { name: enemy.name, dmg: String(magicDmg) })], () => {
+    bm.queueMessages([castMsg, logFormatter.format('battle_log.damage_dealt', { name: enemy.name, dmg: String(magicDmg) })], () => {
       enemy.hp = Math.max(0, enemy.hp - magicDmg);
       bm.enemyFlashTimer = 16;
       if (enemy.hp <= 0) bm.victory();
@@ -103,7 +103,7 @@ function executeMagicAction(bm, spell) {
     }
     bm.effects.createSparks(bm.enemyCenter.x, bm.enemyCenter.y, '#ff1744', 24);
     bm.effects.addPopup(magicDmg, bm.enemyPopupPos.x, bm.enemyPopupPos.y, '#ffffff', '#c0392b', true, 'bounce');
-    bm.queueMessages([castMsg, i18n.t('battle_log.heavy_damage_dealt', { name: enemy.name, dmg: String(magicDmg) })], () => {
+    bm.queueMessages([castMsg, logFormatter.format('battle_log.heavy_damage_dealt', { name: enemy.name, dmg: String(magicDmg) })], () => {
       enemy.hp = Math.max(0, enemy.hp - magicDmg);
       bm.enemyFlashTimer = 20;
       bm.effects.shake(10);
@@ -117,7 +117,7 @@ function executeMagicAction(bm, spell) {
     }
     bm.effects.createSparks(bm.enemyCenter.x, bm.enemyCenter.y, '#00d2d3', 16);
     bm.effects.addPopup(magicDmg, bm.enemyPopupPos.x, bm.enemyPopupPos.y, '#ffffff', '#e74c3c', false, 'bounce');
-    bm.queueMessages([castMsg, i18n.t('battle_log.damage_dealt', { name: enemy.name, dmg: String(magicDmg) })], () => {
+    bm.queueMessages([castMsg, logFormatter.format('battle_log.damage_dealt', { name: enemy.name, dmg: String(magicDmg) })], () => {
       enemy.hp = Math.max(0, enemy.hp - magicDmg);
       bm.enemyFlashTimer = 16;
       if (enemy.hp <= 0) bm.victory();
@@ -130,7 +130,7 @@ function executeMagicAction(bm, spell) {
     }
     bm.effects.createSparks(bm.enemyCenter.x, bm.enemyCenter.y, '#54a0ff', 24);
     bm.effects.addPopup(magicDmg, bm.enemyPopupPos.x, bm.enemyPopupPos.y, '#ffffff', '#c0392b', true, 'bounce');
-    bm.queueMessages([castMsg, i18n.t('battle_log.heavy_damage_dealt', { name: enemy.name, dmg: String(magicDmg) })], () => {
+    bm.queueMessages([castMsg, logFormatter.format('battle_log.heavy_damage_dealt', { name: enemy.name, dmg: String(magicDmg) })], () => {
       enemy.hp = Math.max(0, enemy.hp - magicDmg);
       bm.enemyFlashTimer = 24;
       bm.effects.shake(12);

@@ -6,6 +6,7 @@ import { BattleEffects } from './battleEffects.js';
 import { executeBattleAction } from './battleActions.js';
 import { drawListBox, drawMessageBox } from './ui.js';
 import { i18n } from './i18n.js';
+import { logFormatter } from './logFormatter.js';
 
 export { MONSTER_DEFINITIONS } from './monsters.js';
 
@@ -94,13 +95,13 @@ export class BattleManager {
 
     if (isAmbush) {
       this.queueMessages([
-        i18n.t('battle_log.appeared', { name: this.enemy.name }),
-        i18n.t('battle_log.enemy_ambush', { name: this.enemy.name })
+        logFormatter.format('battle_log.appeared', { name: this.enemy.name }),
+        logFormatter.format('battle_log.enemy_ambush', { name: this.enemy.name })
       ], () => {
         this.runEnemyTurn();
       });
     } else {
-      this.queueMessages([i18n.t('battle_log.appeared', { name: this.enemy.name })], () => {
+      this.queueMessages([logFormatter.format('battle_log.appeared', { name: this.enemy.name })], () => {
         this.checkPlayerTurn(true);
       });
     }
@@ -117,7 +118,7 @@ export class BattleManager {
       this.effects.addPopup(poisonDmg, this.playerPopupPos.x, this.playerPopupPos.y, '#ffffff', '#8854d0', true, 'shake');
 
       const poisonBadge = i18n.t('ui.poison_badge').trim();
-      const damageMsg = i18n.t('battle_log.hero_damage', { dmg: String(poisonDmg) });
+      const damageMsg = logFormatter.format('battle_log.hero_damage', { dmg: String(poisonDmg) });
       const poisonMsg = `${poisonBadge} ${damageMsg}`;
 
       this.queueMessages([poisonMsg], () => {
@@ -136,12 +137,12 @@ export class BattleManager {
       this.playerSleepTurns--;
       if (this.playerSleepTurns <= 0) {
         this.playerSleepTurns = 0;
-        this.queueMessages([i18n.t('battle_log.player_awake')], () => {
+        this.queueMessages([logFormatter.format('battle_log.player_awake')], () => {
           this.commandIndex = 0;
           this.phase = 'COMMAND_SELECT';
         });
       } else {
-        this.queueMessages([i18n.t('battle_log.player_sleep')], () => {
+        this.queueMessages([logFormatter.format('battle_log.player_sleep')], () => {
           this.runEnemyTurn();
         });
       }
@@ -304,9 +305,9 @@ export class BattleManager {
       this.effects.createSparks(this.enemyCenter.x, this.enemyCenter.y, '#ffd32a', 24);
       this.effects.addPopup(dmg, this.enemyPopupPos.x, this.enemyPopupPos.y, '#ffffff', '#ff1744', true, 'bounce');
       this.queueMessages([
-        i18n.t('battle_log.hero_attack'),
-        i18n.t('battle_log.critical_hit'),
-        i18n.t('battle_log.heavy_damage_dealt', { name: this.enemy.name, dmg: String(dmg) })
+        logFormatter.format('battle_log.hero_attack'),
+        logFormatter.format('battle_log.critical_hit'),
+        logFormatter.format('battle_log.heavy_damage_dealt', { name: this.enemy.name, dmg: String(dmg) })
       ], () => {
         this.enemy.hp = Math.max(0, this.enemy.hp - dmg);
         onFinish();
@@ -316,8 +317,8 @@ export class BattleManager {
       this.effects.createSparks(this.enemyCenter.x, this.enemyCenter.y, '#ffffff', 14);
       this.effects.addPopup(dmg, this.enemyPopupPos.x, this.enemyPopupPos.y, '#ffffff', '#e74c3c', false, 'bounce');
       this.queueMessages([
-        i18n.t('battle_log.hero_attack'),
-        i18n.t('battle_log.damage_dealt', { name: this.enemy.name, dmg: String(dmg) })
+        logFormatter.format('battle_log.hero_attack'),
+        logFormatter.format('battle_log.damage_dealt', { name: this.enemy.name, dmg: String(dmg) })
       ], () => {
         this.enemy.hp = Math.max(0, this.enemy.hp - dmg);
         onFinish();
@@ -331,11 +332,11 @@ export class BattleManager {
       this.effects.screenShakeTimer = 0;
       if (this.enemy.sleepTurns <= 0) {
         this.enemy.sleepTurns = 0;
-        this.queueMessages([i18n.t('battle_log.enemy_awake', { name: this.enemy.name })], () => {
+        this.queueMessages([logFormatter.format('battle_log.enemy_awake', { name: this.enemy.name })], () => {
           onFinish();
         });
       } else {
-        this.queueMessages([i18n.t('battle_log.enemy_sleep', { name: this.enemy.name })], () => {
+        this.queueMessages([logFormatter.format('battle_log.enemy_sleep', { name: this.enemy.name })], () => {
           onFinish();
         });
       }
@@ -379,18 +380,18 @@ export class BattleManager {
         this.effects.addPopup(dmg, this.playerPopupPos.x, this.playerPopupPos.y, '#ffffff', '#e84118', true, 'shake');
 
         const messages = [
-          i18n.t('battle_log.breath_attack', { name: this.enemy.name, spell: castSpell.name }),
-          i18n.t('battle_log.hero_damage_heavy', { dmg: String(dmg) })
+          logFormatter.format('battle_log.breath_attack', { name: this.enemy.name, spell: castSpell.name }),
+          logFormatter.format('battle_log.hero_damage_heavy', { dmg: String(dmg) })
         ];
 
         if (hasWaterShield && hasFireCharm) {
-          messages.push(i18n.t('battle_log.breath_defended_both'));
+          messages.push(logFormatter.format('battle_log.breath_defended_both'));
         } else if (hasWaterShield) {
-          messages.push(i18n.t('battle_log.breath_defended_shield'));
+          messages.push(logFormatter.format('battle_log.breath_defended_shield'));
         } else if (hasFireCharm) {
-          messages.push(i18n.t('battle_log.breath_defended_charm'));
+          messages.push(logFormatter.format('battle_log.breath_defended_charm'));
         } else {
-          messages.push(i18n.t('battle_log.breath_no_defense'));
+          messages.push(logFormatter.format('battle_log.breath_no_defense'));
         }
 
         this.player.damage(dmg);
@@ -415,15 +416,15 @@ export class BattleManager {
         this.effects.addPopup(dmg, this.playerPopupPos.x, this.playerPopupPos.y, '#ffffff', '#c0392b', true, 'shake');
 
         const messages = [
-          i18n.t('battle_log.enemy_special_phys', { name: this.enemy.name, spell: castSpell.name }),
-          i18n.t('battle_log.dragon_claw_hit'),
-          i18n.t('battle_log.hero_damage_heavy', { dmg: String(dmg) })
+          logFormatter.format('battle_log.enemy_special_phys', { name: this.enemy.name, spell: castSpell.name }),
+          logFormatter.format('battle_log.dragon_claw_hit'),
+          logFormatter.format('battle_log.hero_damage_heavy', { dmg: String(dmg) })
         ];
 
         if (hasDragonArmor) {
-          messages.push(i18n.t('battle_log.dragon_armor_defend'));
+          messages.push(logFormatter.format('battle_log.dragon_armor_defend'));
         } else {
-          messages.push(i18n.t('battle_log.dragon_armor_penetrated'));
+          messages.push(logFormatter.format('battle_log.dragon_armor_penetrated'));
         }
 
         this.player.damage(dmg);
@@ -431,9 +432,9 @@ export class BattleManager {
         return;
       }
 
-      const messages = [i18n.t('battle_log.enemy_cast', { name: this.enemy.name, spell: castSpell.name })];
+      const messages = [logFormatter.format('battle_log.enemy_cast', { name: this.enemy.name, spell: castSpell.name })];
       if (this.enemy.spellSealed) {
-        messages.push(i18n.t('battle_log.enemy_spell_sealed'));
+        messages.push(logFormatter.format('battle_log.enemy_spell_sealed'));
         this.queueMessages(messages, () => { onFinish(); });
         return;
       }
@@ -442,14 +443,14 @@ export class BattleManager {
 
       if (castSpell.id === 'rariho') {
         if (this.playerSleepTurns > 0) {
-          messages.push(i18n.t('battle_log.already_asleep'));
+          messages.push(logFormatter.format('battle_log.already_asleep'));
         } else {
           if (Math.random() < 0.7) {
             this.playerSleepTurns = Math.floor(Math.random() * 3) + 2;
             this.effects.addPopup('SLEEP', this.playerPopupPos.x, this.playerPopupPos.y, '#a29bfe', '#6c5ce7', false, 'bounce');
-            messages.push(i18n.t('battle_log.hero_fell_asleep'));
+            messages.push(logFormatter.format('battle_log.hero_fell_asleep'));
           } else {
-            messages.push(i18n.t('battle_log.spell_no_effect_hero'));
+            messages.push(logFormatter.format('battle_log.spell_no_effect_hero'));
           }
         }
         this.queueMessages(messages, () => { onFinish(); });
@@ -458,14 +459,14 @@ export class BattleManager {
 
       if (castSpell.id === 'mahoton') {
         if (this.playerSpellSealed) {
-          messages.push(i18n.t('battle_log.already_sealed'));
+          messages.push(logFormatter.format('battle_log.already_sealed'));
         } else {
           if (Math.random() < 0.7) {
             this.playerSpellSealed = true;
             this.effects.addPopup('SEAL', this.playerPopupPos.x, this.playerPopupPos.y, '#00d2d3', '#0984e3', false, 'bounce');
-            messages.push(i18n.t('battle_log.hero_spell_sealed'));
+            messages.push(logFormatter.format('battle_log.hero_spell_sealed'));
           } else {
-            messages.push(i18n.t('battle_log.spell_no_effect_hero'));
+            messages.push(logFormatter.format('battle_log.spell_no_effect_hero'));
           }
         }
         this.queueMessages(messages, () => { onFinish(); });
@@ -483,7 +484,7 @@ export class BattleManager {
       this.effects.shake(18);
       this.effects.createPlayerDamageEffect(this.playerCenter.x, this.playerCenter.y, false);
       this.effects.addPopup(dmg, this.playerPopupPos.x, this.playerPopupPos.y, '#ffffff', '#e74c3c', true, 'shake');
-      messages.push(i18n.t('battle_log.hero_damage', { dmg: String(dmg) }));
+      messages.push(logFormatter.format('battle_log.hero_damage', { dmg: String(dmg) }));
       this.player.damage(dmg);
 
       this.queueMessages(messages, () => { onFinish(); });
@@ -503,19 +504,19 @@ export class BattleManager {
 
     sound.playAttack();
 
-    const messages = [i18n.t('battle_log.enemy_attack', { name: this.enemy.name })];
+    const messages = [logFormatter.format('battle_log.enemy_attack', { name: this.enemy.name })];
 
     if (isCrit) {
       this.effects.shake(28);
       this.effects.createPlayerDamageEffect(this.playerCenter.x, this.playerCenter.y, true);
       this.effects.addPopup(dmg, this.playerPopupPos.x, this.playerPopupPos.y, '#ffffff', '#e84118', true, 'shake');
-      messages.push(i18n.t('battle_log.enemy_critical'));
-      messages.push(i18n.t('battle_log.hero_damage_heavy', { dmg: String(dmg) }));
+      messages.push(logFormatter.format('battle_log.enemy_critical'));
+      messages.push(logFormatter.format('battle_log.hero_damage_heavy', { dmg: String(dmg) }));
     } else {
       this.effects.shake(18);
       this.effects.createPlayerDamageEffect(this.playerCenter.x, this.playerCenter.y, false);
       this.effects.addPopup(dmg, this.playerPopupPos.x, this.playerPopupPos.y, '#ffffff', '#8854d0', true, 'shake');
-      messages.push(i18n.t('battle_log.hero_damage', { dmg: String(dmg) }));
+      messages.push(logFormatter.format('battle_log.hero_damage', { dmg: String(dmg) }));
     }
 
     this.player.damage(dmg);
@@ -524,10 +525,10 @@ export class BattleManager {
       const hasCharm = (this.player.inventory.poison_charm || 0) > 0;
       if (Math.random() < this.enemy.poisonChance) {
         if (hasCharm && Math.random() < 0.8) {
-          messages.push(i18n.t('battle_log.poison_defended'));
+          messages.push(logFormatter.format('battle_log.poison_defended'));
         } else {
           this.player.isPoisoned = true;
-          messages.push(i18n.t('battle_log.hero_poisoned'));
+          messages.push(logFormatter.format('battle_log.hero_poisoned'));
         }
       }
     }
@@ -537,7 +538,7 @@ export class BattleManager {
 
   runEscape() {
     if (this.enemy.dropItem || this.enemy.noEscape) {
-      this.queueMessages([i18n.t('battle_log.hero_escape'), i18n.t('battle_log.escape_failed')], () => {
+      this.queueMessages([logFormatter.format('battle_log.hero_escape'), logFormatter.format('battle_log.escape_failed')], () => {
         this.runEnemyTurn();
       });
       return;
@@ -546,9 +547,9 @@ export class BattleManager {
     const success = Math.random() < 0.65;
     if (success) {
       sound.playEscape();
-      this.queueMessages([i18n.t('battle_log.hero_escape')], () => { this.onEnd({ result: 'ESCAPE' }); });
+      this.queueMessages([logFormatter.format('battle_log.hero_escape')], () => { this.onEnd({ result: 'ESCAPE' }); });
     } else {
-      this.queueMessages([i18n.t('battle_log.hero_escape'), i18n.t('battle_log.escape_failed')], () => {
+      this.queueMessages([logFormatter.format('battle_log.hero_escape'), logFormatter.format('battle_log.escape_failed')], () => {
         this.runEnemyTurn();
       });
     }
@@ -574,8 +575,8 @@ export class BattleManager {
     }
 
     const initialMessages = [
-      i18n.t('battle_log.enemy_defeated', { name: this.enemy.name }),
-      i18n.t('battle_log.exp_gold_gain', { exp: String(earnedExp), gold: String(this.enemy.gold) })
+      logFormatter.format('battle_log.enemy_defeated', { name: this.enemy.name }),
+      logFormatter.format('battle_log.exp_gold_gain', { exp: String(earnedExp), gold: String(this.enemy.gold) })
     ];
 
     this.queueMessages(initialMessages, () => {
@@ -610,12 +611,12 @@ export class BattleManager {
 
           if (candidates.length === 0) {
             // ★修正: 捨てられるものがない場合は諦める
-            afterMessages.push(i18n.t('battle_log.bag_full_drop', { name: this.enemy.name }));
-            afterMessages.push(i18n.t('battle_log.gave_up_item', { item: itemName }) || `${itemName} をあきらめた！`);
+            afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
+            afterMessages.push(logFormatter.format('battle_log.gave_up_item', { item: itemName }));
             this.proceedAfterMessages(afterMessages);
           } else {
             this.pendingDropItem = dropId;
-            afterMessages.push(i18n.t('battle_log.bag_full_drop', { name: this.enemy.name }));
+            afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
             this.queueMessages(afterMessages, () => {
               this.discardList = candidates;
               this.discardIndex = 0;
@@ -625,7 +626,7 @@ export class BattleManager {
           return;
         } else {
           this.player.addItem(dropId, 1);
-          afterMessages.push(i18n.t('battle_log.treasure_drop', { name: this.enemy.name, item: itemName }));
+          afterMessages.push(logFormatter.format('battle_log.treasure_drop', { name: this.enemy.name, item: itemName }));
         }
       }
 
@@ -645,7 +646,7 @@ export class BattleManager {
   }
 
   defeat() {
-    this.queueMessages([i18n.t('battle_log.hero_defeated')], () => {
+    this.queueMessages([logFormatter.format('battle_log.hero_defeated')], () => {
       this.onEnd({ result: 'DEFEAT' });
     });
   }
@@ -699,7 +700,7 @@ export class BattleManager {
         const droppedName = ITEM_DB[this.pendingDropItem]?.name || '';
         sound.playChest();
         this.queueMessages([
-          i18n.t('battle_log.hero_discarded_item', { discarded: discarded.name, dropped: droppedName })
+          logFormatter.format('battle_log.hero_discarded_item', { discarded: discarded.name, dropped: droppedName })
         ], () => {
           this.onEnd({ result: 'VICTORY' });
         });
@@ -776,7 +777,7 @@ export class BattleManager {
     }
 
     if (this.phase === 'DISCARD_SELECT') {
-      drawMessageBox(ctx, margin, msgY, msgW, msgH, i18n.t('battle_log.discard_select_msg'));
+      drawMessageBox(ctx, margin, msgY, msgW, msgH, logFormatter.format('battle_log.discard_select_msg'));
       const discardNames = this.discardList.map(i => i.name);
       drawListBox(ctx, Math.floor(this.cw * 0.35), msgY - 200, discardNames, this.discardIndex, 6);
     } else {

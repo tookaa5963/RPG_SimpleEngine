@@ -4,6 +4,7 @@ import { sound } from './sound.js';
 import { MONSTER_DEFINITIONS } from './monsters.js';
 import { ITEM_DB } from './items.js';
 import { i18n } from './i18n.js';
+import { logFormatter } from './logFormatter.js';
 
 export class FieldManager {
   constructor({
@@ -477,7 +478,7 @@ export class FieldManager {
                       discardNames.push(i18n.t('common.back'));
                       
                       this.messageWindow.openMenu(
-                        i18n.t('battle_log.discard_select_msg'),
+                        logFormatter.format('battle_log.discard_select_msg'),
                         discardNames,
                         (discardIdx) => {
                           if (discardIdx === candidates.length) {
