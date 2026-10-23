@@ -112,9 +112,13 @@ export class EventManager {
     const currentMapId = this.getCurrentMapId ? this.getCurrentMapId() : '';
     // モブ会話は maps.js のゲッターにより npc.pages で直接多言語解決される
 
-    if (npc.pages && npc.pages.length > 0) {
-      this.msgWin.open(npc.pages);
-      return 'MESSAGE';
+    if (npc.pages) {
+      const resolved = i18n.resolve(npc.pages);
+      const textArray = Array.isArray(resolved) ? resolved : [resolved];
+      if (textArray.length > 0) {
+        this.msgWin.open(textArray);
+        return 'MESSAGE';
+      }
     }
 
     return null;

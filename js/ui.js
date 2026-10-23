@@ -108,7 +108,7 @@ export class UIManager {
     }
     if (this.elements.returnPointName) {
       const mapId = playerStats.returnPoint ? playerStats.returnPoint.mapId : null;
-      this.elements.returnPointName.textContent = mapId ? ((maps[mapId]?.name || mapId) || mapId) : i18n.t('ui.none');
+      this.elements.returnPointName.textContent = mapId ? (maps[mapId]?.name ? i18n.resolve(maps[mapId].name) : mapId) : i18n.t('ui.none');
     }
     if (this.elements.controlsText) {
       this.elements.controlsText.innerHTML = i18n.t('ui.controls').replace(/\n/g, '<br>');

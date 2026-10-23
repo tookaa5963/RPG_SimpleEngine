@@ -399,8 +399,9 @@ export class FieldManager {
     if (targetObj) {
       if (this.onStateChange) this.onStateChange('MESSAGE');
       if (targetObj.type === 'sign' || targetObj.type === 'monument' || targetObj.type === 'bookshelf' || targetObj.type === 'notebook') {
-        const localizedObjText = targetObj.pages;
-        this.messageWindow.open(localizedObjText || targetObj.pages);
+        const resolved = i18n.resolve(targetObj.pages);
+        const textArray = Array.isArray(resolved) ? resolved : [resolved];
+        this.messageWindow.open(textArray);
 } else if (targetObj.type === 'chest') {
         if (!targetObj.isOpen) {
           if (targetObj.itemId === 'corrada') {

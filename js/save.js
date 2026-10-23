@@ -30,7 +30,8 @@ export class SaveManager {
 
       const data = JSON.parse(raw);
       const lv = data.playerStats?.level ?? 1;
-      const place = (maps[data.location?.mapId]?.name || data.location?.mapId) || i18n.t('ui.none');
+      const mapDef = maps[data.location?.mapId];
+      const place = mapDef ? (mapDef.name ? i18n.resolve(mapDef.name) : data.location.mapId) : i18n.t('ui.none');
       const dateStr = this.formatDateTime(data.savedAt);
       return `${dateStr}  Lv.${lv} ${place}`;
     } catch (e) {
@@ -46,7 +47,7 @@ export class SaveManager {
         playerStats: player.serialize(),
         location: {
           mapId: currentMapId,
-          mapName: (maps[currentMapId]?.name || currentMapId) || maps[currentMapId]?.name || currentMapId,
+          mapName: maps[currentMapId]?.name ? i18n.resolve(maps[currentMapId].name) : currentMapId,
           gridX: player.gridX,
           gridY: player.gridY,
           direction: player.direction

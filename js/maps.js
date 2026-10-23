@@ -4,39 +4,6 @@ import { i18n } from './i18n.js';
 export const maps = {};
 let isLoaded = false;
 
-/**
- * プロパティに対して i18n.resolve を動的バインドするユーティリティ
- */
-function bindI18nGetter(target, propKey) {
-  if (target[propKey] && typeof target[propKey] === 'object' && !Array.isArray(target[propKey])) {
-    const rawData = target[propKey];
-    Object.defineProperty(target, propKey, {
-      get: () => i18n.resolve(rawData),
-      enumerable: true,
-      configurable: true
-    });
-  }
-}
-
-/**
- * マップデータ内の多言語オブジェクトに動的ゲッターを再帰的に適用
- */
-function applyI18nGetters(mapData) {
-  if (mapData.name) bindI18nGetter(mapData, 'name');
-
-  if (Array.isArray(mapData.npcs)) {
-    mapData.npcs.forEach(npc => {
-      if (npc.pages) bindI18nGetter(npc, 'pages');
-      if (npc.greeting) bindI18nGetter(npc, 'greeting');
-    });
-  }
-
-  if (Array.isArray(mapData.interactables)) {
-    mapData.interactables.forEach(obj => {
-      if (obj.pages) bindI18nGetter(obj, 'pages');
-    });
-  }
-}
 
 /**
  * 全マップデータのロードと初期化を実行する外部公開API
@@ -78,7 +45,6 @@ export async function initMapData() {
         }
       }
 
-      applyI18nGetters(rawMapData);
 
       return { mapId, rawMapData };
     });
