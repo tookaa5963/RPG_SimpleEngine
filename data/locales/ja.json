@@ -49,5 +49,21 @@
     "back": "戻る",
     "backup_export": "バックアップ出力",
     "backup_import": "バックアップ読込"
+  },
+  "battle_action": {
+    "used_herb": "勇者は {item}を使った！\n勇者の傷が 回復した！",
+    "used_strong_herb": "勇者は {item}を使った！\n勇者の傷が 大きく回復した！",
+    "drank_magic_water": "勇者は {item}を飲んだ！\n勇者のＭＰが {mp}回復した！",
+    "cured_poison": "勇者は 毒消し草を使った！\n体の毒が 消え去った！",
+    "not_poisoned": "勇者は 毒消し草を使った！\nしかし 毒には冒されていなかった！",
+    "cast_spell": "勇者は {spell}を唱えた！",
+    "fully_healed": "勇者の傷が 完全に回復した！",
+    "healed": "勇者の傷が 回復した！",
+    "greatly_healed": "勇者の傷が 大きく回復した！",
+    "enemy_asleep": "{name}を 眠らせた！",
+    "enemy_already_asleep": "しかし {name}は\nすでに眠っている！",
+    "enemy_spell_sealed": "{name}の呪文を\n封じ込んだ！",
+    "enemy_already_sealed": "しかし すでに呪文は\n封じ込まれている！",
+    "spell_no_effect": "しかし 効かなかった！"
   }
 }

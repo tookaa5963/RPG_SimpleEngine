@@ -49,5 +49,21 @@
     "back": "Back",
     "backup_export": "Export Save Data",
     "backup_import": "Import Save Data"
+  },
+  "battle_action": {
+    "used_herb": "Hero used {item}!\nWounds were healed!",
+    "used_strong_herb": "Hero used {item}!\nWounds were greatly healed!",
+    "drank_magic_water": "Hero drank {item}!\nRestored {mp} MP!",
+    "cured_poison": "Hero used Antidotal Herb!\nThe poison was cured!",
+    "not_poisoned": "Hero used Antidotal Herb!\nBut was not poisoned!",
+    "cast_spell": "Hero cast {spell}!",
+    "fully_healed": "Wounds were fully healed!",
+    "healed": "Wounds were healed!",
+    "greatly_healed": "Wounds were greatly healed!",
+    "enemy_asleep": "Put {name} to sleep!",
+    "enemy_already_asleep": "But {name} is\nalready asleep!",
+    "enemy_spell_sealed": "Sealed {name}'s magic!",
+    "enemy_already_sealed": "But magic is already sealed!",
+    "spell_no_effect": "But it had no effect!"
   }
 }

@@ -49,5 +49,21 @@
     "back": "Volver",
     "backup_export": "Exportar Datos",
     "backup_import": "Importar Datos"
+  },
+  "battle_action": {
+    "used_herb": "¡Héroe usó {item}!\n¡Las heridas sanaron!",
+    "used_strong_herb": "¡Héroe usó {item}!\n¡Gran recuperación de salud!",
+    "drank_magic_water": "¡Héroe bebió {item}!\n¡Recuperó {mp} PM!",
+    "cured_poison": "¡Héroe usó Hierba amarga!\n¡El veneno desapareció!",
+    "not_poisoned": "¡Héroe usó Hierba amarga!\n¡Pero no estaba envenenado!",
+    "cast_spell": "¡Héroe lanzó {spell}!",
+    "fully_healed": "¡Heridas completamente sanadas!",
+    "healed": "¡Las heridas sanaron!",
+    "greatly_healed": "¡Gran recuperación de salud!",
+    "enemy_asleep": "¡Durmió a {name}!",
+    "enemy_already_asleep": "¡Pero {name} ya\nestá dormido!",
+    "enemy_spell_sealed": "¡Selló la magia de {name}!",
+    "enemy_already_sealed": "¡Pero los hechizos ya están sellados!",
+    "spell_no_effect": "¡Pero no tuvo efecto!"
   }
 }

@@ -28,22 +28,6 @@ export const I18N_DICT = {
       "girl_priority": "今は 女の子を無事に 町へ送り届けるのが 先決だ！",
       "mp_shortage": "ＭＰが 足りない！"
     },
-    "battle_action": {
-      "used_herb": "勇者は {item}を使った！\n勇者の傷が 回復した！",
-      "used_strong_herb": "勇者は {item}を使った！\n勇者の傷が 大きく回復した！",
-      "drank_magic_water": "勇者は {item}を飲んだ！\n勇者のＭＰが {mp}回復した！",
-      "cured_poison": "勇者は 毒消し草を使った！\n体の毒が 消え去った！",
-      "not_poisoned": "勇者は 毒消し草を使った！\nしかし 毒には冒されていなかった！",
-      "cast_spell": "勇者は {spell}を唱えた！",
-      "fully_healed": "勇者の傷が 完全に回復した！",
-      "healed": "勇者の傷が 回復した！",
-      "greatly_healed": "勇者の傷が 大きく回復した！",
-      "enemy_asleep": "{name}を 眠らせた！",
-      "enemy_already_asleep": "しかし {name}は\nすでに眠っている！",
-      "enemy_spell_sealed": "{name}の呪文を\n封じ込んだ！",
-      "enemy_already_sealed": "しかし すでに呪文は\n封じ込まれている！",
-      "spell_no_effect": "しかし 効かなかった！"
-    },
   },
   "en": {
     "menu": {
@@ -72,22 +56,6 @@ export const I18N_DICT = {
       "girl_priority": "You must escort the girl safely back to town first!",
       "mp_shortage": "Not enough MP!"
     },
-    "battle_action": {
-      "used_herb": "Hero used {item}!\nWounds were healed!",
-      "used_strong_herb": "Hero used {item}!\nWounds were greatly healed!",
-      "drank_magic_water": "Hero drank {item}!\nRestored {mp} MP!",
-      "cured_poison": "Hero used Antidotal Herb!\nThe poison was cured!",
-      "not_poisoned": "Hero used Antidotal Herb!\nBut was not poisoned!",
-      "cast_spell": "Hero cast {spell}!",
-      "fully_healed": "Wounds were fully healed!",
-      "healed": "Wounds were healed!",
-      "greatly_healed": "Wounds were greatly healed!",
-      "enemy_asleep": "Put {name} to sleep!",
-      "enemy_already_asleep": "But {name} is\nalready asleep!",
-      "enemy_spell_sealed": "Sealed {name}'s magic!",
-      "enemy_already_sealed": "But magic is already sealed!",
-      "spell_no_effect": "But it had no effect!"
-    },
   },
   "es": {
     "menu": {
@@ -115,22 +83,6 @@ export const I18N_DICT = {
       "no_return_point": "¡No hay punto de retorno registrado!",
       "girl_priority": "¡Primero debes llevar a la niña a la ciudad a salvo!",
       "mp_shortage": "¡No tienes suficientes PM!"
-    },
-    "battle_action": {
-      "used_herb": "¡Héroe usó {item}!\n¡Las heridas sanaron!",
-      "used_strong_herb": "¡Héroe usó {item}!\n¡Gran recuperación de salud!",
-      "drank_magic_water": "¡Héroe bebió {item}!\n¡Recuperó {mp} PM!",
-      "cured_poison": "¡Héroe usó Hierba amarga!\n¡El veneno desapareció!",
-      "not_poisoned": "¡Héroe usó Hierba amarga!\n¡Pero no estaba envenenado!",
-      "cast_spell": "¡Héroe lanzó {spell}!",
-      "fully_healed": "¡Heridas completamente sanadas!",
-      "healed": "¡Las heridas sanaron!",
-      "greatly_healed": "¡Gran recuperación de salud!",
-      "enemy_asleep": "¡Durmió a {name}!",
-      "enemy_already_asleep": "¡Pero {name} ya\nestá dormido!",
-      "enemy_spell_sealed": "¡Selló la magia de {name}!",
-      "enemy_already_sealed": "¡Pero los hechizos ya están sellados!",
-      "spell_no_effect": "¡Pero no tuvo efecto!"
     },
   }
 };
