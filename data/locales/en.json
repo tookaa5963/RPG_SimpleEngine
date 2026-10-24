@@ -23,5 +23,14 @@
     "none": "None",
     "poison_badge": " [POISON]",
     "controls": "[CONTROLS]\nMove: Arrows / WASD\nConfirm: Space / Enter\nCancel: X / ESC\nBGM: M / SE: N"
+  },
+  "battle": {
+    "attack": "Fight",
+    "spell": "Spell",
+    "item": "Item",
+    "escape": "Run",
+    "no_magic": "No spells available\nfor battle!",
+    "magic_sealed": "Magic is sealed!",
+    "no_items": "No usable items\nin possession!"
   }
 }

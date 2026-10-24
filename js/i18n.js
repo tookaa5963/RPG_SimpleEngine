@@ -28,15 +28,6 @@ export const I18N_DICT = {
       "girl_priority": "今は 女の子を無事に 町へ送り届けるのが 先決だ！",
       "mp_shortage": "ＭＰが 足りない！"
     },
-    "battle": {
-      "attack": "戦う",
-      "spell": "呪文",
-      "item": "道具",
-      "escape": "逃げる",
-      "no_magic": "勇者は まだ戦いで\n使える呪文がない！",
-      "magic_sealed": "呪文は 封じ込まれている！",
-      "no_items": "使える道具を\n持っていない！"
-    },
     "battle_action": {
       "used_herb": "勇者は {item}を使った！\n勇者の傷が 回復した！",
       "used_strong_herb": "勇者は {item}を使った！\n勇者の傷が 大きく回復した！",
@@ -98,15 +89,6 @@ export const I18N_DICT = {
       "girl_priority": "You must escort the girl safely back to town first!",
       "mp_shortage": "Not enough MP!"
     },
-    "battle": {
-      "attack": "Fight",
-      "spell": "Spell",
-      "item": "Item",
-      "escape": "Run",
-      "no_magic": "No spells available\nfor battle!",
-      "magic_sealed": "Magic is sealed!",
-      "no_items": "No usable items\nin possession!"
-    },
     "battle_action": {
       "used_herb": "Hero used {item}!\nWounds were healed!",
       "used_strong_herb": "Hero used {item}!\nWounds were greatly healed!",
@@ -167,15 +149,6 @@ export const I18N_DICT = {
       "no_return_point": "¡No hay punto de retorno registrado!",
       "girl_priority": "¡Primero debes llevar a la niña a la ciudad a salvo!",
       "mp_shortage": "¡No tienes suficientes PM!"
-    },
-    "battle": {
-      "attack": "Atacar",
-      "spell": "Hechizo",
-      "item": "Objeto",
-      "escape": "Huir",
-      "no_magic": "¡No hay hechizos disponibles\npara la batalla!",
-      "magic_sealed": "¡Los hechizos están bloqueados!",
-      "no_items": "¡No tienes objetos utilizables!"
     },
     "battle_action": {
       "used_herb": "¡Héroe usó {item}!\n¡Las heridas sanaron!",

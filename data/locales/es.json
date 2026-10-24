@@ -23,5 +23,14 @@
     "none": "Ninguno",
     "poison_badge": " [VENENO]",
     "controls": "[CONTROLES]\nMover: Flechas / WASD\nAceptar: Espacio / Intro\nCancelar: X / ESC\nBGM: M / SE: N"
+  },
+  "battle": {
+    "attack": "Atacar",
+    "spell": "Hechizo",
+    "item": "Objeto",
+    "escape": "Huir",
+    "no_magic": "¡No hay hechizos disponibles\npara la batalla!",
+    "magic_sealed": "¡Los hechizos están bloqueados!",
+    "no_items": "¡No tienes objetos utilizables!"
   }
 }

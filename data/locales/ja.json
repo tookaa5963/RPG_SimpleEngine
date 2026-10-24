@@ -23,5 +23,14 @@
     "none": "なし",
     "poison_badge": " [毒]",
     "controls": "【操作方法】\n移動: 矢印 / WASD\n決定: Space / Enter\n取消: X / ESC\nBGM: M / SE: N"
+  },
+  "battle": {
+    "attack": "戦う",
+    "spell": "呪文",
+    "item": "道具",
+    "escape": "逃げる",
+    "no_magic": "勇者は まだ戦いで\n使える呪文がない！",
+    "magic_sealed": "呪文は 封じ込まれている！",
+    "no_items": "使える道具を\n持っていない！"
   }
 }
