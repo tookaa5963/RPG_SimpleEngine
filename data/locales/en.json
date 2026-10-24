@@ -7,5 +7,8 @@
     "theater_fall": "Fall of Black Dragon",
     "theater_ending": "Ending",
     "theater_back": "Back"
+  },
+  "system": {
+    "theater_unlocked": "Congratulations on clearing the game!\n\n'Theater' mode has been added to the Title Screen.\nYou can now replay cinematics anytime."
   }
 }
