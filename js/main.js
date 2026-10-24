@@ -16,7 +16,7 @@ import { EventManager, initEventData, getEndingText } from './events.js'; // ★
 import { SlotDialog } from './slotDialog.js';
 import { TitleScene } from './titleScene.js';
 import { FieldManager } from './fieldManager.js';
-import { i18n } from './i18n.js';
+import { i18n, initLocaleData } from './i18n.js';
 import { initLogData, logFormatter } from './logFormatter.js';
 import { initItemData } from './items.js';
 import { initMonsterData } from './monsters.js';
@@ -790,7 +790,8 @@ async function bootstrapEngine() {
   try {
     console.log("Starting engine bootstrap...");
     await Promise.all([
-    initItemData(),
+      initLocaleData(),
+      initItemData(),
     initMonsterData(),
     initMapData(),
     initEventData(),

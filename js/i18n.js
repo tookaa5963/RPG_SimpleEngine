@@ -7,15 +7,6 @@ export const I18N_DICT = {
       "no": "いいえ",
       "back": "戻る"
     },
-    "title": {
-      "new_game": "New Game",
-      "load_game": "Load Game",
-      "lang": "Language: 日本語",
-      "theater": "Theater",
-      "theater_fall": "黒竜討伐",
-      "theater_ending": "エンディング",
-      "theater_back": "戻る"
-    },
     "system": {
       "theater_unlocked": "ゲームクリア おめでとうございます！\n\nタイトル画面に「Theater」が追加され、\nいつでも映像を振り返ることができるようになりました。"
     },
@@ -53,7 +44,7 @@ export const I18N_DICT = {
       "girl_priority": "今は 女の子を無事に 町へ送り届けるのが 先決だ！",
       "mp_shortage": "ＭＰが 足りない！"
     },
-        "battle": {
+    "battle": {
       "attack": "戦う",
       "spell": "呪文",
       "item": "道具",
@@ -94,22 +85,13 @@ export const I18N_DICT = {
       "back": "戻る",
       "backup_export": "バックアップ出力",
       "backup_import": "バックアップ読込"
-    },
-      },
+    }
+  },
   "en": {
     "common": {
       "yes": "Yes",
       "no": "No",
       "back": "Back"
-    },
-    "title": {
-      "new_game": "New Game",
-      "load_game": "Load Game",
-      "lang": "Language: English",
-      "theater": "Theater",
-      "theater_fall": "Fall of Black Dragon",
-      "theater_ending": "Ending",
-      "theater_back": "Back"
     },
     "system": {
       "theater_unlocked": "Congratulations on clearing the game!\n\n'Theater' mode has been added to the Title Screen.\nYou can now replay cinematics anytime."
@@ -148,7 +130,7 @@ export const I18N_DICT = {
       "girl_priority": "You must escort the girl safely back to town first!",
       "mp_shortage": "Not enough MP!"
     },
-        "battle": {
+    "battle": {
       "attack": "Fight",
       "spell": "Spell",
       "item": "Item",
@@ -189,22 +171,13 @@ export const I18N_DICT = {
       "back": "Back",
       "backup_export": "Export Save Data",
       "backup_import": "Import Save Data"
-    },
-      },
+    }
+  },
   "es": {
     "common": {
       "yes": "Sí",
       "no": "No",
       "back": "Volver"
-    },
-    "title": {
-      "new_game": "Nueva Partida",
-      "load_game": "Cargar Partida",
-      "lang": "Idioma: Español",
-      "theater": "Teatro",
-      "theater_fall": "Caída del Dragón",
-      "theater_ending": "Final",
-      "theater_back": "Volver"
     },
     "system": {
       "theater_unlocked": "¡Felicidades por completar el juego!\n\nSe ha añadido el modo 'Teatro' a la pantalla de título.\nAhora puedes revivir las escenas cuando quieras."
@@ -243,7 +216,7 @@ export const I18N_DICT = {
       "girl_priority": "¡Primero debes llevar a la niña a la ciudad a salvo!",
       "mp_shortage": "¡No tienes suficientes PM!"
     },
-        "battle": {
+    "battle": {
       "attack": "Atacar",
       "spell": "Hechizo",
       "item": "Objeto",
@@ -284,12 +257,19 @@ export const I18N_DICT = {
       "back": "Volver",
       "backup_export": "Exportar Datos",
       "backup_import": "Importar Datos"
-    },
-      }
+    }
+  }
 };
 
 class I18nManager {
-  constructor() {}
+  constructor() {
+    this.localeData = {
+      ja: {},
+      en: {},
+      es: {}
+    };
+    this.isLoaded = false;
+  }
 
   get currentLang() {
     return locale.getLanguage();
@@ -302,31 +282,68 @@ class I18nManager {
   get langs() {
     return locale.langs;
   }
+
   toggleLang() {
     return locale.toggleLang();
   }
+
+  async loadLocales() {
+    const langs = ['ja', 'en', 'es'];
+    const loadPromises = langs.map(async (lang) => {
+      const response = await fetch(`data/locales/${lang}.json`);
+      if (!response.ok) {
+        throw new Error(`[DataValidationError] Failed to load locale file: data/locales/${lang}.json (HTTP ${response.status})`);
+      }
+      const json = await response.json();
+      if (!json || typeof json !== 'object') {
+        throw new Error(`[DataValidationError] Invalid JSON format in data/locales/${lang}.json`);
+      }
+      this.localeData[lang] = json;
+    });
+
+    await Promise.all(loadPromises);
+    this.isLoaded = true;
+    console.log('[i18n] Locales loaded successfully:', Object.keys(this.localeData));
+  }
+
   resolve(textObj) {
     if (!textObj || typeof textObj !== 'object') {
-      throw new Error(`[DataValidationError] i18n.js:resolve: 翻訳オブジェクトが不正です (値: ${textObj}, 型: ${typeof textObj})`);
+      throw new Error(`[DataValidationError] i18n.js:resolve: ????????????? (?: ${textObj}, ?: ${typeof textObj})`);
     }
     const val = textObj[this.currentLang];
     if (val === undefined) {
-      throw new Error(`[DataValidationError] i18n.js:resolve: 言語 "${this.currentLang}" に対応するテキストがありません。`);
+      throw new Error(`[DataValidationError] i18n.js:resolve: ?? "${this.currentLang}" ????????????????`);
     }
     return val;
   }
 
   t(keyPath, params = {}) {
     const keys = keyPath.split('.');
-    let result = I18N_DICT[this.currentLang];
+    
+    // 1. ?????????????????????
+    let result = this.localeData[this.currentLang];
+    let foundInExternal = true;
     for (const k of keys) {
-      if (result === undefined || result === null) {
-        throw new Error(`[DataValidationError] i18n.js:t: 辞書に存在しないキーが参照されました (キー: "${keyPath}", lang: "${this.currentLang}")`);
+      if (result === undefined || result === null || result[k] === undefined) {
+        foundInExternal = false;
+        break;
       }
       result = result[k];
     }
+
+    // 2. ???????????????? I18N_DICT ???? (?????)
+    if (!foundInExternal) {
+      result = I18N_DICT[this.currentLang];
+      for (const k of keys) {
+        if (result === undefined || result === null) {
+          throw new Error(`[DataValidationError] i18n.js:t: ?????????????????? (??: "${keyPath}", lang: "${this.currentLang}")`);
+        }
+        result = result[k];
+      }
+    }
+
     if (typeof result !== 'string') {
-      throw new Error(`[DataValidationError] i18n.js:t: 参照されたキーの値が文字列ではありません (キー: "${keyPath}", 値: ${result}, 型: ${typeof result})`);
+      throw new Error(`[DataValidationError] i18n.js:t: ???????????????????? (??: "${keyPath}", ?: ${result}, ?: ${typeof result})`);
     }
 
     Object.keys(params).forEach(p => {
@@ -337,15 +354,31 @@ class I18nManager {
 
   tArray(keyPath, params = {}) {
     const keys = keyPath.split('.');
-    let result = I18N_DICT[this.currentLang];
+
+    // 1. ?????????????????????
+    let result = this.localeData[this.currentLang];
+    let foundInExternal = true;
     for (const k of keys) {
-      if (result === undefined || result === null) {
-        throw new Error(`[DataValidationError] i18n.js:tArray: 辞書に存在しないキーが参照されました (キー: "${keyPath}", lang: "${this.currentLang}")`);
+      if (result === undefined || result === null || result[k] === undefined) {
+        foundInExternal = false;
+        break;
       }
       result = result[k];
     }
+
+    // 2. ???????????????? I18N_DICT ???? (?????)
+    if (!foundInExternal) {
+      result = I18N_DICT[this.currentLang];
+      for (const k of keys) {
+        if (result === undefined || result === null) {
+          throw new Error(`[DataValidationError] i18n.js:tArray: ?????????????????? (??: "${keyPath}", lang: "${this.currentLang}")`);
+        }
+        result = result[k];
+      }
+    }
+
     if (!Array.isArray(result)) {
-      throw new Error(`[DataValidationError] i18n.js:tArray: 参照されたキーの値が配列ではありません (キー: "${keyPath}", 値: ${result}, 型: ${typeof result})`);
+      throw new Error(`[DataValidationError] i18n.js:tArray: ??????????????????? (??: "${keyPath}", ?: ${result}, ?: ${typeof result})`);
     }
 
     return result.map(text => {
@@ -360,7 +393,10 @@ class I18nManager {
 
 export const i18n = new I18nManager();
 
+export async function initLocaleData() {
+  await i18n.loadLocales();
+}
+
 if (typeof window !== 'undefined') {
   window.i18n = i18n;
 }
-
