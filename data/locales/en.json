@@ -65,5 +65,31 @@
     "enemy_spell_sealed": "Sealed {name}'s magic!",
     "enemy_already_sealed": "But magic is already sealed!",
     "spell_no_effect": "But it had no effect!"
+  },
+  "menu": {
+    "spell": "Spells",
+    "item": "Items",
+    "equip": "Equip",
+    "recall": "Recall",
+    "load": "Load",
+    "save": "Save",
+    "quit": "Quit",
+    "use": "Use",
+    "drop": "Drop",
+    "back": "Back",
+    "quit_confirm": "Are you sure you want to quit?\n(Unsaved progress will be lost)",
+    "drop_confirm": "Are you sure you want\nto discard {name}?",
+    "cannot_drop_equipped": "You cannot discard equipped items!",
+    "cannot_drop_key": "This is an important item!\nYou cannot discard it!",
+    "inventory_full_unequip": "Inventory is full!\nCannot unequip item!",
+    "unequipped": "Hero unequipped {name}!",
+    "equipped": "Hero equipped {name}!",
+    "dropped": "Hero discarded {name}!",
+    "full_hp": "HP is already full!",
+    "full_mp": "MP is already full!",
+    "cannot_use_here": "Cannot use that here!",
+    "no_return_point": "No return point registered!",
+    "girl_priority": "You must escort the girl safely back to town first!",
+    "mp_shortage": "Not enough MP!"
   }
 }

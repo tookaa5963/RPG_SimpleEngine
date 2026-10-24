@@ -65,5 +65,31 @@
     "enemy_spell_sealed": "{name}の呪文を\n封じ込んだ！",
     "enemy_already_sealed": "しかし すでに呪文は\n封じ込まれている！",
     "spell_no_effect": "しかし 効かなかった！"
+  },
+  "menu": {
+    "spell": "呪文",
+    "item": "道具",
+    "equip": "装備",
+    "recall": "思い出す",
+    "load": "再開",
+    "save": "記録",
+    "quit": "終了",
+    "use": "使う",
+    "drop": "捨てる",
+    "back": "やめる",
+    "quit_confirm": "このまま 終了して\nよろしいですか？\n（セーブしていない記録は失われます）",
+    "drop_confirm": "{name}を\n本当に 捨てますか？",
+    "cannot_drop_equipped": "装備しているものは 捨てられない！",
+    "cannot_drop_key": "それは 大切なものだ！\n捨てることなど できない！",
+    "inventory_full_unequip": "持ち物がいっぱいで\n装備を 外すことができない！",
+    "unequipped": "勇者は {name}を 外した！",
+    "equipped": "勇者は {name}を 装備した！",
+    "dropped": "{name}を 捨てた！",
+    "full_hp": "しかし ＨＰは 満タンだ！",
+    "full_mp": "しかし ＭＰは 満タンだ！",
+    "cannot_use_here": "ここでは 使えない！",
+    "no_return_point": "帰還地が 登録されていない！",
+    "girl_priority": "今は 女の子を無事に 町へ送り届けるのが 先決だ！",
+    "mp_shortage": "ＭＰが 足りない！"
   }
 }

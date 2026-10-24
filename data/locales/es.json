@@ -65,5 +65,31 @@
     "enemy_spell_sealed": "¡Selló la magia de {name}!",
     "enemy_already_sealed": "¡Pero los hechizos ya están sellados!",
     "spell_no_effect": "¡Pero no tuvo efecto!"
+  },
+  "menu": {
+    "spell": "Hechizos",
+    "item": "Objetos",
+    "equip": "Equipo",
+    "recall": "Recordar",
+    "load": "Cargar",
+    "save": "Guardar",
+    "quit": "Salir",
+    "use": "Usar",
+    "drop": "Tirar",
+    "back": "Volver",
+    "quit_confirm": "¿Seguro que quieres salir?\n(El progreso no guardado se perderá)",
+    "drop_confirm": "¿Seguro que quieres\ntirar {name}?",
+    "cannot_drop_equipped": "¡No puedes tirar objetos equipados!",
+    "cannot_drop_key": "¡Es un objeto importante!\n¡No puedes tirarlo!",
+    "inventory_full_unequip": "¡La bolsa está llena!\n¡No puedes desequipar el objeto!",
+    "unequipped": "¡El héroe se desequipó {name}!",
+    "equipped": "¡El héroe se equipó {name}!",
+    "dropped": "¡Tiraste {name}!",
+    "full_hp": "¡Los PV ya están al máximo!",
+    "full_mp": "¡Los PM ya están al máximo!",
+    "cannot_use_here": "¡No se puede usar aquí!",
+    "no_return_point": "¡No hay punto de retorno registrado!",
+    "girl_priority": "¡Primero debes llevar a la niña a la ciudad a salvo!",
+    "mp_shortage": "¡No tienes suficientes PM!"
   }
 }
