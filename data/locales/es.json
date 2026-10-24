@@ -15,5 +15,13 @@
     "yes": "Sí",
     "no": "No",
     "back": "Volver"
+  },
+  "ui": {
+    "status": "ESTADO",
+    "items": "OBJETOS",
+    "equipment": "EQUIPO",
+    "none": "Ninguno",
+    "poison_badge": " [VENENO]",
+    "controls": "[CONTROLES]\nMover: Flechas / WASD\nAceptar: Espacio / Intro\nCancelar: X / ESC\nBGM: M / SE: N"
   }
 }

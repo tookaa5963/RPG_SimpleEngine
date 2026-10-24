@@ -15,5 +15,13 @@
     "yes": "Yes",
     "no": "No",
     "back": "Back"
+  },
+  "ui": {
+    "status": "STATUS",
+    "items": "ITEMS",
+    "equipment": "EQUIP",
+    "none": "None",
+    "poison_badge": " [POISON]",
+    "controls": "[CONTROLS]\nMove: Arrows / WASD\nConfirm: Space / Enter\nCancel: X / ESC\nBGM: M / SE: N"
   }
 }

@@ -15,5 +15,13 @@
     "yes": "はい",
     "no": "いいえ",
     "back": "戻る"
+  },
+  "ui": {
+    "status": "ステータス",
+    "items": "道具",
+    "equipment": "装備",
+    "none": "なし",
+    "poison_badge": " [毒]",
+    "controls": "【操作方法】\n移動: 矢印 / WASD\n決定: Space / Enter\n取消: X / ESC\nBGM: M / SE: N"
   }
 }

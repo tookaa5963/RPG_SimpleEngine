@@ -2,14 +2,6 @@ import { locale } from './locale.js';
 
 export const I18N_DICT = {
   "ja": {
-    "ui": {
-      "status": "ステータス",
-      "items": "道具",
-      "equipment": "装備",
-      "none": "なし",
-      "poison_badge": " [毒]",
-      "controls": "【操作方法】\n移動: 矢印 / WASD\n決定: Space / Enter\n取消: X / ESC\nBGM: M / SE: N"
-    },
     "menu": {
       "spell": "呪文",
       "item": "道具",
@@ -80,14 +72,6 @@ export const I18N_DICT = {
     }
   },
   "en": {
-    "ui": {
-      "status": "STATUS",
-      "items": "ITEMS",
-      "equipment": "EQUIP",
-      "none": "None",
-      "poison_badge": " [POISON]",
-      "controls": "[CONTROLS]\nMove: Arrows / WASD\nConfirm: Space / Enter\nCancel: X / ESC\nBGM: M / SE: N"
-    },
     "menu": {
       "spell": "Spells",
       "item": "Items",
@@ -158,14 +142,6 @@ export const I18N_DICT = {
     }
   },
   "es": {
-    "ui": {
-      "status": "ESTADO",
-      "items": "OBJETOS",
-      "equipment": "EQUIPO",
-      "none": "Ninguno",
-      "poison_badge": " [VENENO]",
-      "controls": "[CONTROLES]\nMover: Flechas / WASD\nAceptar: Espacio / Intro\nCancelar: X / ESC\nBGM: M / SE: N"
-    },
     "menu": {
       "spell": "Hechizos",
       "item": "Objetos",
