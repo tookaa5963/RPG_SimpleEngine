@@ -2,11 +2,6 @@ import { locale } from './locale.js';
 
 export const I18N_DICT = {
   "ja": {
-    "common": {
-      "yes": "はい",
-      "no": "いいえ",
-      "back": "戻る"
-    },
     "ui": {
       "status": "ステータス",
       "items": "道具",
@@ -85,11 +80,6 @@ export const I18N_DICT = {
     }
   },
   "en": {
-    "common": {
-      "yes": "Yes",
-      "no": "No",
-      "back": "Back"
-    },
     "ui": {
       "status": "STATUS",
       "items": "ITEMS",
@@ -168,11 +158,6 @@ export const I18N_DICT = {
     }
   },
   "es": {
-    "common": {
-      "yes": "Sí",
-      "no": "No",
-      "back": "Volver"
-    },
     "ui": {
       "status": "ESTADO",
       "items": "OBJETOS",

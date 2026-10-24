@@ -10,5 +10,10 @@
   },
   "system": {
     "theater_unlocked": "¡Felicidades por completar el juego!\n\nSe ha añadido el modo 'Teatro' a la pantalla de título.\nAhora puedes revivir las escenas cuando quieras."
+  },
+  "common": {
+    "yes": "Sí",
+    "no": "No",
+    "back": "Volver"
   }
 }

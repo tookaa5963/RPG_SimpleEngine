@@ -10,5 +10,10 @@
   },
   "system": {
     "theater_unlocked": "Congratulations on clearing the game!\n\n'Theater' mode has been added to the Title Screen.\nYou can now replay cinematics anytime."
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back"
   }
 }
