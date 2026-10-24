@@ -32,5 +32,22 @@
     "no_magic": "No spells available\nfor battle!",
     "magic_sealed": "Magic is sealed!",
     "no_items": "No usable items\nin possession!"
+  },
+  "slot": {
+    "title_save": "Log of Adventure - Save",
+    "title_load": "Log of Adventure - Load",
+    "current": "Current Log",
+    "new_game": "None (New Adventure)",
+    "book": "Log ",
+    "empty": "Empty",
+    "corrupted": "Corrupted",
+    "current_badge": " [Active]",
+    "overwrite_title": "Overwrite Confirmation",
+    "overwrite_confirm": "Log {slot} already contains data.\nDo you want to overwrite it?",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "backup_export": "Export Save Data",
+    "backup_import": "Import Save Data"
   }
 }

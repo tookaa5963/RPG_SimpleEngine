@@ -32,5 +32,22 @@
     "no_magic": "勇者は まだ戦いで\n使える呪文がない！",
     "magic_sealed": "呪文は 封じ込まれている！",
     "no_items": "使える道具を\n持っていない！"
+  },
+  "slot": {
+    "title_save": "冒険の書 - 記録",
+    "title_load": "冒険の書 - 再開",
+    "current": "現在の冒険の書",
+    "new_game": "なし（新規冒険）",
+    "book": "書",
+    "empty": "空っぽ",
+    "corrupted": "データ異常",
+    "current_badge": " [現在]",
+    "overwrite_title": "記録の上書き確認",
+    "overwrite_confirm": "冒険の書{slot}には 既に記録があります。\n前の記録を消して 上書きしますか？",
+    "yes": "はい",
+    "no": "いいえ",
+    "back": "戻る",
+    "backup_export": "バックアップ出力",
+    "backup_import": "バックアップ読込"
   }
 }

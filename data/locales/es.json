@@ -32,5 +32,22 @@
     "no_magic": "¡No hay hechizos disponibles\npara la batalla!",
     "magic_sealed": "¡Los hechizos están bloqueados!",
     "no_items": "¡No tienes objetos utilizables!"
+  },
+  "slot": {
+    "title_save": "Diario de Aventura - Guardar",
+    "title_load": "Diario de Aventura - Cargar",
+    "current": "Diario actual",
+    "new_game": "Ninguno (Nueva Aventura)",
+    "book": "Reg. ",
+    "empty": "Vacío",
+    "corrupted": "Dañado",
+    "current_badge": " [Actual]",
+    "overwrite_title": "Confirmar Sobrescritura",
+    "overwrite_confirm": "El registro {slot} ya contiene datos.\n¿Deseas sobrescribirlo?",
+    "yes": "Sí",
+    "no": "No",
+    "back": "Volver",
+    "backup_export": "Exportar Datos",
+    "backup_import": "Importar Datos"
   }
 }

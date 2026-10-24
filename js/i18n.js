@@ -44,23 +44,6 @@ export const I18N_DICT = {
       "enemy_already_sealed": "しかし すでに呪文は\n封じ込まれている！",
       "spell_no_effect": "しかし 効かなかった！"
     },
-    "slot": {
-      "title_save": "冒険の書 - 記録",
-      "title_load": "冒険の書 - 再開",
-      "current": "現在の冒険の書",
-      "new_game": "なし（新規冒険）",
-      "book": "書",
-      "empty": "空っぽ",
-      "corrupted": "データ異常",
-      "current_badge": " [現在]",
-      "overwrite_title": "記録の上書き確認",
-      "overwrite_confirm": "冒険の書{slot}には 既に記録があります。\n前の記録を消して 上書きしますか？",
-      "yes": "はい",
-      "no": "いいえ",
-      "back": "戻る",
-      "backup_export": "バックアップ出力",
-      "backup_import": "バックアップ読込"
-    }
   },
   "en": {
     "menu": {
@@ -105,23 +88,6 @@ export const I18N_DICT = {
       "enemy_already_sealed": "But magic is already sealed!",
       "spell_no_effect": "But it had no effect!"
     },
-    "slot": {
-      "title_save": "Log of Adventure - Save",
-      "title_load": "Log of Adventure - Load",
-      "current": "Current Log",
-      "new_game": "None (New Adventure)",
-      "book": "Log ",
-      "empty": "Empty",
-      "corrupted": "Corrupted",
-      "current_badge": " [Active]",
-      "overwrite_title": "Overwrite Confirmation",
-      "overwrite_confirm": "Log {slot} already contains data.\nDo you want to overwrite it?",
-      "yes": "Yes",
-      "no": "No",
-      "back": "Back",
-      "backup_export": "Export Save Data",
-      "backup_import": "Import Save Data"
-    }
   },
   "es": {
     "menu": {
@@ -166,23 +132,6 @@ export const I18N_DICT = {
       "enemy_already_sealed": "¡Pero los hechizos ya están sellados!",
       "spell_no_effect": "¡Pero no tuvo efecto!"
     },
-    "slot": {
-      "title_save": "Diario de Aventura - Guardar",
-      "title_load": "Diario de Aventura - Cargar",
-      "current": "Diario actual",
-      "new_game": "Ninguno (Nueva Aventura)",
-      "book": "Reg. ",
-      "empty": "Vacío",
-      "corrupted": "Dañado",
-      "current_badge": " [Actual]",
-      "overwrite_title": "Confirmar Sobrescritura",
-      "overwrite_confirm": "El registro {slot} ya contiene datos.\n¿Deseas sobrescribirlo?",
-      "yes": "Sí",
-      "no": "No",
-      "back": "Volver",
-      "backup_export": "Exportar Datos",
-      "backup_import": "Importar Datos"
-    }
   }
 };
 
