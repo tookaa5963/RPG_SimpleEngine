@@ -1,14 +1,5 @@
 import { locale } from './locale.js';
 
-export const I18N_DICT = {
-  "ja": {
-  },
-  "en": {
-  },
-  "es": {
-  }
-};
-
 class I18nManager {
   constructor() {
     this.localeData = {
@@ -56,7 +47,7 @@ class I18nManager {
 
   resolve(textObj) {
     if (!textObj || typeof textObj !== 'object') {
-      throw new Error(`[DataValidationError] i18n.js:resolve: \u7ffb\u8bad\u30aa\u30d6\u30b8\u30a7\u30af\u30c8\u304c\u4e0d\u6b63\u3067\u3059 (\u5024: ${textObj}, \u578b: ${typeof textObj})`);
+      throw new Error(`[DataValidationError] i18n.js:resolve: \u7ffb\u8bad\u30aa\u30b8\u30a7\u30af\u30c8\u304c\u4e0d\u6b63\u3067\u3059 (\u5024: ${textObj}, \u578b: ${typeof textObj})`);
     }
     const val = textObj[this.currentLang];
     if (val === undefined) {
@@ -67,31 +58,20 @@ class I18nManager {
 
   t(keyPath, params = {}) {
     const keys = keyPath.split('.');
-
-    // 1. \u5916\u90e8\u30ed\u30fc\u30c9\u3055\u308c\u305f\u30ed\u30b1\u30fc\u30eb\u30c7\u30fc\u30bf\u304b\u3089\u512a\u5148\u63a2\u7d22
     let result = this.localeData[this.currentLang];
-    let foundInExternal = true;
+    if (!result || typeof result !== 'object') {
+      throw new Error(`[DataValidationError] i18n.js:t: \u30ed\u30b1\u30fc\u30eb\u30c7\u30fc\u30bf\u304c\u672a\u30ed\u30fc\u30c9\u307e\u305f\u306f\u4e0d\u6b63\u3067\u3059 (lang: "${this.currentLang}", \u578b: ${typeof result})`);
+    }
+
     for (const k of keys) {
       if (result === undefined || result === null || result[k] === undefined) {
-        foundInExternal = false;
-        break;
+        throw new Error(`[DataValidationError] i18n.js:t: \u8f9e\u66f8\u306b\u5b58\u5728\u3057\u306a\u3044\u30ad\u30fc\u304c\u53c2\u7167\u3055\u308c\u307e\u3057\u305f (\u30ad\u30fc: "${keyPath}", \u672a\u89e3\u6c7a\u90e8: "${k}", lang: "${this.currentLang}")`);
       }
       result = result[k];
     }
 
-    // 2. \u5916\u90e8\u30c7\u30fc\u30bf\u306b\u5b58\u5728\u3057\u306a\u3044\u5834\u5408\u3001\u6b8b\u5b58 I18N_DICT \u304b\u3089\u63a2\u7d22 (\u6bb5\u968e\u79fb\u884c\u7528)
-    if (!foundInExternal) {
-      result = I18N_DICT[this.currentLang];
-      for (const k of keys) {
-        if (result === undefined || result === null) {
-          throw new Error(`[DataValidationError] i18n.js:t: \u8f9e\u66f8\u306b\u5b58\u5728\u3057\u306a\u3044\u30ad\u30fc\u304c\u53c2\u7167\u3055\u308c\u307e\u3057\u305f (\u30ad\u30fc: "${keyPath}", lang: "${this.currentLang}")`);
-        }
-        result = result[k];
-      }
-    }
-
     if (typeof result !== 'string') {
-      throw new Error(`[DataValidationError] i18n.js:t: \u53c2\u7167\u3055\u308c\u307f\u30ad\u30fc\u306e\u5024\u304c\u6587\u5b57\u5217\u3067\u306f\u3042\u308a\u307e\u305b\u3093 (\u30ad\u30fc: "${keyPath}", \u5024: ${result}, \u578b: ${typeof result})`);
+      throw new Error(`[DataValidationError] i18n.js:t: \u53c2\u7167\u3055\u308c\u305f\u30ad\u30fc\u306e\u5024\u304c\u6587\u5b57\u5217\u3067\u306f\u3042\u308a\u307e\u305b\u3093 (\u30ad\u30fc: "${keyPath}", \u5024: ${result}, \u578b: ${typeof result})`);
     }
 
     Object.keys(params).forEach(p => {
@@ -102,27 +82,16 @@ class I18nManager {
 
   tArray(keyPath, params = {}) {
     const keys = keyPath.split('.');
-
-    // 1. \u5916\u90e8\u30ed\u30fc\u30c9\u3055\u308c\u305f\u30ed\u30b1\u30fc\u30eb\u30c7\u30fc\u30bf\u304b\u3089\u512a\u5148\u63a2\u7d22
     let result = this.localeData[this.currentLang];
-    let foundInExternal = true;
-    for (const k of keys) {
-      if (result === undefined || result === null || result[k] === undefined) {
-        foundInExternal = false;
-        break;
-      }
-      result = result[k];
+    if (!result || typeof result !== 'object') {
+      throw new Error(`[DataValidationError] i18n.js:tArray: \u30ed\u30b1\u30fc\u30eb\u30c7\u30fc\u30bf\u304c\u672a\u30ed\u30fc\u30c9\u307e\u305f\u306f\u4e0d\u6b63\u3067\u3059 (lang: "${this.currentLang}", \u578b: ${typeof result})`);
     }
 
-    // 2. \u5916\u90e8\u30c7\u30fc\u30bf\u306b\u5b58\u5728\u3057\u306a\u3044\u5834\u5408\u3001\u6b8b\u5b58 I18N_DICT \u304b\u3089\u63a2\u7d22 (\u6bb5\u968e\u79fb\u884c\u7528)
-    if (!foundInExternal) {
-      result = I18N_DICT[this.currentLang];
-      for (const k of keys) {
-        if (result === undefined || result === null) {
-          throw new Error(`[DataValidationError] i18n.js:tArray: \u8f9e\u66f8\u306b\u5b58\u5728\u3057\u306a\u3044\u30ad\u30fc\u304c\u53c2\u7167\u3055\u308c\u307e\u3057\u305f (\u30ad\u30fc: "${keyPath}", lang: "${this.currentLang}")`);
-        }
-        result = result[k];
+    for (const k of keys) {
+      if (result === undefined || result === null || result[k] === undefined) {
+        throw new Error(`[DataValidationError] i18n.js:tArray: \u8f9e\u66f8\u306b\u5b58\u5728\u3057\u306a\u3044\u30ad\u30fc\u304c\u53c2\u7167\u3055\u308c\u307e\u3057\u305f (\u30ad\u30fc: "${keyPath}", \u672a\u89e3\u6c7a\u90e8: "${k}", lang: "${this.currentLang}")`);
       }
+      result = result[k];
     }
 
     if (!Array.isArray(result)) {
