@@ -733,9 +733,22 @@ function initializeGameEntities() {
     returnToTitle
   );
   shopManager = new ShopManager(player, () => { currentState = STATE_EXPLORE; });
-  innManager = new InnManager(player, messageWindow, () => fieldManager.currentMap, () => {
-    currentState = STATE_EXPLORE;
-  });
+  innManager = new InnManager(
+    player,
+    messageWindow,
+    () => fieldManager.currentMap,
+    () => {
+      currentState = STATE_EXPLORE;
+    },
+    {
+      onAudio: (action, payload) => {
+        if (action === 'bump') sound.playBump();
+        else if (action === 'stopBgm') sound.stopBgm();
+        else if (action === 'inn') sound.playInn();
+        else if (action === 'playBgm') sound.playBgm(payload);
+      }
+    }
+  );
   churchManager = new ChurchManager(player, messageWindow, {
     onPlaySound: (soundId) => {
       if (soundId === 'victory') sound.playVictory();

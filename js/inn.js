@@ -1,5 +1,4 @@
 // FILE_ENTRY: js/inn.js
-import { sound } from './sound.js';
 import { i18n } from './i18n.js';
 
 export let INN_DATA = null;
@@ -7,21 +6,30 @@ export let INN_DATA = null;
 export async function initInnData() {
   try {
     const res = await fetch('data/facilities/inn.json');
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status} on inn.json`);
+    if (!res.ok) {
+      throw new Error(`[DataValidationError] initInnData: HTTP error! status: ${res.status} on inn.json (\u5024: ${res.status}, \u578b: ${typeof res.status})`);
+    }
     INN_DATA = await res.json();
-    console.log("INN_DATA initialized successfully from inn.json.");
+    console.log('INN_DATA initialized successfully from inn.json.');
   } catch (error) {
-    console.error("Failed to fetch inn data:", error);
+    console.error('Failed to fetch inn data:', error);
     throw error;
   }
 }
 
 export class InnManager {
-  constructor(player, messageWindow, getCurrentMap, onFinish) {
+  constructor(player, messageWindow, getCurrentMap, onFinish, options = {}) {
+    if (!player) {
+      throw new Error(`[LogicValidationError] InnManager.constructor: \u30d7\u30ed\u30d1\u30c6\u30a3 "player" \u304c\u4e0d\u6b63\u3067\u3059 (\u5024: ${player}, \u578b: ${typeof player})`);
+    }
+    if (!messageWindow) {
+      throw new Error(`[LogicValidationError] InnManager.constructor: \u30d7\u30ed\u30d1\u30c6\u30a3 "messageWindow" \u304c\u4e0d\u6b63\u3067\u3059 (\u5024: ${messageWindow}, \u578b: ${typeof messageWindow})`);
+    }
     this.player = player;
     this.msgWin = messageWindow;
-    this.getCurrentMap = getCurrentMap;
-    this.onFinish = onFinish;
+    this.getCurrentMap = (typeof getCurrentMap === 'function') ? getCurrentMap : null;
+    this.onFinish = (typeof onFinish === 'function') ? onFinish : null;
+    this.onAudio = (options && typeof options.onAudio === 'function') ? options.onAudio : null;
 
     this.isStaying = false;
     this.fadeTimer = 0;
@@ -29,13 +37,26 @@ export class InnManager {
   }
 
   _ensureData() {
-    if (!INN_DATA) throw new Error('[DataValidationError] InnManager: INN_DATA is not initialized.');
+    if (!INN_DATA) {
+      throw new Error('[DataValidationError] InnManager: INN_DATA is not initialized.');
+    }
+  }
+
+  emitAudio(action, payload = null) {
+    if (this.onAudio) {
+      this.onAudio(action, payload);
+    }
   }
 
   getMessage(key, params = {}) {
     this._ensureData();
+    if (typeof key !== 'string') {
+      throw new Error(`[LogicValidationError] InnManager.getMessage: \u30d7\u30ed\u30d1\u30c6\u30a3 "key" \u304c\u4e0d\u6b63\u3067\u3059 (\u5024: ${key}, \u578b: ${typeof key})`);
+    }
     const msgObj = INN_DATA.messages[key];
-    if (!msgObj) throw new Error(`[DataValidationError] InnManager: message key "${key}" not found.`);
+    if (!msgObj) {
+      throw new Error(`[DataValidationError] InnManager.getMessage: \u30d7\u30ed\u30d1\u30c6\u30a3 "${key}" \u304c\u4e0d\u6b63\u3067\u3059 (\u5024: undefined, \u578b: undefined)`);
+    }
     let text = i18n.resolve(msgObj);
     for (const [k, v] of Object.entries(params)) {
       text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
@@ -45,14 +66,14 @@ export class InnManager {
 
   open(npc) {
     this._ensureData();
-    const cost = npc.cost || INN_DATA.defaultCost || 10;
+    const cost = (npc && typeof npc.cost === 'number') ? npc.cost : (INN_DATA.defaultCost || 10);
     this.msgWin.openMenu(
       this.getMessage('greeting', { cost: String(cost) }),
       [i18n.t('common.yes'), i18n.t('common.no')],
       (selectedIndex) => {
         if (selectedIndex === 0) {
           if (!this.player.useGold(cost)) {
-            sound.playBump();
+            this.emitAudio('bump');
             this.msgWin.open([this.getMessage('gold_shortage')]);
           } else {
             this.msgWin.close();
@@ -71,8 +92,8 @@ export class InnManager {
   startStaying() {
     this.isStaying = true;
     this.fadeTimer = this.FADE_MAX;
-    sound.stopBgm();
-    sound.playInn();
+    this.emitAudio('stopBgm');
+    this.emitAudio('inn');
   }
 
   update() {
@@ -85,7 +106,7 @@ export class InnManager {
       this.isStaying = false;
       const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
       if (currentMap && currentMap.bgm) {
-        sound.playBgm(currentMap.bgm);
+        this.emitAudio('playBgm', currentMap.bgm);
       }
       if (this.onFinish) this.onFinish();
       this.msgWin.open([this.getMessage('morning')]);
