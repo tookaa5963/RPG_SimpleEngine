@@ -52,6 +52,10 @@ export class AudioService {
             sound.playSubmit();
             return;
         }
+        if (soundId === 'magic') {
+            sound.playMagic();
+            return;
+        }
 
         throw createProtocolError('NotFoundError', 'audioService.js:playSe', 'soundId', soundId);
     }
