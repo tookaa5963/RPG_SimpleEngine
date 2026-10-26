@@ -56,6 +56,14 @@ export class AudioService {
             sound.playMagic();
             return;
         }
+        if (soundId === 'cursor') {
+            sound.playCursor();
+            return;
+        }
+        if (soundId === 'textChar') {
+            sound.playTextChar();
+            return;
+        }
 
         throw createProtocolError('NotFoundError', 'audioService.js:playSe', 'soundId', soundId);
     }
