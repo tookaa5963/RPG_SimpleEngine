@@ -1,4 +1,17 @@
-// FILE_ENTRY: js/battleEffects.js
+﻿// FILE_ENTRY: js/battleEffects.js
+
+/**
+ * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
+ * @param {string} type 例外種別
+ * @param {string} contextId 発生箇所
+ * @param {string} propName 不正を検知したプロパティ名
+ * @param {*} val 実際に渡された値
+ * @returns {Error}
+ */
+export function createProtocolError(type, contextId, propName, val) {
+  return new Error(`[${type}] ${contextId}: プロパティ "${propName}" が不正です (値: ${JSON.stringify(val)}, 型: ${typeof val})`);
+}
+
 export class BattleEffects {
   constructor() {
     this.popups = [];
@@ -15,18 +28,62 @@ export class BattleEffects {
   }
 
   shake(duration = 14) {
+    if (typeof duration !== 'number') {
+      throw createProtocolError('TypeError', 'battleEffects.js:shake', 'duration', duration);
+    }
+    if (Number.isNaN(duration)) {
+      throw createProtocolError('RangeError', 'battleEffects.js:shake', 'duration', duration);
+    }
     this.screenShakeTimer = duration;
   }
 
   addPopup(text, x, y, fillColor = '#ffffff', strokeColor = '#e74c3c', isBig = false, type = 'bounce') {
+    if (text === null) {
+      throw createProtocolError('NullReferenceError', 'battleEffects.js:addPopup', 'text', text);
+    }
+    if (text === undefined) {
+      throw createProtocolError('UndefinedReferenceError', 'battleEffects.js:addPopup', 'text', text);
+    }
+    if (typeof x !== 'number') {
+      throw createProtocolError('TypeError', 'battleEffects.js:addPopup', 'x', x);
+    }
+    if (Number.isNaN(x)) {
+      throw createProtocolError('RangeError', 'battleEffects.js:addPopup', 'x', x);
+    }
+    if (typeof y !== 'number') {
+      throw createProtocolError('TypeError', 'battleEffects.js:addPopup', 'y', y);
+    }
+    if (Number.isNaN(y)) {
+      throw createProtocolError('RangeError', 'battleEffects.js:addPopup', 'y', y);
+    }
+    if (typeof fillColor !== 'string') {
+      throw createProtocolError('TypeError', 'battleEffects.js:addPopup', 'fillColor', fillColor);
+    }
+    if (typeof strokeColor !== 'string') {
+      throw createProtocolError('TypeError', 'battleEffects.js:addPopup', 'strokeColor', strokeColor);
+    }
+    if (typeof isBig !== 'boolean') {
+      throw createProtocolError('TypeError', 'battleEffects.js:addPopup', 'isBig', isBig);
+    }
+    if (typeof type !== 'string') {
+      throw createProtocolError('TypeError', 'battleEffects.js:addPopup', 'type', type);
+    }
+
+    let vy = 0;
+    let gravity = 0;
+    if (type === 'bounce') {
+      vy = -6.0;
+      gravity = 0.28;
+    }
+
     this.popups.push({
       text: String(text),
       x: x + (Math.random() - 0.5) * 8,
       y: y,
       baseX: x,
       vx: (Math.random() - 0.5) * 2.0,
-      vy: type === 'bounce' ? -6.0 : 0,
-      gravity: type === 'bounce' ? 0.28 : 0,
+      vy: vy,
+      gravity: gravity,
       timer: 55,
       maxTimer: 55,
       fillColor: fillColor,
@@ -38,6 +95,28 @@ export class BattleEffects {
   }
 
   createSparks(x, y, color = '#ffffff', count = 12) {
+    if (typeof x !== 'number') {
+      throw createProtocolError('TypeError', 'battleEffects.js:createSparks', 'x', x);
+    }
+    if (Number.isNaN(x)) {
+      throw createProtocolError('RangeError', 'battleEffects.js:createSparks', 'x', x);
+    }
+    if (typeof y !== 'number') {
+      throw createProtocolError('TypeError', 'battleEffects.js:createSparks', 'y', y);
+    }
+    if (Number.isNaN(y)) {
+      throw createProtocolError('RangeError', 'battleEffects.js:createSparks', 'y', y);
+    }
+    if (typeof color !== 'string') {
+      throw createProtocolError('TypeError', 'battleEffects.js:createSparks', 'color', color);
+    }
+    if (typeof count !== 'number') {
+      throw createProtocolError('TypeError', 'battleEffects.js:createSparks', 'count', count);
+    }
+    if (Number.isNaN(count)) {
+      throw createProtocolError('RangeError', 'battleEffects.js:createSparks', 'count', count);
+    }
+
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 6 + 3;
@@ -56,8 +135,36 @@ export class BattleEffects {
   }
 
   createPlayerDamageEffect(x, y, isCrit = false) {
-    const length = isCrit ? 120 : 80;
-    const duration = isCrit ? 20 : 14;
+    if (typeof x !== 'number') {
+      throw createProtocolError('TypeError', 'battleEffects.js:createPlayerDamageEffect', 'x', x);
+    }
+    if (Number.isNaN(x)) {
+      throw createProtocolError('RangeError', 'battleEffects.js:createPlayerDamageEffect', 'x', x);
+    }
+    if (typeof y !== 'number') {
+      throw createProtocolError('TypeError', 'battleEffects.js:createPlayerDamageEffect', 'y', y);
+    }
+    if (Number.isNaN(y)) {
+      throw createProtocolError('RangeError', 'battleEffects.js:createPlayerDamageEffect', 'y', y);
+    }
+    if (typeof isCrit !== 'boolean') {
+      throw createProtocolError('TypeError', 'battleEffects.js:createPlayerDamageEffect', 'isCrit', isCrit);
+    }
+
+    let length = 80;
+    let duration = 14;
+    let slashColor = '#ff0055';
+    let particleCount = 16;
+    let speedMultiplier = 5;
+
+    if (isCrit) {
+      length = 120;
+      duration = 20;
+      slashColor = '#ff3838';
+      particleCount = 26;
+      speedMultiplier = 8;
+    }
+
     this.slashes.push({
       x: x,
       y: y,
@@ -66,13 +173,21 @@ export class BattleEffects {
       length: length,
       life: duration,
       maxLife: duration,
-      color: isCrit ? '#ff3838' : '#ff0055'
+      color: slashColor
     });
 
-    const particleCount = isCrit ? 26 : 16;
     for (let i = 0; i < particleCount; i++) {
       const angle = (Math.PI / 2) + (Math.random() - 0.5) * 1.5;
-      const speed = Math.random() * (isCrit ? 8 : 5) + 2;
+      const speed = Math.random() * speedMultiplier + 2;
+
+      let particleColor = '#7158e2';
+      if (isCrit) {
+        particleColor = '#ff3838';
+      }
+      if (Math.random() < 0.5) {
+        particleColor = '#ff0055';
+      }
+
       this.particles.push({
         x: x + (Math.random() - 0.5) * 20,
         y: y + (Math.random() - 0.5) * 20,
@@ -80,7 +195,7 @@ export class BattleEffects {
         vy: -Math.sin(angle) * speed * 0.5,
         gravity: 0.35,
         size: Math.random() * 5 + 3,
-        color: Math.random() < 0.5 ? '#ff0055' : (isCrit ? '#ff3838' : '#7158e2'),
+        color: particleColor,
         life: 26,
         maxLife: 26
       });
@@ -88,7 +203,9 @@ export class BattleEffects {
   }
 
   update() {
-    if (this.screenShakeTimer > 0) this.screenShakeTimer--;
+    if (this.screenShakeTimer > 0) {
+      this.screenShakeTimer--;
+    }
 
     for (let i = this.popups.length - 1; i >= 0; i--) {
       const p = this.popups[i];
@@ -132,6 +249,13 @@ export class BattleEffects {
   }
 
   applyScreenShake(ctx) {
+    if (ctx === null) {
+      throw createProtocolError('NullReferenceError', 'battleEffects.js:applyScreenShake', 'ctx', ctx);
+    }
+    if (typeof ctx !== 'object') {
+      throw createProtocolError('TypeError', 'battleEffects.js:applyScreenShake', 'ctx', ctx);
+    }
+
     if (this.screenShakeTimer > 0) {
       const shakeX = (Math.random() - 0.5) * 14;
       const shakeY = (Math.random() - 0.5) * 14;
@@ -140,12 +264,26 @@ export class BattleEffects {
   }
 
   draw(ctx) {
+    if (ctx === null) {
+      throw createProtocolError('NullReferenceError', 'battleEffects.js:draw', 'ctx', ctx);
+    }
+    if (typeof ctx !== 'object') {
+      throw createProtocolError('TypeError', 'battleEffects.js:draw', 'ctx', ctx);
+    }
+
     this.drawSlashes(ctx);
     this.drawParticles(ctx);
     this.drawPopups(ctx);
   }
 
   drawSlashes(ctx) {
+    if (ctx === null) {
+      throw createProtocolError('NullReferenceError', 'battleEffects.js:drawSlashes', 'ctx', ctx);
+    }
+    if (typeof ctx !== 'object') {
+      throw createProtocolError('TypeError', 'battleEffects.js:drawSlashes', 'ctx', ctx);
+    }
+
     ctx.save();
     this.slashes.forEach(sl => {
       const alpha = sl.life / sl.maxLife;
@@ -172,6 +310,13 @@ export class BattleEffects {
   }
 
   drawParticles(ctx) {
+    if (ctx === null) {
+      throw createProtocolError('NullReferenceError', 'battleEffects.js:drawParticles', 'ctx', ctx);
+    }
+    if (typeof ctx !== 'object') {
+      throw createProtocolError('TypeError', 'battleEffects.js:drawParticles', 'ctx', ctx);
+    }
+
     ctx.save();
     this.particles.forEach(pt => {
       const alpha = pt.life / pt.maxLife;
@@ -183,6 +328,13 @@ export class BattleEffects {
   }
 
   drawPopups(ctx) {
+    if (ctx === null) {
+      throw createProtocolError('NullReferenceError', 'battleEffects.js:drawPopups', 'ctx', ctx);
+    }
+    if (typeof ctx !== 'object') {
+      throw createProtocolError('TypeError', 'battleEffects.js:drawPopups', 'ctx', ctx);
+    }
+
     ctx.save();
     this.popups.forEach(p => {
       const alpha = Math.min(1.0, p.timer / 15);
@@ -192,7 +344,11 @@ export class BattleEffects {
       ctx.translate(p.x, p.y);
       ctx.scale(p.scale, p.scale);
 
-      const baseFontSize = p.isBig ? 48 : 38;
+      let baseFontSize = 38;
+      if (p.isBig) {
+        baseFontSize = 48;
+      }
+
       ctx.font = `900 ${baseFontSize}px Impact, "Arial Black", "Hiragino Kaku Gothic ProN", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
