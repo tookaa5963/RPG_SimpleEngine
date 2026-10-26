@@ -1,7 +1,8 @@
-// FILE_ENTRY: js/main.js
+﻿// FILE_ENTRY: js/main.js
 import { maps, initMapData } from './maps.js';
 import { MessageWindow } from './message.js';
 import { sound } from './sound.js';
+import { audioService } from './audioService.js';
 import { BattleManager } from './battle.js';
 import { MenuManager } from './menu.js';
 import { ShopManager, initShopData } from './shop.js';
@@ -76,7 +77,11 @@ function playCutsceneVideo(videoSrc, onFinished) {
     cutsceneVideo.src = videoSrc;
     cutsceneVideo.currentTime = 0;
     cutsceneVideo.muted = !sound.bgmEnabled;
-    cutsceneVideo.volume = sound.bgmVolume ? Math.min(1.0, sound.bgmVolume * 5) : 0.5;
+    let cutsceneVolume = 0.5;
+    if (sound.bgmVolume) {
+      cutsceneVolume = Math.min(1.0, sound.bgmVolume * 5);
+    }
+    cutsceneVideo.volume = cutsceneVolume;
 
     cutsceneFinishHandler = () => {
       if (!isCutscenePlaying) return;
@@ -116,12 +121,20 @@ function playCutsceneVideo(videoSrc, onFinished) {
 
 function updateSoundUI() {
   if (btnToggleBgm) {
-    btnToggleBgm.textContent = `BGM: ${sound.bgmEnabled ? 'ON' : 'OFF'}`;
+    let bgmStatus = 'OFF';
+    if (sound.bgmEnabled) {
+      bgmStatus = 'ON';
+    }
+    btnToggleBgm.textContent = `BGM: ${bgmStatus}`;
     if (sound.bgmEnabled) btnToggleBgm.classList.remove('off');
     else btnToggleBgm.classList.add('off');
   }
   if (btnToggleSe) {
-    btnToggleSe.textContent = `SE: ${sound.seEnabled ? 'ON' : 'OFF'}`;
+    let seStatus = 'OFF';
+    if (sound.seEnabled) {
+      seStatus = 'ON';
+    }
+    btnToggleSe.textContent = `SE: ${seStatus}`;
     if (sound.seEnabled) btnToggleSe.classList.remove('off');
     else btnToggleSe.classList.add('off');
   }
@@ -207,11 +220,15 @@ function handlePlayerDeath(isPoison = false) {
   }
 
   // フォールバック先を灯台守の小屋に変更
-  const rp = player.returnPoint || { mapId: 'lighthousekeeper_cottage', gridX: 3, gridY: 4, direction: 'up' };
+  let rp = { mapId: 'lighthousekeeper_cottage', gridX: 3, gridY: 4, direction: 'up' };
+  if (player.returnPoint) {
+    rp = player.returnPoint;
+  }
 
-  let deathMsg = isPoison
-    ? logFormatter.format('field.death_poison')
-    : logFormatter.format('field.death_normal');
+  let deathMsg = logFormatter.format('field.death_normal');
+  if (isPoison) {
+    deathMsg = logFormatter.format('field.death_poison');
+  }
 
   if (lostExp > 0) {
     deathMsg += '\n' + logFormatter.format('field.death_exp_lost', { exp: String(lostExp) });
@@ -280,7 +297,11 @@ function runEndingSequence() {
       if (player.equipment.armor === 'dragon_armor') {
         player.equipment.armor = null;
       }
-      player.removeItem('dragon_armor', player.inventory.dragon_armor || 1);
+      let dragonArmorCount = 1;
+      if (player.inventory.dragon_armor) {
+        dragonArmorCount = player.inventory.dragon_armor;
+      }
+      player.removeItem('dragon_armor', dragonArmorCount);
 
       fieldManager.changeMap('deep_forest', 36, 6, 'right', false);
       currentState = STATE_MESSAGE;
@@ -297,7 +318,11 @@ function runEndingSequence() {
         if (player.equipment.shield === 'water_shield') {
           player.equipment.shield = null;
         }
-        player.removeItem('water_shield', player.inventory.water_shield || 1);
+        let waterShieldCount = 1;
+        if (player.inventory.water_shield) {
+          waterShieldCount = player.inventory.water_shield;
+        }
+        player.removeItem('water_shield', waterShieldCount);
 
         fieldManager.changeMap('port_town', 10, 6, 'up', false);
         currentState = STATE_MESSAGE;
@@ -478,12 +503,20 @@ function update() {
     return;
   }
 
-  if (input.keys['m'] || input.keys['M']) {
+  if (input.keys['m']) {
+    input.keys['m'] = false;
+    input.keys['M'] = false;
+    toggleBgmAction();
+  } else if (input.keys['M']) {
     input.keys['m'] = false;
     input.keys['M'] = false;
     toggleBgmAction();
   }
-  if (input.keys['n'] || input.keys['N']) {
+  if (input.keys['n']) {
+    input.keys['n'] = false;
+    input.keys['N'] = false;
+    toggleSeAction();
+  } else if (input.keys['N']) {
     input.keys['n'] = false;
     input.keys['N'] = false;
     toggleSeAction();
@@ -562,7 +595,11 @@ function draw() {
   if (currentState === STATE_MENU) menuManager.draw(ctx, canvas);
   if (currentState === STATE_SHOP) shopManager.draw(ctx, canvas);
   if (currentState === STATE_FLASH) {
-    ctx.fillStyle = (Math.floor(flashTimer / 4) % 2 === 0) ? '#ffffff' : '#000000';
+    let flashColor = '#000000';
+    if (Math.floor(flashTimer / 4) % 2 === 0) {
+      flashColor = '#ffffff';
+    }
+    ctx.fillStyle = flashColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
@@ -695,14 +732,8 @@ function initializeGameEntities() {
       }
       if (fieldManager.pendingMonsterIndex !== null) {
         const deadNpc = fieldManager.currentMap.npcs[fieldManager.pendingMonsterIndex];
-        if (
-          deadNpc.id === 'gargoyle' ||
-          deadNpc.id === 'dungeon_boss' ||
-          deadNpc.id === 'troll' ||
-          deadNpc.id === 'grave_thief' ||
-          deadNpc.id === 'talos' ||
-          deadNpc.id === 'cerberus'
-        ) {
+        const bossList = ['gargoyle', 'dungeon_boss', 'troll', 'grave_thief', 'talos', 'cerberus'];
+        if (bossList.includes(deadNpc.id)) {
           fieldManager.defeatedBosses.push(deadNpc.id);
         }
         fieldManager.currentMap.npcs.splice(fieldManager.pendingMonsterIndex, 1);
@@ -742,16 +773,13 @@ function initializeGameEntities() {
     },
     {
       onAudio: (action, payload) => {
-        if (action === 'bump') sound.playBump();
-        else if (action === 'stopBgm') sound.stopBgm();
-        else if (action === 'inn') sound.playInn();
-        else if (action === 'playBgm') sound.playBgm(payload);
+        audioService.handleAudioEvent(action, payload);
       }
     }
   );
   churchManager = new ChurchManager(player, messageWindow, {
     onPlaySound: (soundId) => {
-      if (soundId === 'victory') sound.playVictory();
+      audioService.handleSeEvent(soundId);
     }
   });
   eventManager = new EventManager(
