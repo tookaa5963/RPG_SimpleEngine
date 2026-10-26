@@ -1,66 +1,107 @@
-// FILE_ENTRY: js/maps.js
-import { i18n } from './i18n.js';
+﻿/**
+ * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
+ * @param {string} type 例外種別
+ * @param {string} contextId 発生箇所（ファイル名:関数名）
+ * @param {string} propName 不正を検知したプロパティ名
+ * @param {*} val 実際に渡された値
+ * @returns {Error}
+ */
+export function createProtocolError(type, contextId, propName, val) {
+    return new Error(`[${type}] ${contextId}: プロパティ "${propName}" が不正です (値: ${JSON.stringify(val)}, 型: ${typeof val})`);
+}
 
 export const maps = {};
 let isLoaded = false;
-
 
 /**
  * 全マップデータのロードと初期化を実行する外部公開API
  */
 export async function initMapData() {
-  if (isLoaded) return maps;
+    if (isLoaded) {
+        return maps;
+    }
 
-  try {
     const manifestRes = await fetch('data/maps/index.json');
     if (!manifestRes.ok) {
-      throw new Error(`[DataValidationError] maps.js: マップマニフェスト取得失敗 (status: ${manifestRes.status})`);
+        throw createProtocolError('HttpError', 'maps.js:initMapData', 'manifestRes.status', manifestRes.status);
     }
 
     const manifest = await manifestRes.json();
-    if (!manifest || !Array.isArray(manifest.maps)) {
-      throw new Error(`[DataValidationError] maps.js: マニフェスト形式が不正です (型: ${typeof manifest})`);
+    if (typeof manifest !== 'object') {
+        throw createProtocolError('TypeError', 'maps.js:initMapData', 'manifest', manifest);
+    }
+    if (manifest === null) {
+        throw createProtocolError('NullValueError', 'maps.js:initMapData', 'manifest', manifest);
+    }
+    if (!Array.isArray(manifest.maps)) {
+        throw createProtocolError('TypeError', 'maps.js:initMapData', 'manifest.maps', manifest.maps);
     }
 
     const loadPromises = manifest.maps.map(async (entry) => {
-      const mapId = typeof entry === 'string' ? entry : entry.id;
-      const mapFile = typeof entry === 'string' ? `${entry}.json` : entry.file;
+        let mapId = '';
+        let mapFile = '';
 
-      if (!mapId || typeof mapId !== 'string') {
-        throw new Error(`[DataValidationError] maps.js: マップIDが不正です (値: ${mapId})`);
-      }
-
-      const mapUrl = `data/maps/${mapFile}`;
-      const res = await fetch(mapUrl);
-      if (!res.ok) {
-        throw new Error(`[DataValidationError] maps.js: マップデータ取得失敗: ${mapId} (status: ${res.status})`);
-      }
-      
-      const rawMapData = await res.json();
-      
-      const requiredProps = ['data', 'warps', 'npcs', 'interactables'];
-      for (const prop of requiredProps) {
-        if (!rawMapData[prop]) {
-          throw new Error(`[DataValidationError] maps.js: ${mapId} に必須プロパティ "${prop}" が存在しません。`);
+        if (typeof entry === 'string') {
+            mapId = entry;
+            mapFile = `${entry}.json`;
+        } else {
+            if (typeof entry !== 'object') {
+                throw createProtocolError('TypeError', 'maps.js:initMapData', 'entry', entry);
+            }
+            if (entry === null) {
+                throw createProtocolError('NullValueError', 'maps.js:initMapData', 'entry', entry);
+            }
+            if (typeof entry.id !== 'string') {
+                throw createProtocolError('TypeError', 'maps.js:initMapData', 'entry.id', entry.id);
+            }
+            if (typeof entry.file !== 'string') {
+                throw createProtocolError('TypeError', 'maps.js:initMapData', 'entry.file', entry.file);
+            }
+            mapId = entry.id;
+            mapFile = entry.file;
         }
-      }
 
+        if (typeof mapId !== 'string') {
+            throw createProtocolError('TypeError', 'maps.js:initMapData', 'mapId', mapId);
+        }
+        if (mapId.trim() === '') {
+            throw createProtocolError('EmptyStringError', 'maps.js:initMapData', 'mapId', mapId);
+        }
 
-      return { mapId, rawMapData };
+        const mapUrl = `data/maps/${mapFile}`;
+        const res = await fetch(mapUrl);
+        if (!res.ok) {
+            throw createProtocolError('HttpError', 'maps.js:initMapData', `map_${mapId}.status`, res.status);
+        }
+
+        const rawMapData = await res.json();
+        if (typeof rawMapData !== 'object') {
+            throw createProtocolError('TypeError', 'maps.js:initMapData', `rawMapData_${mapId}`, rawMapData);
+        }
+        if (rawMapData === null) {
+            throw createProtocolError('NullValueError', 'maps.js:initMapData', `rawMapData_${mapId}`, rawMapData);
+        }
+
+        const requiredProps = ['data', 'warps', 'npcs', 'interactables'];
+        for (const prop of requiredProps) {
+            if (typeof rawMapData[prop] === 'undefined') {
+                throw createProtocolError('MissingPropertyError', 'maps.js:initMapData', `${mapId}.${prop}`, undefined);
+            }
+            if (rawMapData[prop] === null) {
+                throw createProtocolError('NullValueError', 'maps.js:initMapData', `${mapId}.${prop}`, null);
+            }
+        }
+
+        return { mapId, rawMapData };
     });
 
     const loadedMaps = await Promise.all(loadPromises);
     loadedMaps.forEach(({ mapId, rawMapData }) => {
-      maps[mapId] = rawMapData;
+        maps[mapId] = rawMapData;
     });
 
     isLoaded = true;
     return maps;
-
-  } catch (err) {
-    console.error('[MapManager] 初期化中に致命的エラーを検知しました:', err);
-    throw err;
-  }
 }
 
 // 念のためトップレベルでも初期化を実行しておく
