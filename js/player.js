@@ -1,11 +1,42 @@
-// FILE_ENTRY: js/player.js
+﻿// FILE_ENTRY: js/player.js
 import { ITEM_DB, SPELL_DB } from './items.js';
 import { logFormatter } from './logFormatter.js';
+
+/**
+ * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
+ * @param {string} type 例外種別
+ * @param {string} contextId 発生箇所
+ * @param {string} propName 不正を検知したプロパティ名
+ * @param {*} val 実際に渡された値
+ * @returns {Error}
+ */
+export function createProtocolError(type, contextId, propName, val) {
+  return new Error(`[${type}] ${contextId}: プロパティ "${propName}" が不正です (値: ${JSON.stringify(val)}, 型: ${typeof val})`);
+}
 
 export const MAX_INVENTORY_CAPACITY = 12;
 
 export class Player {
   constructor(gridX = 3, gridY = 4, tileSize = 64) {
+    if (typeof gridX !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:constructor', 'gridX', gridX);
+    }
+    if (Number.isNaN(gridX)) {
+      throw createProtocolError('RangeError', 'player.js:constructor', 'gridX', gridX);
+    }
+    if (typeof gridY !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:constructor', 'gridY', gridY);
+    }
+    if (Number.isNaN(gridY)) {
+      throw createProtocolError('RangeError', 'player.js:constructor', 'gridY', gridY);
+    }
+    if (typeof tileSize !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:constructor', 'tileSize', tileSize);
+    }
+    if (Number.isNaN(tileSize)) {
+      throw createProtocolError('RangeError', 'player.js:constructor', 'tileSize', tileSize);
+    }
+
     this.tileSize = tileSize;
 
     this.gridX = gridX;
@@ -73,41 +104,94 @@ export class Player {
   }
 
   get atk() {
-    const weaponAtk = this.equipment.weapon && ITEM_DB[this.equipment.weapon]
-      ? ITEM_DB[this.equipment.weapon].atk
-      : 0;
+    let weaponAtk = 0;
+    const weaponId = this.equipment.weapon;
+    if (typeof weaponId === 'string') {
+      if (weaponId in ITEM_DB) {
+        const item = ITEM_DB[weaponId];
+        if (typeof item.atk === 'number') {
+          weaponAtk = item.atk;
+        }
+      }
+    }
     return this.baseAtk + weaponAtk;
   }
 
   get def() {
-    const armorDef = this.equipment.armor && ITEM_DB[this.equipment.armor]
-      ? ITEM_DB[this.equipment.armor].def
-      : 0;
-    const shieldDef = this.equipment.shield && ITEM_DB[this.equipment.shield]
-      ? ITEM_DB[this.equipment.shield].def
-      : 0;
+    let armorDef = 0;
+    const armorId = this.equipment.armor;
+    if (typeof armorId === 'string') {
+      if (armorId in ITEM_DB) {
+        const item = ITEM_DB[armorId];
+        if (typeof item.def === 'number') {
+          armorDef = item.def;
+        }
+      }
+    }
+
+    let shieldDef = 0;
+    const shieldId = this.equipment.shield;
+    if (typeof shieldId === 'string') {
+      if (shieldId in ITEM_DB) {
+        const item = ITEM_DB[shieldId];
+        if (typeof item.def === 'number') {
+          shieldDef = item.def;
+        }
+      }
+    }
+
     return this.baseDef + armorDef + shieldDef;
   }
 
   getInventoryCount() {
     let total = 0;
     for (const [id, count] of Object.entries(this.inventory)) {
-      if (count > 0 && ITEM_DB[id]) {
-        total += count;
+      if (typeof count === 'number') {
+        if (count > 0) {
+          if (id in ITEM_DB) {
+            total += count;
+          }
+        }
       }
     }
-    if (this.equipment.weapon) total--;
-    if (this.equipment.armor) total--;
-    if (this.equipment.shield) total--;
+    if (this.equipment.weapon !== null) {
+      if (this.equipment.weapon !== undefined) {
+        total--;
+      }
+    }
+    if (this.equipment.armor !== null) {
+      if (this.equipment.armor !== undefined) {
+        total--;
+      }
+    }
+    if (this.equipment.shield !== null) {
+      if (this.equipment.shield !== undefined) {
+        total--;
+      }
+    }
     return Math.max(0, total);
   }
 
   isInventoryFull(additional = 1) {
+    if (typeof additional !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:isInventoryFull', 'additional', additional);
+    }
+    if (Number.isNaN(additional)) {
+      throw createProtocolError('RangeError', 'player.js:isInventoryFull', 'additional', additional);
+    }
     return (this.getInventoryCount() + additional) > MAX_INVENTORY_CAPACITY;
   }
 
   getRequiredExpForLevel(level) {
-    if (level <= 1) return 0;
+    if (typeof level !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:getRequiredExpForLevel', 'level', level);
+    }
+    if (Number.isNaN(level)) {
+      throw createProtocolError('RangeError', 'player.js:getRequiredExpForLevel', 'level', level);
+    }
+    if (level <= 1) {
+      return 0;
+    }
 
     if (level <= 9) {
       return Math.floor(10 * Math.pow(2, level - 2));
@@ -123,6 +207,13 @@ export class Player {
   }
 
   addExp(amount) {
+    if (typeof amount !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:addExp', 'amount', amount);
+    }
+    if (Number.isNaN(amount)) {
+      throw createProtocolError('RangeError', 'player.js:addExp', 'amount', amount);
+    }
+
     this.exp += Math.max(0, amount);
     let leveledUp = false;
     const oldMaxHp = this.maxHp;
@@ -142,10 +233,12 @@ export class Player {
       this.spd += Math.floor(Math.random() * 2) + 1;
 
       Object.values(SPELL_DB).forEach(spell => {
-        if (spell.learnLevel && spell.learnLevel === this.level) {
-          if (!this.spells.includes(spell.id)) {
-            this.spells.push(spell.id);
-            newlyLearnedSpells.push(spell.name);
+        if (typeof spell.learnLevel === 'number') {
+          if (spell.learnLevel === this.level) {
+            if (!this.spells.includes(spell.id)) {
+              this.spells.push(spell.id);
+              newlyLearnedSpells.push(spell.name);
+            }
           }
         }
       });
@@ -176,6 +269,13 @@ export class Player {
   }
 
   applyExpDeathPenalty(ratio = 0.5) {
+    if (typeof ratio !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:applyExpDeathPenalty', 'ratio', ratio);
+    }
+    if (Number.isNaN(ratio)) {
+      throw createProtocolError('RangeError', 'player.js:applyExpDeathPenalty', 'ratio', ratio);
+    }
+
     const baseExp = this.getRequiredExpForLevel(this.level);
     const surplusExp = Math.max(0, this.exp - baseExp);
     const lostExp = Math.floor(surplusExp * ratio);
@@ -184,25 +284,55 @@ export class Player {
   }
 
   damage(amount) {
+    if (typeof amount !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:damage', 'amount', amount);
+    }
+    if (Number.isNaN(amount)) {
+      throw createProtocolError('RangeError', 'player.js:damage', 'amount', amount);
+    }
+
     const actual = Math.max(0, Math.min(this.hp, Math.floor(amount)));
     this.hp -= actual;
     return actual;
   }
 
   heal(amount) {
+    if (typeof amount !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:heal', 'amount', amount);
+    }
+    if (Number.isNaN(amount)) {
+      throw createProtocolError('RangeError', 'player.js:heal', 'amount', amount);
+    }
+
     const actual = Math.max(0, Math.min(this.maxHp - this.hp, Math.floor(amount)));
-    this.hp += actual;
+    this.hp -= actual;
     return actual;
   }
 
   healMp(amount) {
+    if (typeof amount !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:healMp', 'amount', amount);
+    }
+    if (Number.isNaN(amount)) {
+      throw createProtocolError('RangeError', 'player.js:healMp', 'amount', amount);
+    }
+
     const actual = Math.max(0, Math.min(this.maxMp - this.mp, Math.floor(amount)));
-    this.mp += actual;
+    this.mp -= actual;
     return actual;
   }
 
   consumeMp(amount) {
-    if (this.mp < amount) return false;
+    if (typeof amount !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:consumeMp', 'amount', amount);
+    }
+    if (Number.isNaN(amount)) {
+      throw createProtocolError('RangeError', 'player.js:consumeMp', 'amount', amount);
+    }
+
+    if (this.mp < amount) {
+      return false;
+    }
     this.mp -= amount;
     return true;
   }
@@ -217,27 +347,79 @@ export class Player {
   }
 
   addGold(amount) {
+    if (typeof amount !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:addGold', 'amount', amount);
+    }
+    if (Number.isNaN(amount)) {
+      throw createProtocolError('RangeError', 'player.js:addGold', 'amount', amount);
+    }
+
     this.gold += Math.max(0, Math.floor(amount));
     return this.gold;
   }
 
   useGold(amount) {
-    if (this.gold < amount) return false;
+    if (typeof amount !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:useGold', 'amount', amount);
+    }
+    if (Number.isNaN(amount)) {
+      throw createProtocolError('RangeError', 'player.js:useGold', 'amount', amount);
+    }
+
+    if (this.gold < amount) {
+      return false;
+    }
     this.gold -= amount;
     return true;
   }
 
   addItem(id, count = 1) {
-    if (!this.inventory[id]) this.inventory[id] = 0;
+    if (typeof id !== 'string') {
+      throw createProtocolError('TypeError', 'player.js:addItem', 'id', id);
+    }
+    if (id.trim() === '') {
+      throw createProtocolError('EmptyStringError', 'player.js:addItem', 'id', id);
+    }
+    if (typeof count !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:addItem', 'count', count);
+    }
+    if (Number.isNaN(count)) {
+      throw createProtocolError('RangeError', 'player.js:addItem', 'count', count);
+    }
+
+    if (!(id in this.inventory)) {
+      this.inventory[id] = 0;
+    }
     this.inventory[id] += count;
     return this.inventory[id];
   }
 
   removeItem(id, count = 1) {
-    if (!this.inventory[id] || this.inventory[id] < count) return false;
+    if (typeof id !== 'string') {
+      throw createProtocolError('TypeError', 'player.js:removeItem', 'id', id);
+    }
+    if (id.trim() === '') {
+      throw createProtocolError('EmptyStringError', 'player.js:removeItem', 'id', id);
+    }
+    if (typeof count !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:removeItem', 'count', count);
+    }
+    if (Number.isNaN(count)) {
+      throw createProtocolError('RangeError', 'player.js:removeItem', 'count', count);
+    }
+
+    if (!(id in this.inventory)) {
+      return false;
+    }
+    if (this.inventory[id] < count) {
+      return false;
+    }
+
     this.inventory[id] -= count;
-    if (id === 'lantern' && this.inventory.lantern <= 0) {
-      this.isLanternLit = false;
+    if (id === 'lantern') {
+      if (this.inventory.lantern <= 0) {
+        this.isLanternLit = false;
+      }
     }
     return true;
   }
@@ -249,22 +431,44 @@ export class Player {
 
     if (this.remiraSteps > 0) {
       this.remiraSteps--;
-      if (this.remiraSteps === 0 && this.torchSteps === 0) remiraExpired = true;
+      if (this.remiraSteps === 0) {
+        if (this.torchSteps === 0) {
+          remiraExpired = true;
+        }
+      }
     }
 
     if (this.torchSteps > 0) {
       this.torchSteps--;
-      if (this.torchSteps === 0 && this.remiraSteps === 0) remiraExpired = true;
+      if (this.torchSteps === 0) {
+        if (this.remiraSteps === 0) {
+          remiraExpired = true;
+        }
+      }
     }
 
     if (this.holyWaterSteps > 0) {
       this.holyWaterSteps--;
-      if (this.holyWaterSteps === 0) holyWaterExpired = true;
+      if (this.holyWaterSteps === 0) {
+        holyWaterExpired = true;
+      }
     }
 
     if (this.isPoisoned) {
-      const hasCharm = (this.inventory.poison_charm || 0) > 0;
-      const rate = hasCharm ? 0.01 : 0.02;
+      let hasCharm = false;
+      if ('poison_charm' in this.inventory) {
+        if (typeof this.inventory.poison_charm === 'number') {
+          if (this.inventory.poison_charm > 0) {
+            hasCharm = true;
+          }
+        }
+      }
+
+      let rate = 0.02;
+      if (hasCharm) {
+        rate = 0.01;
+      }
+
       poisonDamage = Math.max(1, Math.ceil(this.maxHp * rate));
       this.damage(poisonDamage);
       this.poisonFlashTimer = 24;
@@ -275,6 +479,19 @@ export class Player {
   }
 
   setPosition(gridX, gridY, direction = null) {
+    if (typeof gridX !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:setPosition', 'gridX', gridX);
+    }
+    if (Number.isNaN(gridX)) {
+      throw createProtocolError('RangeError', 'player.js:setPosition', 'gridX', gridX);
+    }
+    if (typeof gridY !== 'number') {
+      throw createProtocolError('TypeError', 'player.js:setPosition', 'gridY', gridY);
+    }
+    if (Number.isNaN(gridY)) {
+      throw createProtocolError('RangeError', 'player.js:setPosition', 'gridY', gridY);
+    }
+
     this.gridX = gridX;
     this.gridY = gridY;
     this.pixelX = gridX * this.tileSize;
@@ -283,10 +500,19 @@ export class Player {
     this.targetPixelY = this.pixelY;
     this.isMoving = false;
     this.turnDelay = 0;
-    if (direction) this.direction = direction;
+    if (typeof direction === 'string') {
+      this.direction = direction;
+    }
   }
 
   serialize() {
+    let returnPointCopy = null;
+    if (this.returnPoint !== null) {
+      if (typeof this.returnPoint === 'object') {
+        returnPointCopy = { ...this.returnPoint };
+      }
+    }
+
     return {
       level: this.level,
       hp: this.hp,
@@ -306,43 +532,99 @@ export class Player {
       holyWaterSteps: this.holyWaterSteps,
       isLanternLit: this.isLanternLit,
       isPoisoned: this.isPoisoned,
-      returnPoint: this.returnPoint ? { ...this.returnPoint } : null,
+      returnPoint: returnPointCopy,
       flags: { ...this.flags }
     };
   }
 
   deserialize(data) {
-    if (!data) return;
-    const ps = data.playerStats || data;
-    this.level = ps.level ?? this.level;
-    this.hp = ps.hp ?? this.hp;
-    this.maxHp = ps.maxHp ?? this.maxHp;
-    this.mp = ps.mp ?? this.mp;
-    this.maxMp = ps.maxMp ?? this.maxMp;
-    this.baseAtk = ps.baseAtk ?? this.baseAtk;
-    this.baseDef = ps.baseDef ?? this.baseDef;
-    this.spd = ps.spd ?? this.spd;
-    this.exp = ps.exp ?? this.exp;
-    this.gold = ps.gold ?? this.gold;
-    this.spells = Array.isArray(ps.spells) ? [...ps.spells] : [];
-    this.inventory = ps.inventory ? { ...ps.inventory } : {};
-    this.equipment = ps.equipment ? { ...ps.equipment } : { weapon: null, armor: null, shield: null };
-    if (this.equipment.shield === undefined) this.equipment.shield = null;
-    this.remiraSteps = ps.remiraSteps ?? 0;
-    this.torchSteps = ps.torchSteps ?? 0;
-    this.holyWaterSteps = ps.holyWaterSteps ?? 0;
-    this.isLanternLit = ps.isLanternLit ?? false;
-    this.isPoisoned = ps.isPoisoned ?? false;
+    if (data === null) {
+      return;
+    }
+    if (typeof data !== 'object') {
+      return;
+    }
 
-    // 帰還地のフォールバック先を灯台守の小屋に修正
-    this.returnPoint = ps.returnPoint ? { ...ps.returnPoint } : {
+    let ps = data;
+    if (data.playerStats !== undefined) {
+      if (data.playerStats !== null) {
+        if (typeof data.playerStats === 'object') {
+          ps = data.playerStats;
+        }
+      }
+    }
+
+    const numberProps = [
+      'level', 'hp', 'maxHp', 'mp', 'maxMp',
+      'baseAtk', 'baseDef', 'spd', 'exp', 'gold',
+      'remiraSteps', 'torchSteps', 'holyWaterSteps'
+    ];
+
+    numberProps.forEach(prop => {
+      if (prop in ps) {
+        if (typeof ps[prop] === 'number') {
+          if (!Number.isNaN(ps[prop])) {
+            this[prop] = ps[prop];
+          }
+        }
+      }
+    });
+
+    if ('isLanternLit' in ps) {
+      if (typeof ps.isLanternLit === 'boolean') {
+        this.isLanternLit = ps.isLanternLit;
+      }
+    }
+
+    if ('isPoisoned' in ps) {
+      if (typeof ps.isPoisoned === 'boolean') {
+        this.isPoisoned = ps.isPoisoned;
+      }
+    }
+
+    if (Array.isArray(ps.spells)) {
+      this.spells = [...ps.spells];
+    } else {
+      this.spells = [];
+    }
+
+    if (ps.inventory !== null) {
+      if (typeof ps.inventory === 'object') {
+        if (!Array.isArray(ps.inventory)) {
+          this.inventory = { ...ps.inventory };
+        }
+      }
+    }
+
+    let defaultEquipment = { weapon: null, armor: null, shield: null };
+    if (ps.equipment !== null) {
+      if (typeof ps.equipment === 'object') {
+        if (!Array.isArray(ps.equipment)) {
+          defaultEquipment = { ...ps.equipment };
+        }
+      }
+    }
+    if (defaultEquipment.shield === undefined) {
+      defaultEquipment.shield = null;
+    }
+    this.equipment = defaultEquipment;
+
+    let defaultReturnPoint = {
       mapId: 'lighthousekeeper_cottage',
       gridX: 3,
       gridY: 4,
       direction: 'up'
     };
+    if (ps.returnPoint !== null) {
+      if (typeof ps.returnPoint === 'object') {
+        if (!Array.isArray(ps.returnPoint)) {
+          defaultReturnPoint = { ...ps.returnPoint };
+        }
+      }
+    }
+    this.returnPoint = defaultReturnPoint;
 
-    this.flags = ps.flags ? { ...ps.flags } : {
+    const defaultFlags = {
       talkedToSister: false,
       receivedSisterHerb: false,
       talkedToScholar: false,
@@ -361,19 +643,21 @@ export class Player {
       heardOfDwarf: false
     };
 
-    if (this.flags.hasLeftInitialCottage === undefined) this.flags.hasLeftInitialCottage = false;
-    if (this.flags.reportedMonumentToScholar === undefined) this.flags.reportedMonumentToScholar = false;
-    if (this.flags.elfQuestStarted === undefined) this.flags.elfQuestStarted = false;
-    if (this.flags.returnedLoversRing === undefined) this.flags.returnedLoversRing = false;
-    if (this.flags.receivedWaterShield === undefined) this.flags.receivedWaterShield = false;
-    if (this.flags.heardOfDwarf === undefined) this.flags.heardOfDwarf = false;
+    if (ps.flags !== null) {
+      if (typeof ps.flags === 'object') {
+        if (!Array.isArray(ps.flags)) {
+          Object.assign(defaultFlags, ps.flags);
+        }
+      }
+    }
+    this.flags = defaultFlags;
 
-    // initItemDataでSPELL_DBが初期化されるのを待つため、deserializeは遅延評価する
-    // この時点でSPELL_DBにアクセスしても安全である前提
     Object.values(SPELL_DB).forEach(spell => {
-      if (spell.learnLevel && this.level >= spell.learnLevel) {
-        if (!this.spells.includes(spell.id)) {
-          this.spells.push(spell.id);
+      if (typeof spell.learnLevel === 'number') {
+        if (this.level >= spell.learnLevel) {
+          if (!this.spells.includes(spell.id)) {
+            this.spells.push(spell.id);
+          }
         }
       }
     });
