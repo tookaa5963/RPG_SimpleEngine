@@ -318,7 +318,7 @@ export class Player {
     }
 
     const actual = Math.max(0, Math.min(this.maxMp - this.mp, Math.floor(amount)));
-    this.mp -= actual;
+    this.mp += actual;
     return actual;
   }
 
