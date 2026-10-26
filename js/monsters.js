@@ -1,6 +1,17 @@
-// FILE_ENTRY: ai_staging/js/monsters.js
-import { i18n } from './i18n.js';
+﻿import { i18n } from './i18n.js';
 import { SPELL_DB } from './items.js';
+
+/**
+ * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
+ * @param {string} type 例外種別
+ * @param {string} contextId 発生箇所（ファイル名:関数名）
+ * @param {string} propName 不正を検知したプロパティ名
+ * @param {*} val 実際に渡された値
+ * @returns {Error}
+ */
+export function createProtocolError(type, contextId, propName, val) {
+    return new Error(`[${type}] ${contextId}: プロパティ "${propName}" が不正です (値: ${JSON.stringify(val)}, 型: ${typeof val})`);
+}
 
 export const MONSTER_DEFINITIONS = {};
 
@@ -10,7 +21,17 @@ export const MONSTER_DEFINITIONS = {};
  * @returns {object|null}
  */
 export function getMonsterById(id) {
-    return MONSTER_DEFINITIONS[id] || null;
+    if (typeof id !== 'string') {
+        throw createProtocolError('TypeError', 'monsters.js:getMonsterById', 'id', id);
+    }
+    if (id.trim() === '') {
+        throw createProtocolError('EmptyStringError', 'monsters.js:getMonsterById', 'id', id);
+    }
+
+    if (typeof MONSTER_DEFINITIONS[id] !== 'undefined') {
+        return MONSTER_DEFINITIONS[id];
+    }
+    return null;
 }
 
 /**
@@ -18,46 +39,50 @@ export function getMonsterById(id) {
  * 個別のモジュール化された JSON を Promise.all で並行ロードして初期化する。
  */
 export async function initMonsterData() {
-    try {
-        const manifestRes = await fetch('data/monsters/index.json');
-        if (!manifestRes.ok) throw new Error(`HTTP error! status: ${manifestRes.status} on monsters/index.json`);
-        
-        const monsterIds = await manifestRes.json();
-        const monsterPromises = monsterIds.map(id => fetch(`data/monsters/m_${id}.json`).then(r => {
-             if (!r.ok) throw new Error(`HTTP error! status: ${r.status} on m_${id}.json`);
-             return r.json();
-        }));
+    const manifestRes = await fetch('data/monsters/index.json');
+    if (!manifestRes.ok) {
+        throw createProtocolError('HttpError', 'monsters.js:initMonsterData', 'manifestRes.status', manifestRes.status);
+    }
 
-        const monstersRaw = await Promise.all(monsterPromises);
+    const monsterIds = await manifestRes.json();
+    const monsterPromises = monsterIds.map(id => fetch(`data/monsters/m_${id}.json`).then(r => {
+        if (!r.ok) {
+            throw createProtocolError('HttpError', 'monsters.js:initMonsterData', `monster_${id}.status`, r.status);
+        }
+        return r.json();
+    }));
 
-        for (const raw of monstersRaw) {
-            const monster = {
-                ...raw,
-                // 新しい resolve API で多言語オブジェクトを解決 (Fail-Fast)
-                get name() { return i18n.resolve(raw.name); }
-            };
+    const monstersRaw = await Promise.all(monsterPromises);
 
-            if (raw.spells && Array.isArray(raw.spells)) {
+    for (const raw of monstersRaw) {
+        const monster = {
+            ...raw,
+            get name() {
+                return i18n.resolve(raw.name);
+            }
+        };
+
+        if (typeof raw.spells !== 'undefined') {
+            if (Array.isArray(raw.spells)) {
                 monster.spells = raw.spells.map(sp => {
                     return {
                         ...sp,
                         get name() {
-                            // 1. 特技固有の多言語オブジェクトがあれば解決
-                            if (sp.name) return i18n.resolve(sp.name);
-                            // 2. プレイヤー呪文DBにあれば解決
-                            if (SPELL_DB[sp.id]) return SPELL_DB[sp.id].name;
-                            // 3. どちらでも解決できない場合はサイレントフェイルさせず例外送出 (Fail-Fast)
-                            throw new Error(`[Monster: ${raw.id}] 呪文・特技名を解決できません: id="${sp.id}"`);
+                            if (typeof sp.name !== 'undefined') {
+                                return i18n.resolve(sp.name);
+                            }
+                            if (typeof SPELL_DB[sp.id] !== 'undefined') {
+                                return SPELL_DB[sp.id].name;
+                            }
+                            throw createProtocolError('ResolveError', 'monsters.js:initMonsterData:get name', 'spell.id', sp.id);
                         }
                     };
                 });
             }
-
-            MONSTER_DEFINITIONS[raw.id] = monster;
         }
-        console.log("MONSTER_DEFINITIONS initialized successfully from module JSONs.");
-    } catch (error) {
-        console.error("Failed to fetch monster data:", error);
-        throw error;
+
+        MONSTER_DEFINITIONS[raw.id] = monster;
     }
+
+    console.log("MONSTER_DEFINITIONS initialized successfully from module JSONs.");
 }
