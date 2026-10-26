@@ -1,75 +1,142 @@
-// FILE_ENTRY: js/events.js
-import { sound } from './sound.js';
+﻿// FILE_ENTRY: js/events.js
+import { audioService } from './audioService.js';
 import { i18n } from './i18n.js';
 
-export let EVENT_DB = {};
-export let OBJECTIVES_DB = {};
-export let ENDING_DB = {};
+/**
+ * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
+ * @param {string} type 例外種別
+ * @param {string} contextId 発生箇所
+ * @param {string} propName 不正を検知したプロパティ名
+ * @param {*} val 実際に渡された値
+ * @returns {Error}
+ */
+export function createProtocolError(type, contextId, propName, val) {
+  return new Error(`[${type}] ${contextId}: プロパティ "${propName}" が不正です (値: ${JSON.stringify(val)}, 型: ${typeof val})`);
+}
 
 let isLoaded = false;
+const rawEventDb = {};
+const rawObjectivesDb = {};
+const rawEndingDb = {};
+
+function createDbProxy(name, rawTarget) {
+  return new Proxy(rawTarget, {
+    get(target, prop, receiver) {
+      if (typeof prop === 'string') {
+        if (!isLoaded) {
+          throw createProtocolError('NotInitializedError', `events.js:${name}`, prop, undefined);
+        }
+        if (!(prop in target)) {
+          throw createProtocolError('NotFoundError', `events.js:${name}`, prop, undefined);
+        }
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+    has(target, prop) {
+      if (!isLoaded) {
+        throw createProtocolError('NotInitializedError', `events.js:${name}`, prop, undefined);
+      }
+      return Reflect.has(target, prop);
+    }
+  });
+}
+
+export const EVENT_DB = createDbProxy('EVENT_DB', rawEventDb);
+export const OBJECTIVES_DB = createDbProxy('OBJECTIVES_DB', rawObjectivesDb);
+export const ENDING_DB = createDbProxy('ENDING_DB', rawEndingDb);
 
 export async function initEventData() {
-  if (isLoaded) return EVENT_DB;
-
-  try {
-    const manifestRes = await fetch('data/events/index.json');
-    if (!manifestRes.ok) {
-      throw new Error(`[DataValidationError] events.js: イベントマニフェスト取得失敗 (status: ${manifestRes.status})`);
-    }
-
-    const manifest = await manifestRes.json();
-    if (!manifest || !Array.isArray(manifest.chapters)) {
-      throw new Error(`[DataValidationError] events.js: マニフェスト形式が不正です (chapters 配列が存在しません)`);
-    }
-
-    const loadPromises = manifest.chapters.map(async (filename) => {
-      const res = await fetch(`data/events/${filename}`);
-      if (!res.ok) {
-        throw new Error(`[DataValidationError] events.js: 章データ取得失敗: ${filename} (status: ${res.status})`);
-      }
-      return await res.json();
-    });
-
-    const [chapters, objectivesRes, endingRes] = await Promise.all([
-      Promise.all(loadPromises),
-      fetch('data/events/objectives.json'),
-      fetch('data/events/ending.json')
-    ]);
-
-    if (!objectivesRes.ok) {
-      throw new Error(`[DataValidationError] events.js: objectives.json 取得失敗 (status: ${objectivesRes.status})`);
-    }
-    const objectivesJson = await objectivesRes.json();
-    if (!objectivesJson || typeof objectivesJson !== 'object' || Array.isArray(objectivesJson)) {
-      throw new Error(`[DataValidationError] events.js: objectives.json の形式が不正です (型: ${typeof objectivesJson})`);
-    }
-
-    if (!endingRes.ok) {
-      throw new Error(`[DataValidationError] events.js: ending.json 取得失敗 (status: ${endingRes.status})`);
-    }
-    const endingJson = await endingRes.json();
-    if (!endingJson || typeof endingJson !== 'object' || Array.isArray(endingJson)) {
-      throw new Error(`[DataValidationError] events.js: ending.json の形式が不正です (型: ${typeof endingJson})`);
-    }
-
-    OBJECTIVES_DB = objectivesJson;
-    ENDING_DB = endingJson;
-    EVENT_DB = {};
-    chapters.forEach(chapterData => {
-      Object.assign(EVENT_DB, chapterData);
-    });
-
-    isLoaded = true;
-    console.log("EVENT_DB, OBJECTIVES_DB, and ENDING_DB initialized successfully.");
+  if (isLoaded) {
     return EVENT_DB;
-  } catch (error) {
-    console.error("[EventManager] イベントデータ初期化中に致命的エラー:", error);
-    throw error;
   }
+
+  const manifestRes = await fetch('data/events/index.json');
+  if (!manifestRes.ok) {
+    throw createProtocolError('NetworkError', 'events.js:initEventData', 'manifestRes.status', manifestRes.status);
+  }
+
+  const manifest = await manifestRes.json();
+  if (manifest === null) {
+    throw createProtocolError('NullReferenceError', 'events.js:initEventData', 'manifest', manifest);
+  }
+  if (typeof manifest !== 'object') {
+    throw createProtocolError('TypeError', 'events.js:initEventData', 'manifest', manifest);
+  }
+  if (!Array.isArray(manifest.chapters)) {
+    throw createProtocolError('TypeError', 'events.js:initEventData', 'manifest.chapters', manifest.chapters);
+  }
+
+  const loadPromises = manifest.chapters.map(async (filename) => {
+    if (typeof filename !== 'string') {
+      throw createProtocolError('TypeError', 'events.js:initEventData', 'filename', filename);
+    }
+    const res = await fetch(`data/events/${filename}`);
+    if (!res.ok) {
+      throw createProtocolError('NetworkError', 'events.js:initEventData', filename, res.status);
+    }
+    return await res.json();
+  });
+
+  const [chapters, objectivesRes, endingRes] = await Promise.all([
+    Promise.all(loadPromises),
+    fetch('data/events/objectives.json'),
+    fetch('data/events/ending.json')
+  ]);
+
+  if (!objectivesRes.ok) {
+    throw createProtocolError('NetworkError', 'events.js:initEventData', 'objectivesRes.status', objectivesRes.status);
+  }
+  const objectivesJson = await objectivesRes.json();
+  if (objectivesJson === null) {
+    throw createProtocolError('NullReferenceError', 'events.js:initEventData', 'objectivesJson', objectivesJson);
+  }
+  if (typeof objectivesJson !== 'object') {
+    throw createProtocolError('TypeError', 'events.js:initEventData', 'objectivesJson', objectivesJson);
+  }
+  if (Array.isArray(objectivesJson)) {
+    throw createProtocolError('TypeError', 'events.js:initEventData', 'objectivesJson', objectivesJson);
+  }
+
+  if (!endingRes.ok) {
+    throw createProtocolError('NetworkError', 'events.js:initEventData', 'endingRes.status', endingRes.status);
+  }
+  const endingJson = await endingRes.json();
+  if (endingJson === null) {
+    throw createProtocolError('NullReferenceError', 'events.js:initEventData', 'endingJson', endingJson);
+  }
+  if (typeof endingJson !== 'object') {
+    throw createProtocolError('TypeError', 'events.js:initEventData', 'endingJson', endingJson);
+  }
+  if (Array.isArray(endingJson)) {
+    throw createProtocolError('TypeError', 'events.js:initEventData', 'endingJson', endingJson);
+  }
+
+  Object.assign(rawObjectivesDb, objectivesJson);
+  Object.assign(rawEndingDb, endingJson);
+  chapters.forEach((chapterData) => {
+    Object.assign(rawEventDb, chapterData);
+  });
+
+  isLoaded = true;
+  console.log("EVENT_DB, OBJECTIVES_DB, and ENDING_DB initialized successfully.");
+  return EVENT_DB;
 }
 
 export class EventManager {
   constructor(player, messageWindow, shopManager, innManager, churchManager, onStateChange = null, getCurrentMapId = null) {
+    if (player === null) {
+      throw createProtocolError('NullReferenceError', 'events.js:EventManager.constructor', 'player', player);
+    }
+    if (typeof player !== 'object') {
+      throw createProtocolError('TypeError', 'events.js:EventManager.constructor', 'player', player);
+    }
+    if (messageWindow === null) {
+      throw createProtocolError('NullReferenceError', 'events.js:EventManager.constructor', 'messageWindow', messageWindow);
+    }
+    if (typeof messageWindow !== 'object') {
+      throw createProtocolError('TypeError', 'events.js:EventManager.constructor', 'messageWindow', messageWindow);
+    }
+
     this.player = player;
     this.msgWin = messageWindow;
     this.shopManager = shopManager;
@@ -86,7 +153,16 @@ export class EventManager {
   }
 
   handleInteract(npc, currentMap) {
-    if (this.isRunning) return 'MESSAGE';
+    if (npc === null) {
+      throw createProtocolError('NullReferenceError', 'events.js:handleInteract', 'npc', npc);
+    }
+    if (typeof npc !== 'object') {
+      throw createProtocolError('TypeError', 'events.js:handleInteract', 'npc', npc);
+    }
+
+    if (this.isRunning) {
+      return 'MESSAGE';
+    }
 
     if (npc.isShop) {
       this.shopManager.open(npc);
@@ -97,10 +173,12 @@ export class EventManager {
       return 'MESSAGE';
     }
 
-    const script = EVENT_DB[npc.id];
-    if (script) {
-      this.startQueue(script, npc, currentMap);
-      return 'MESSAGE';
+    if (typeof npc.id === 'string') {
+      if (npc.id in EVENT_DB) {
+        const script = EVENT_DB[npc.id];
+        this.startQueue(script, npc, currentMap);
+        return 'MESSAGE';
+      }
     }
 
     // デフォルト挙動（汎用メッセージ）
@@ -109,12 +187,17 @@ export class EventManager {
       return 'MESSAGE';
     }
 
-    const currentMapId = this.getCurrentMapId ? this.getCurrentMapId() : '';
-    // モブ会話は maps.js のゲッターにより npc.pages で直接多言語解決される
+    let currentMapId = '';
+    if (typeof this.getCurrentMapId === 'function') {
+      currentMapId = this.getCurrentMapId();
+    }
 
     if (npc.pages) {
       const resolved = i18n.resolve(npc.pages);
-      const textArray = Array.isArray(resolved) ? resolved : [resolved];
+      let textArray = [resolved];
+      if (Array.isArray(resolved)) {
+        textArray = resolved;
+      }
       if (textArray.length > 0) {
         this.msgWin.open(textArray);
         return 'MESSAGE';
@@ -125,6 +208,9 @@ export class EventManager {
   }
 
   startQueue(script, npc, currentMap) {
+    if (!Array.isArray(script)) {
+      throw createProtocolError('TypeError', 'events.js:startQueue', 'script', script);
+    }
     this.currentQueue = script;
     this.queueIndex = 0;
     this.activeNpc = npc;
@@ -134,135 +220,248 @@ export class EventManager {
   }
 
   jumpToLabel(label) {
+    if (typeof label !== 'string') {
+      throw createProtocolError('TypeError', 'events.js:jumpToLabel', 'label', label);
+    }
+    if (this.currentQueue === null) {
+      throw createProtocolError('NullReferenceError', 'events.js:jumpToLabel', 'currentQueue', this.currentQueue);
+    }
+
     const targetIndex = this.currentQueue.findIndex(cmd => cmd.label === label);
     if (targetIndex !== -1) {
       this.queueIndex = targetIndex;
       this.processNextCommand();
-    } else {
-      console.warn(`Label '${label}' not found in event script.`);
-      this.endQueue();
+      return;
     }
+
+    console.warn(`Label '${label}' not found in event script.`);
+    this.endQueue();
   }
 
   processNextCommand() {
-    if (!this.isRunning || !this.currentQueue || this.queueIndex >= this.currentQueue.length) {
+    if (!this.isRunning) {
+      this.endQueue();
+      return;
+    }
+    if (this.currentQueue === null) {
+      this.endQueue();
+      return;
+    }
+    if (this.queueIndex >= this.currentQueue.length) {
       this.endQueue();
       return;
     }
 
     const cmd = this.currentQueue[this.queueIndex];
+    if (cmd === null) {
+      throw createProtocolError('NullReferenceError', 'events.js:processNextCommand', 'cmd', cmd);
+    }
+    if (typeof cmd !== 'object') {
+      throw createProtocolError('TypeError', 'events.js:processNextCommand', 'cmd', cmd);
+    }
     this.queueIndex++;
 
     switch (cmd.type) {
       case 'show_dialog':
         let text = [];
-        if (cmd.text) {
-          const resolved = (typeof cmd.text === 'object' && !Array.isArray(cmd.text))
-            ? i18n.resolve(cmd.text)
-            : cmd.text;
-          text = Array.isArray(resolved) ? resolved : [resolved];
-        } else if (cmd.textKey) {
+        if (cmd.text !== undefined && cmd.text !== null) {
+          let resolved = cmd.text;
+          if (typeof cmd.text === 'object') {
+            if (!Array.isArray(cmd.text)) {
+              resolved = i18n.resolve(cmd.text);
+            }
+          }
+          if (Array.isArray(resolved)) {
+            text = resolved;
+          } else {
+            text = [resolved];
+          }
+        } else if (typeof cmd.textKey === 'string') {
           text = i18n.tArray(cmd.textKey);
         } else {
-          throw new Error(`[DataValidationError] events.js: show_dialog に text が定義されていません。`);
+          throw createProtocolError('DataValidationError', 'events.js:processNextCommand', 'show_dialog.text', cmd);
         }
-        
-        // メッセージ終了後に次のコマンドへ進むようコールバック設定
+
         this.msgWin.open(text, () => {
-          if (cmd.onComplete === 'refresh_map' && this.onStateChange) {
-            this.onStateChange();
+          if (cmd.onComplete === 'refresh_map') {
+            if (typeof this.onStateChange === 'function') {
+              this.onStateChange();
+            }
           }
           this.processNextCommand();
         });
         break;
 
       case 'give_item':
-        this.player.addItem(cmd.itemId, cmd.count || 1);
+        let giveCount = 1;
+        if (typeof cmd.count === 'number') {
+          giveCount = cmd.count;
+        }
+        this.player.addItem(cmd.itemId, giveCount);
         this.processNextCommand();
         break;
 
       case 'remove_item':
-        this.player.removeItem(cmd.itemId, cmd.count || 1);
+        let removeCount = 1;
+        if (typeof cmd.count === 'number') {
+          removeCount = cmd.count;
+        }
+        this.player.removeItem(cmd.itemId, removeCount);
         this.processNextCommand();
         break;
 
       case 'set_flag':
-        if (!this.player.flags) this.player.flags = {};
+        if (!this.player.flags) {
+          this.player.flags = {};
+        }
         this.player.flags[cmd.flag] = cmd.value;
         this.processNextCommand();
         break;
 
       case 'check_flag':
-        const flagValue = this.player.flags && this.player.flags[cmd.flag];
-        if (flagValue && cmd.if_true) {
-          this.jumpToLabel(cmd.if_true);
-        } else if (!flagValue && cmd.if_false) {
-          this.jumpToLabel(cmd.if_false);
-        } else {
-          this.processNextCommand();
+        let flagValue = false;
+        if (this.player.flags !== null) {
+          if (typeof this.player.flags === 'object') {
+            if (cmd.flag in this.player.flags) {
+              flagValue = Boolean(this.player.flags[cmd.flag]);
+            }
+          }
         }
-        break;
-
-      case 'check_item':
-        const hasItem = (this.player.inventory[cmd.itemId] || 0) > 0 ||
-                        this.player.equipment.weapon === cmd.itemId ||
-                        this.player.equipment.armor === cmd.itemId ||
-                        this.player.equipment.shield === cmd.itemId;
-        if (hasItem && cmd.if_true) {
-          this.jumpToLabel(cmd.if_true);
-        } else if (!hasItem && cmd.if_false) {
-          this.jumpToLabel(cmd.if_false);
-        } else {
-          this.processNextCommand();
+        if (flagValue) {
+          if (typeof cmd.if_true === 'string') {
+            this.jumpToLabel(cmd.if_true);
+            break;
+          }
         }
-        break;
-
-      case 'check_inventory_full':
-        const addCount = cmd.additional || 1;
-        if (this.player.isInventoryFull(addCount)) {
-          if (cmd.if_true) this.jumpToLabel(cmd.if_true);
-          else this.processNextCommand();
-        } else {
-          if (cmd.if_false) this.jumpToLabel(cmd.if_false);
-          else this.processNextCommand();
-        }
-        break;
-
-      case 'check_map':
-        const currentMapId = this.getCurrentMapId ? this.getCurrentMapId() : '';
-        if (currentMapId === cmd.mapId) {
-          if (cmd.if_true) this.jumpToLabel(cmd.if_true);
-          else this.processNextCommand();
-        } else {
-          if (cmd.if_false) this.jumpToLabel(cmd.if_false);
-          else this.processNextCommand();
-        }
-        break;
-
-      case 'check_npc_exists':
-        const npcIds = Array.isArray(cmd.npcId) ? cmd.npcId : [cmd.npcId];
-        const npcExists = this.activeMap && this.activeMap.npcs.some(n => npcIds.includes(n.id));
-        if (npcExists) {
-          if (cmd.if_true) this.jumpToLabel(cmd.if_true);
-          else this.processNextCommand();
-        } else {
-          if (cmd.if_false) this.jumpToLabel(cmd.if_false);
-          else this.processNextCommand();
-        }
-        break;
-
-      case 'set_return_point':
-        if (this.activeNpc && this.activeNpc.returnPoint) {
-          this.player.returnPoint = { ...this.activeNpc.returnPoint };
+        if (!flagValue) {
+          if (typeof cmd.if_false === 'string') {
+            this.jumpToLabel(cmd.if_false);
+            break;
+          }
         }
         this.processNextCommand();
         break;
-        
+
+      case 'check_item':
+        let hasItem = false;
+        if (this.player.inventory !== null) {
+          if (typeof this.player.inventory === 'object') {
+            const invCount = this.player.inventory[cmd.itemId];
+            if (typeof invCount === 'number') {
+              if (invCount > 0) {
+                hasItem = true;
+              }
+            }
+          }
+        }
+        if (this.player.equipment !== null) {
+          if (typeof this.player.equipment === 'object') {
+            if (this.player.equipment.weapon === cmd.itemId) {
+              hasItem = true;
+            }
+            if (this.player.equipment.armor === cmd.itemId) {
+              hasItem = true;
+            }
+            if (this.player.equipment.shield === cmd.itemId) {
+              hasItem = true;
+            }
+          }
+        }
+
+        if (hasItem) {
+          if (typeof cmd.if_true === 'string') {
+            this.jumpToLabel(cmd.if_true);
+            break;
+          }
+        }
+        if (!hasItem) {
+          if (typeof cmd.if_false === 'string') {
+            this.jumpToLabel(cmd.if_false);
+            break;
+          }
+        }
+        this.processNextCommand();
+        break;
+
+      case 'check_inventory_full':
+        let addCount = 1;
+        if (typeof cmd.additional === 'number') {
+          addCount = cmd.additional;
+        }
+        if (this.player.isInventoryFull(addCount)) {
+          if (typeof cmd.if_true === 'string') {
+            this.jumpToLabel(cmd.if_true);
+            break;
+          }
+        } else {
+          if (typeof cmd.if_false === 'string') {
+            this.jumpToLabel(cmd.if_false);
+            break;
+          }
+        }
+        this.processNextCommand();
+        break;
+
+      case 'check_map':
+        let mapCheckId = '';
+        if (typeof this.getCurrentMapId === 'function') {
+          mapCheckId = this.getCurrentMapId();
+        }
+        if (mapCheckId === cmd.mapId) {
+          if (typeof cmd.if_true === 'string') {
+            this.jumpToLabel(cmd.if_true);
+            break;
+          }
+        } else {
+          if (typeof cmd.if_false === 'string') {
+            this.jumpToLabel(cmd.if_false);
+            break;
+          }
+        }
+        this.processNextCommand();
+        break;
+
+      case 'check_npc_exists':
+        let npcIds = [cmd.npcId];
+        if (Array.isArray(cmd.npcId)) {
+          npcIds = cmd.npcId;
+        }
+        let npcExists = false;
+        if (this.activeMap !== null) {
+          if (typeof this.activeMap === 'object') {
+            if (Array.isArray(this.activeMap.npcs)) {
+              npcExists = this.activeMap.npcs.some(n => npcIds.includes(n.id));
+            }
+          }
+        }
+        if (npcExists) {
+          if (typeof cmd.if_true === 'string') {
+            this.jumpToLabel(cmd.if_true);
+            break;
+          }
+        } else {
+          if (typeof cmd.if_false === 'string') {
+            this.jumpToLabel(cmd.if_false);
+            break;
+          }
+        }
+        this.processNextCommand();
+        break;
+
+      case 'set_return_point':
+        if (this.activeNpc !== null) {
+          if (this.activeNpc.returnPoint !== undefined && this.activeNpc.returnPoint !== null) {
+            this.player.returnPoint = { ...this.activeNpc.returnPoint };
+          }
+        }
+        this.processNextCommand();
+        break;
+
       case 'set_npc_position':
-        if (this.activeNpc) {
+        if (this.activeNpc !== null) {
           this.activeNpc.gridX = cmd.gridX;
           this.activeNpc.gridY = cmd.gridY;
-          this.activeNpc.pixelX = cmd.gridX * 64; // tileSize assumed 64
+          this.activeNpc.pixelX = cmd.gridX * 64;
           this.activeNpc.pixelY = cmd.gridY * 64;
           this.activeNpc.targetPixelX = cmd.gridX * 64;
           this.activeNpc.targetPixelY = cmd.gridY * 64;
@@ -272,13 +471,14 @@ export class EventManager {
 
       case 'open_church':
         this.churchManager.open(this.activeNpc);
-        this.endQueue(); // 教会メニューが開くためキューはここで終了
+        this.endQueue();
         break;
 
       case 'play_sound':
-        if (cmd.se === 'victory') sound.playVictory();
-        else if (cmd.se === 'heal') sound.playHeal();
-        else if (cmd.se === 'bump') sound.playBump();
+        if (typeof cmd.se !== 'string') {
+          throw createProtocolError('TypeError', 'events.js:processNextCommand', 'play_sound.se', cmd.se);
+        }
+        audioService.playSe(cmd.se);
         this.processNextCommand();
         break;
 
@@ -298,31 +498,43 @@ export class EventManager {
 }
 
 export function getObjectiveText(key) {
-  if (!isLoaded || !OBJECTIVES_DB) {
-    throw new Error(`[DataValidationError] events.js/getObjectiveText: イベントデータが未ロードです (key: "${key}")`);
+  if (typeof key !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:getObjectiveText', 'key', key);
+  }
+  if (!isLoaded) {
+    throw createProtocolError('NotInitializedError', 'events.js:getObjectiveText', 'isLoaded', isLoaded);
+  }
+  if (!(key in OBJECTIVES_DB)) {
+    throw createProtocolError('NotFoundError', 'events.js:getObjectiveText', 'key', key);
   }
   const entry = OBJECTIVES_DB[key];
-  if (!entry) {
-    throw new Error(`[DataValidationError] events.js/getObjectiveText: 目的キー "${key}" が定義されていません`);
-  }
   const text = i18n.resolve(entry);
-  if (typeof text !== 'string' || text.trim() === '') {
-    throw new Error(`[DataValidationError] events.js/getObjectiveText: 目的キー "${key}" の現在言語テキストが不正です (値: ${text}, 型: ${typeof text})`);
+  if (typeof text !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:getObjectiveText', 'text', text);
+  }
+  if (text.trim() === '') {
+    throw createProtocolError('EmptyStringError', 'events.js:getObjectiveText', 'text', text);
   }
   return text;
 }
 
 export function getEndingText(key) {
-  if (!isLoaded || !ENDING_DB) {
-    throw new Error(`[DataValidationError] events.js/getEndingText: イベントデータが未ロードです (key: "${key}")`);
+  if (typeof key !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:getEndingText', 'key', key);
+  }
+  if (!isLoaded) {
+    throw createProtocolError('NotInitializedError', 'events.js:getEndingText', 'isLoaded', isLoaded);
+  }
+  if (!(key in ENDING_DB)) {
+    throw createProtocolError('NotFoundError', 'events.js:getEndingText', 'key', key);
   }
   const entry = ENDING_DB[key];
-  if (!entry) {
-    throw new Error(`[DataValidationError] events.js/getEndingText: エンディングキー "${key}" が定義されていません`);
-  }
   const text = i18n.resolve(entry);
-  if (typeof text !== 'string' || text.trim() === '') {
-    throw new Error(`[DataValidationError] events.js/getEndingText: エンディングキー "${key}" の現在言語テキストが不正です (値: ${text}, 型: ${typeof text})`);
+  if (typeof text !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:getEndingText', 'text', text);
+  }
+  if (text.trim() === '') {
+    throw createProtocolError('EmptyStringError', 'events.js:getEndingText', 'text', text);
   }
   return text;
 }
