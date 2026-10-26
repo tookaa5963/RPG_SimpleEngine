@@ -1,5 +1,30 @@
-// FILE_ENTRY: js/logFormatter.js
+﻿// FILE_ENTRY: js/logFormatter.js
 import { locale } from './locale.js';
+
+/**
+ * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
+ * @param {string} type 例外種別
+ * @param {string} contextId 発生箇所
+ * @param {string} propName 不正を検知したプロパティ名
+ * @param {*} val 実際に渡された値
+ * @returns {Error}
+ */
+export function createProtocolError(type, contextId, propName, val) {
+  return new Error(`[${type}] ${contextId}: プロパティ "${propName}" が不正です (値: ${JSON.stringify(val)}, 型: ${typeof val})`);
+}
+
+function createDomainProxy(domainName, rawData) {
+  return new Proxy(rawData, {
+    get(target, prop, receiver) {
+      if (typeof prop === 'string') {
+        if (!(prop in target)) {
+          throw createProtocolError('NotFoundError', `logFormatter.js:${domainName}`, prop, undefined);
+        }
+      }
+      return Reflect.get(target, prop, receiver);
+    }
+  });
+}
 
 export class LogFormatter {
   constructor() {
@@ -7,13 +32,21 @@ export class LogFormatter {
   }
 
   registerDomain(domain, data) {
-    if (typeof domain !== 'string' || !domain) {
-      throw new Error(`[LogFormatterError] registerDomain: ドメイン名が不正です (値: "${domain}")`);
+    if (typeof domain !== 'string') {
+      throw createProtocolError('TypeError', 'logFormatter.js:registerDomain', 'domain', domain);
     }
-    if (!data || typeof data !== 'object') {
-      throw new Error(`[LogFormatterError] registerDomain: ドメイン "${domain}" のデータが不正です`);
+    if (domain.trim() === '') {
+      throw createProtocolError('EmptyStringError', 'logFormatter.js:registerDomain', 'domain', domain);
     }
-    this.domains.set(domain, data);
+    if (data === null) {
+      throw createProtocolError('NullReferenceError', 'logFormatter.js:registerDomain', 'data', data);
+    }
+    if (typeof data !== 'object') {
+      throw createProtocolError('TypeError', 'logFormatter.js:registerDomain', 'data', data);
+    }
+
+    const proxiedData = createDomainProxy(domain, data);
+    this.domains.set(domain, proxiedData);
   }
 
   getLanguage() {
@@ -21,12 +54,18 @@ export class LogFormatter {
   }
 
   setLanguage(lang) {
+    if (typeof lang !== 'string') {
+      throw createProtocolError('TypeError', 'logFormatter.js:setLanguage', 'lang', lang);
+    }
     locale.setLanguage(lang);
   }
 
   format(key, params = {}) {
-    if (typeof key !== 'string' || !key.includes('.')) {
-      throw new Error(`[LogFormatterError] format: キーの形式が不正です (期待形式: "domain.key", 受信値: "${key}")`);
+    if (typeof key !== 'string') {
+      throw createProtocolError('TypeError', 'logFormatter.js:format', 'key', key);
+    }
+    if (!key.includes('.')) {
+      throw createProtocolError('FormatError', 'logFormatter.js:format', 'key', key);
     }
 
     const dotIndex = key.indexOf('.');
@@ -34,41 +73,60 @@ export class LogFormatter {
     const subKey = key.substring(dotIndex + 1);
 
     if (!this.domains.has(domain)) {
-      throw new Error(`[LogFormatterError] format: ドメイン "${domain}" が登録されていません (対象キー: "${key}")`);
+      throw createProtocolError('NotFoundError', 'logFormatter.js:format', 'domain', domain);
     }
 
     const domainData = this.domains.get(domain);
-    if (!domainData[subKey]) {
-      throw new Error(`[LogFormatterError] format: キー "${subKey}" はドメイン "${domain}" に存在しません (対象キー: "${key}")`);
+    if (!(subKey in domainData)) {
+      throw createProtocolError('NotFoundError', 'logFormatter.js:format', 'subKey', subKey);
+    }
+
+    const langTemplates = domainData[subKey];
+    if (langTemplates === null) {
+      throw createProtocolError('NullReferenceError', 'logFormatter.js:format', 'langTemplates', langTemplates);
+    }
+    if (typeof langTemplates !== 'object') {
+      throw createProtocolError('TypeError', 'logFormatter.js:format', 'langTemplates', langTemplates);
     }
 
     const lang = this.getLanguage();
-    const langTemplates = domainData[subKey];
-    if (typeof langTemplates !== 'object' || langTemplates === null) {
-      throw new Error(`[LogFormatterError] format: キー "${key}" の言語定義オブジェクトが不正です`);
+    if (!(lang in langTemplates)) {
+      throw createProtocolError('NotFoundError', 'logFormatter.js:format', 'lang', lang);
     }
 
     const template = langTemplates[lang];
     if (typeof template !== 'string') {
-      throw new Error(`[LogFormatterError] format: キー "${key}" に言語 "${lang}" のテンプレートが存在しません (フォールバック禁止)`);
+      throw createProtocolError('TypeError', 'logFormatter.js:format', 'template', template);
     }
 
-    if (params === null || typeof params !== 'object') {
-      throw new Error(`[LogFormatterError] format: 引数 params がオブジェクトではありません (キー: "${key}", 値: ${params})`);
+    if (params === null) {
+      throw createProtocolError('NullReferenceError', 'logFormatter.js:format', 'params', params);
+    }
+    if (typeof params !== 'object') {
+      throw createProtocolError('TypeError', 'logFormatter.js:format', 'params', params);
     }
 
-    const placeholderMatches = template.match(/\{([a-zA-Z0-9_]+)\}/g) || [];
+    let placeholderMatches = template.match(/\{([a-zA-Z0-9_]+)\}/g);
+    if (placeholderMatches === null) {
+      placeholderMatches = [];
+    }
     const expectedKeys = new Set(placeholderMatches.map(m => m.slice(1, -1)));
 
     for (const expectedKey of expectedKeys) {
-      if (!(expectedKey in params) || params[expectedKey] === undefined || params[expectedKey] === null) {
-        throw new Error(`[LogFormatterError] format: 必須プレースホルダー "${expectedKey}" が未指定または不正です (キー: "${key}")`);
+      if (!(expectedKey in params)) {
+        throw createProtocolError('MissingKeyError', 'logFormatter.js:format', expectedKey, undefined);
+      }
+      if (params[expectedKey] === undefined) {
+        throw createProtocolError('UndefinedReferenceError', 'logFormatter.js:format', expectedKey, params[expectedKey]);
+      }
+      if (params[expectedKey] === null) {
+        throw createProtocolError('NullReferenceError', 'logFormatter.js:format', expectedKey, params[expectedKey]);
       }
     }
 
     for (const paramKey of Object.keys(params)) {
       if (!expectedKeys.has(paramKey)) {
-        throw new Error(`[LogFormatterError] format: 未定義の余剰パラメータ "${paramKey}" が渡されました (キー: "${key}")`);
+        throw createProtocolError('UnexpectedKeyError', 'logFormatter.js:format', paramKey, params[paramKey]);
       }
     }
 
@@ -83,43 +141,20 @@ if (typeof window !== 'undefined') {
 }
 
 export async function initLogData() {
-  try {
-    const res = await fetch('data/logs/player.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-    const data = await res.json();
-    logFormatter.registerDomain('player', data);
-    console.log("logFormatter: player domain loaded.");
-  } catch (error) {
-    console.error("Failed to fetch log data (player):", error);
-  }
+  const logEntries = [
+    { domain: 'player', path: 'data/logs/player.json' },
+    { domain: 'menu_action', path: 'data/logs/menu_action.json' },
+    { domain: 'battle_log', path: 'data/logs/battle_log.json' },
+    { domain: 'field', path: 'data/logs/field.json' }
+  ];
 
-  try {
-    const res = await fetch('data/logs/menu_action.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+  for (const entry of logEntries) {
+    const res = await fetch(entry.path);
+    if (!res.ok) {
+      throw createProtocolError('NetworkError', 'logFormatter.js:initLogData', entry.path, res.status);
+    }
     const data = await res.json();
-    logFormatter.registerDomain('menu_action', data);
-    console.log("logFormatter: menu_action domain loaded.");
-  } catch (error) {
-    console.error("Failed to fetch log data (menu_action):", error);
-  }
-
-  try {
-    const res = await fetch('data/logs/battle_log.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-    const data = await res.json();
-    logFormatter.registerDomain('battle_log', data);
-    console.log("logFormatter: battle_log domain loaded.");
-  } catch (error) {
-    console.error("Failed to fetch log data (battle_log):", error);
-  }
-
-  try {
-    const res = await fetch('data/logs/field.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-    const data = await res.json();
-    logFormatter.registerDomain('field', data);
-    console.log("logFormatter: field domain loaded.");
-  } catch (error) {
-    console.error("Failed to fetch log data (field):", error);
+    logFormatter.registerDomain(entry.domain, data);
+    console.log(`logFormatter: ${entry.domain} domain loaded.`);
   }
 }
