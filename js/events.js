@@ -47,7 +47,7 @@ export const ENDING_DB = createDbProxy('ENDING_DB', rawEndingDb);
 
 export async function initEventData() {
   if (isLoaded) {
-    return EVENT_DB;
+    return;
   }
 
   const manifestRes = await fetch('data/events/index.json');
@@ -119,7 +119,6 @@ export async function initEventData() {
 
   isLoaded = true;
   console.log("EVENT_DB, OBJECTIVES_DB, and ENDING_DB initialized successfully.");
-  return EVENT_DB;
 }
 
 export class EventManager {
