@@ -64,6 +64,10 @@ export class AudioService {
             sound.playTextChar();
             return;
         }
+        if (soundId === 'buy') {
+            sound.playBuy();
+            return;
+        }
 
         throw createProtocolError('NotFoundError', 'audioService.js:playSe', 'soundId', soundId);
     }
