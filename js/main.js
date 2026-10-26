@@ -736,7 +736,11 @@ function initializeGameEntities() {
   innManager = new InnManager(player, messageWindow, () => fieldManager.currentMap, () => {
     currentState = STATE_EXPLORE;
   });
-  churchManager = new ChurchManager(player, messageWindow);
+  churchManager = new ChurchManager(player, messageWindow, {
+    onPlaySound: (soundId) => {
+      if (soundId === 'victory') sound.playVictory();
+    }
+  });
   eventManager = new EventManager(
     player,
     messageWindow,
