@@ -1,0 +1,6 @@
+# AI作業用ステージング領域の除外
+ai_staging/
+
+# OS・環境依存ファイル
+.DS_Store
+Thumbs.db
