@@ -77,8 +77,8 @@
 - [202610290245] Step 2-4a: js/engine/effects/HealMpEffect.js の新規作成
   - 規模: 約 160 行（MP回復計算ストラテジー、完全ヘッドレス・副作用ゼロ・Tier 3構文準拠）
   - 検証: Gate 1 ＋ Gate 2 通過
-- Step 2-4b: js/engine/effects/CureStatusEffect.js の新規作成
-  - 規模: 約 50〜80 行（状態異常解除ストラテジー）
+- [202610290333] Step 2-4b: js/engine/effects/CureStatusEffect.js の新規作成
+  - 規模: 約 120 行（状態異常解除ストラテジー、完全ヘッドレス・副作用ゼロ・Tier 3構文準拠）
   - 検証: Gate 1 ＋ Gate 2 通過
 - Step 2-5: menu.js（フィールド使用）の委譲切り替え
   - 規模: menu.js 内の重複分岐を削除し、EffectResolver.apply() へ置換
@@ -139,9 +139,9 @@
 
 
 ## 5. 引き継ぎ部
-完了コミット: 66f6f66
+完了コミット: （コミット後にハッシュを記録）
 完了内容:
-- js/engine/effects/HealMpEffect.js の新規配備（完全ヘッドレス、副作用なし、Tier 3 構文準拠）
-- tools/test_heal_mp_effect.mjs の配備および Gate 1 / Gate 2 通過
+- js/engine/effects/CureStatusEffect.js の新規配備（完全ヘッドレス、副作用なし、Tier 3 構文準拠）
+- tools/test_cure_status_effect.mjs の配備および Gate 1 / Gate 2 通過
 次タスク:
-- Phase 2 Step 2-4b: js/engine/effects/CureStatusEffect.js の新規作成
+- Phase 2 Step 2-5: menu.js（フィールド使用）の委譲切り替え
