@@ -65,9 +65,9 @@
 2. イベント発火の分離:
    - Effect 内部で `EngineEventBus.emit()` を直接呼ばない。状態の変更およびイベントの発火は、Result を受け取った呼び出し側（menu.js, battleActions.js、将来の Actor）が担う
 
-- Step 2-1: データスキーマ拡張（data/items.json, data/spells.json）
-  - 規模: 既存 JSON への定義追加（まずは回復系アイテム・呪文）
-  - 検証: JSON スキーマ構文検証
+-[202610282231] Step 2-1: データスキーマ拡張（data/items/i_*.json, data/spells/s_*.json）
+  - 規模: 回復アイテム3件、回復呪文3件への effect 定義付与（集約JSONの二重定義は排除）
+  - 検証: Gate 1（JSON構文・構造検証）通過
 - Step 2-2: js/engine/effects/EffectResolver.js の新規作成
   - 規模: 約 50 行（strategy 名を解釈し対応クラスへ委譲するディスパッチャ）
   - 検証: Gate 1 通過
@@ -135,15 +135,15 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-- 現在コミット: c6c3bc2
-- 完了実績: Phase 1 完了（EventTypes, EngineEventBus の配備および main.js への配線完了）
-- 注意点・現場知見:
-  - tools/verify_gate1.mjs の引数には単一ファイルではなくディレクトリパスを指定すること。
-  - ai_staging は作業一時領域のため、ステップ完了時に必ず削除すること。
-  - main.js の更新時は局所適用スクリプトを用い、全体再生成によるデグレを防止すること。
-- 次回への指示:
-  - Phase 2（効果解決系）と Phase 3（Actorモデル）の依存関係の逆転リスクを再検討の上、Phase 2 Step 2-1（データスキーマ拡張）の着手判断を行う。
-  - 次回への指示:
-  
-  - 検討結論: Phase 2 先行を採用。ただし、Phase 3（Actor）との依存逆転を防ぐため、Effect クラス群は「副作用を持たない純粋計算ストラテジー（Command-Result パターン）」として実装する規約を適用する。
-  - 次期タスク: Phase 2 Step 2-1（データスキーマ拡張: data/items.json, data/spells.json への effect 定義追加）に着手する。
+
+現在コミット: [a886eaa]
+
+完了実績: Phase 2 Step 2-1 完了（個別ファイルへの effect スキーマ定義配備、SSOT確立）
+
+注意点・現場知見:
+
+アイテムおよび呪文の実行時マスターデータは data/items/i_${id}.json および data/spells/s_${id}.json の個別ファイル群である。
+
+ルート直下の data/items.json および data/spells.json はコードから参照されていないため、変更対象から除外してSSOTを維持する。
+
+次期タスク: Phase 2 Step 2-2（js/engine/effects/EffectResolver.js の新規作成）に着手する。
