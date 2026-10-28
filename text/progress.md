@@ -74,8 +74,11 @@
 - [202610290215] Step 2-3: js/engine/effects/HealHpEffect.js の新規作成
   - 規模: 約 170 行（HP回復計算ストラテジー、完全ヘッドレス・副作用ゼロ・Tier 3構文準拠）
   - 検証: Gate 1 ＋ Gate 2 通過
-- Step 2-4: js/engine/effects/HealMpEffect.js, CureStatusEffect.js の新規作成
-  - 規模: 各 40〜50 行（MP回復および状態異常解除ストラテジー）
+- [202610290245] Step 2-4a: js/engine/effects/HealMpEffect.js の新規作成
+  - 規模: 約 160 行（MP回復計算ストラテジー、完全ヘッドレス・副作用ゼロ・Tier 3構文準拠）
+  - 検証: Gate 1 ＋ Gate 2 通過
+- Step 2-4b: js/engine/effects/CureStatusEffect.js の新規作成
+  - 規模: 約 50〜80 行（状態異常解除ストラテジー）
   - 検証: Gate 1 ＋ Gate 2 通過
 - Step 2-5: menu.js（フィールド使用）の委譲切り替え
   - 規模: menu.js 内の重複分岐を削除し、EffectResolver.apply() へ置換
@@ -134,17 +137,11 @@
   - 規模: main.js からロジックを排除し、Core/Driver の配線・初期化のみに圧縮
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
+
 ## 5. 引き継ぎ部
-
-完了コミット: 6a2ffaa
-
+完了コミット: 66f6f66
 完了内容:
-
-js/engine/effects/HealHpEffect.js の新規配備（完全ヘッドレス、副作用なし、Tier 3 構文準拠）
-
-tools/test_heal_hp_effect.mjs の配備および Gate 1 / Gate 2 通過
-
+- js/engine/effects/HealMpEffect.js の新規配備（完全ヘッドレス、副作用なし、Tier 3 構文準拠）
+- tools/test_heal_mp_effect.mjs の配備および Gate 1 / Gate 2 通過
 次タスク:
-
-Phase 2 Step 2-4: js/engine/effects/HealMpEffect.js および js/engine/effects/CureStatusEffect.js の新規作成
-
+- Phase 2 Step 2-4b: js/engine/effects/CureStatusEffect.js の新規作成
