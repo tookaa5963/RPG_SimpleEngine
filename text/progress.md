@@ -136,14 +136,16 @@
 
 ## 5. 引き継ぎ部
 
-現在コミット: [a886eaa]
+現在コミット: [1c39e31]
 
-完了実績: Phase 2 Step 2-1 完了（個別ファイルへの effect スキーマ定義配備、SSOT確立）
+完了実績:
+
+Phase 2 Step 2-1 完了（個別ファイルへの effect スキーマ定義配備、SSOT確立）
+
+未使用集約JSONファイル（items.json, monsters.json, spells.json）の物理削除完了
 
 注意点・現場知見:
 
-アイテムおよび呪文の実行時マスターデータは data/items/i_${id}.json および data/spells/s_${id}.json の個別ファイル群である。
-
-ルート直下の data/items.json および data/spells.json はコードから参照されていないため、変更対象から除外してSSOTを維持する。
+データ定義は data/{items,spells,monsters}/ 配下の個別ファイル群に完全一元化された。
 
 次期タスク: Phase 2 Step 2-2（js/engine/effects/EffectResolver.js の新規作成）に着手する。
