@@ -68,9 +68,9 @@
 -[202610282231] Step 2-1: データスキーマ拡張（data/items/i_*.json, data/spells/s_*.json）
   - 規模: 回復アイテム3件、回復呪文3件への effect 定義付与（集約JSONの二重定義は排除）
   - 検証: Gate 1（JSON構文・構造検証）通過
-- Step 2-2: js/engine/effects/EffectResolver.js の新規作成
-  - 規模: 約 50 行（strategy 名を解釈し対応クラスへ委譲するディスパッチャ）
-  - 検証: Gate 1 通過
+-[202610290130] Step 2-2: js/engine/effects/EffectResolver.js の新規作成
+  - 規模: 約 80 行（strategy 名を解釈し対応クラスへ委譲するディスパッチャ）
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3 通過
 - Step 2-3: js/engine/effects/HealHpEffect.js の新規作成
   - 規模: 約 50 行（HP回復計算ストラテジー）
   - 検証: Gate 1 ＋ Gate 2 通過
@@ -136,17 +136,11 @@
 
 ## 5. 引き継ぎ部
 
-現在コミット: [1c39e31]
+現在コミット: [cf51492d50940a7f09068e590d1541bb1411e35e]
 
 完了実績:
+- Phase 2 Step 2-2 完了（EffectResolver.js の新規作成、ディスパッチ・型検証基盤配備）
 
-Phase 2 Step 2-1 完了（個別ファイルへの effect スキーマ定義配備、SSOT確立）
+次タスク:
+- Phase 2 Step 2-3（js/engine/effects/HealHpEffect.js の新規作成）に着手する。
 
-未使用集約JSONファイル（items.json, monsters.json, spells.json）の物理削除完了
-
-注意点・現場知見:
-
-データ定義は data/{items,spells,monsters}/ 配下の個別ファイル群に完全一元化された。
-
-次期タスク: Phase 2 Step 2-2（js/engine/effects/EffectResolver.js の新規作成）に着手する。
-982e4fe2aaef41d655b4b9e0e914833e439a1fb0
