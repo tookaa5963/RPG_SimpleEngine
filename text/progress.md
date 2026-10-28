@@ -80,6 +80,15 @@
 - [202610290333] Step 2-4b: js/engine/effects/CureStatusEffect.js の新規作成
   - 規模: 約 120 行（状態異常解除ストラテジー、完全ヘッドレス・副作用ゼロ・Tier 3構文準拠）
   - 検証: Gate 1 ＋ Gate 2 通過
+- Step 2-4c: データスキーマ拡張（MP回復系アイテム: i_magic_water.json, i_sage_water.json）
+  - 規模: MP回復アイテム2件への heal_mp effect 定義付与
+  - 検証: Gate 1（JSON構文検証）通過
+- Step 2-4d: データスキーマ拡張（状態異常解除系: i_antidote.json, s_kiari.json）
+  - 規模: アイテム1件、呪文1件への cure_status effect 定義付与
+  - 検証: Gate 1（JSON構文検証）通過
+- Step 2-4e: EffectResolver への全ストラテジー登録配線
+  - 規模: EffectResolver または初期化箇所にて HealMpEffect / CureStatusEffect を登録
+  - 検証: Gate 1 ＋ Gate 2（全ストラテジーのディスパッチ疎通テスト）通過
 - Step 2-5: menu.js（フィールド使用）の委譲切り替え
   - 規模: menu.js 内の重複分岐を削除し、EffectResolver.apply() へ置換
   - 検証: Gate 3（実機フィールド上で回復アイテム・呪文使用確認）
@@ -137,11 +146,10 @@
   - 規模: main.js からロジックを排除し、Core/Driver の配線・初期化のみに圧縮
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
-
 ## 5. 引き継ぎ部
-完了コミット: （コミット後にハッシュを記録）
+完了コミット: e119e01
 完了内容:
 - js/engine/effects/CureStatusEffect.js の新規配備（完全ヘッドレス、副作用なし、Tier 3 構文準拠）
 - tools/test_cure_status_effect.mjs の配備および Gate 1 / Gate 2 通過
 次タスク:
-- Phase 2 Step 2-5: menu.js（フィールド使用）の委譲切り替え
+- Phase 2 Step 2-4c: データスキーマ拡張（MP回復系アイテム: i_magic_water.json, i_sage_water.json）
