@@ -21,6 +21,11 @@ import { i18n, initLocaleData } from './i18n.js';
 import { initLogData, logFormatter } from './logFormatter.js';
 import { initItemData } from './items.js';
 import { initMonsterData } from './monsters.js';
+import { EngineEventBus } from './engine/core/EngineEventBus.js';
+
+// Core Event Hub instance
+export const engineEventBus = new EngineEventBus();
+
 
 export const TILE_DB = {
   0: { id: 0, name: '草地(歩行可)', pass: true, blockLight: false, color: '#27ae60' },
