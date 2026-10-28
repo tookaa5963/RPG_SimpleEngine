@@ -136,11 +136,15 @@
 
 ## 5. 引き継ぎ部
 
-現在コミット: [cf51492d50940a7f09068e590d1541bb1411e35e]
+完了コミット: 6a2ffaa
 
-完了実績:
-- Phase 2 Step 2-3 完了（HealHpEffect.js の新規作成および単体テスト通過）
+完了内容:
+
+js/engine/effects/HealHpEffect.js の新規配備（完全ヘッドレス、副作用なし、Tier 3 構文準拠）
+
+tools/test_heal_hp_effect.mjs の配備および Gate 1 / Gate 2 通過
 
 次タスク:
-- Phase 2 Step 2-4（js/engine/effects/HealMpEffect.js, CureStatusEffect.js の新規作成
+
+Phase 2 Step 2-4: js/engine/effects/HealMpEffect.js および js/engine/effects/CureStatusEffect.js の新規作成
 
