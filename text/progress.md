@@ -149,3 +149,4 @@ Phase 2 Step 2-1 完了（個別ファイルへの effect スキーマ定義配�
 データ定義は data/{items,spells,monsters}/ 配下の個別ファイル群に完全一元化された。
 
 次期タスク: Phase 2 Step 2-2（js/engine/effects/EffectResolver.js の新規作成）に着手する。
+982e4fe2aaef41d655b4b9e0e914833e439a1fb0
