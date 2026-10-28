@@ -47,7 +47,7 @@
 - [202610281900]Step 1-1: js/engine/core/EventTypes.js の新規作成
   - 規模: 約 30 行（システム全体で利用するイベント名定数定義）
   - 検証: Gate 1（構文・境界検証）通過
-- Step 1-2: js/engine/core/EngineEventBus.js の新規作成
+- [202610281900] Step 1-2: js/engine/core/EngineEventBus.js の新規作成
   - 規模: 約 60 行（外部依存ゼロの純粋 Pub/Sub ハブ: on, off, emit, clear）
   - 検証: Gate 1 通過 ＋ Gate 2（単体テストスクリプトによる動作検証）
 - Step 1-3: main.js へのグローバル/コンテキスト配線
@@ -129,10 +129,10 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-- 現在コミット: (本ステップコミット後にハッシュを記録)
-- 完了実績: Phase 1 Step 1-1 完了（EventTypes.js の配備・Gate 1 通過）
+- 現在コミット: <取得したコミットハッシュ>
+- 完了実績: Phase 1 Step 1-2 完了（EngineEventBus.js の配備・Gate 1 および Gate 2 通過）
 - 注意点・現場知見:
   - tools/verify_gate1.mjs の引数には単一ファイルではなくディレクトリパスを指定すること。
   - ai_staging は作業一時領域のため、恒久的な文書は置かないこと。
 - 次回への指示:
-  - Phase 1 Step 1-2（EngineEventBus.js）の作成から開始。
+  - Phase 1 Step 1-3（main.js への配線と実機動作確認・Gate 3）の実施。
