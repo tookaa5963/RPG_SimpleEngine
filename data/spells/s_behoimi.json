@@ -9,5 +9,12 @@
     "ja": "ベホイミ",
     "en": "Midheal",
     "es": "Semicura"
+  },
+  "effect": {
+    "type": "heal_hp",
+    "params": {
+      "base": 75,
+      "variance": 16
+    }
   }
 }

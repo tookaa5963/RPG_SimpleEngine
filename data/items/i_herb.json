@@ -6,5 +6,12 @@
     "ja": "薬草",
     "en": "Medicinal Herb",
     "es": "Planta medicinal"
+  },
+  "effect": {
+    "type": "heal_hp",
+    "params": {
+      "base": 30,
+      "variance": 0
+    }
   }
 }

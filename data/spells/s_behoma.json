@@ -9,5 +9,11 @@
     "ja": "ベホマ",
     "en": "Fullheal",
     "es": "Maxicura"
+  },
+  "effect": {
+    "type": "heal_hp",
+    "params": {
+      "full": true
+    }
   }
 }

@@ -6,5 +6,12 @@
     "ja": "上薬草",
     "en": "Strong Herb",
     "es": "Planta fuerte"
+  },
+  "effect": {
+    "type": "heal_hp",
+    "params": {
+      "base": 70,
+      "variance": 0
+    }
   }
 }

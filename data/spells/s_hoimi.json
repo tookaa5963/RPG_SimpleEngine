@@ -9,5 +9,12 @@
     "ja": "ホイミ",
     "en": "Heal",
     "es": "Cura"
+  },
+  "effect": {
+    "type": "heal_hp",
+    "params": {
+      "base": 25,
+      "variance": 8
+    }
   }
 }

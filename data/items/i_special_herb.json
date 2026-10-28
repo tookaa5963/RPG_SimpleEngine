@@ -6,5 +6,12 @@
     "ja": "特薬草",
     "en": "Special Herb",
     "es": "Planta especial"
+  },
+  "effect": {
+    "type": "heal_hp",
+    "params": {
+      "base": 120,
+      "variance": 0
+    }
   }
 }
