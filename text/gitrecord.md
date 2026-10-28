@@ -4,3 +4,4 @@
 202610282231/Phase 2　Step 2-1: データスキーマ拡張（data/items/i_*.json, data/spells/s_*.json）/a886eaa
 202610290130/Step 2-2: js/engine/effects/EffectResolver.js の新規作成/cf51492d50940a7f09068e590d1541bb1411e35e
 202610290222/js/engine/effects/HealHpEffect.js の新規配備・tools/test_heal_hp_effect.mjs の配備/8d7147351098ec753cf08a1da4a49cf133cdb8bf
+202610290306/js/engine/effects/HealMpEffect.js の新規配備/bb04b0712a6813757dd0a06b92ebf80b315fb225
