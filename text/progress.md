@@ -58,7 +58,13 @@
 再検討の上でPhase 2  に移行すること
 
 ### Phase 2: 効果解決系（EffectSystem）垂直スライス抽出 (Core/effects)
-目的: menu.js と battleActions.js に散在するアイテム・呪文の回復分岐をポリモーフィズム化・純粋計算化する。
+【Phase 2 固有設計制約】
+1. 副作用（Mutation）の完全禁止:
+   - EffectResolver および各 Effect クラスは、引数で渡された Target（Player や Monster）のプロパティを直接変更してはならない（`target.hp += x` 等の禁止）。
+   - 計算結果（変動量、成否、付随情報）を含むプレーンな Result オブジェクトのみを呼び出し元へ返却すること。
+2. イベント発火の分離:
+   - Effect 内部で `EngineEventBus.emit()` を直接呼ばない。状態の変更およびイベントの発火は、Result を受け取った呼び出し側（menu.js, battleActions.js、将来の Actor）が担う
+
 - Step 2-1: データスキーマ拡張（data/items.json, data/spells.json）
   - 規模: 既存 JSON への定義追加（まずは回復系アイテム・呪文）
   - 検証: JSON スキーマ構文検証
@@ -137,3 +143,7 @@
   - main.js の更新時は局所適用スクリプトを用い、全体再生成によるデグレを防止すること。
 - 次回への指示:
   - Phase 2（効果解決系）と Phase 3（Actorモデル）の依存関係の逆転リスクを再検討の上、Phase 2 Step 2-1（データスキーマ拡張）の着手判断を行う。
+  - 次回への指示:
+  
+  - 検討結論: Phase 2 先行を採用。ただし、Phase 3（Actor）との依存逆転を防ぐため、Effect クラス群は「副作用を持たない純粋計算ストラテジー（Command-Result パターン）」として実装する規約を適用する。
+  - 次期タスク: Phase 2 Step 2-1（データスキーマ拡張: data/items.json, data/spells.json への effect 定義追加）に着手する。
