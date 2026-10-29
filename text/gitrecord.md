@@ -8,3 +8,4 @@
 202610291120/data/items/i_magic_water.json および i_sage_water.json への heal_mp effect 定義付与/8d53028b58aa39c37cf7b3248a333991d62f021b
 [202610291133] Step 2-4d: データスキーマ拡張（状態異常解除系: i_antidote.json, s_kiari.json）/1dc99023e3d1a8e4a1bdff8cf797652ddb0cf3a3
 [202610291225] Step 2-4e: EffectResolver への全ストラテジー登録配線/4793415432042df3fc90a3bd805e0bb222a9ef35
+[202610291450] Step 2-6: battleActions.js（戦闘使用）の委譲切り替え/b30a355e17b99875b5a51987e92629cff6d29907

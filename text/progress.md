@@ -97,9 +97,9 @@
 - [202610291410] Step 2-5: menu.js（フィールド使用）の委譲切り替え
   - 規模: menu.js 内の重複分岐を削除し、EffectResolver.resolve() へ置換
   - 検証: Gate 1 ＋ Gate 3（実機フィールド上で回復アイテム・呪文使用確認）通過
-- Step 2-6: battleActions.js（戦闘使用）の委譲切り替え
-  - 規模: battleActions.js 内の重複分岐を削除し、同一の EffectResolver.apply() へ置換
-  - 検証: Gate 3（実機戦闘で回復アイテム・呪文が同一計算で動くことを確認）
+- [202610291450] Step 2-6: battleActions.js（戦闘使用）の委譲切り替え
+  - 規模: battleActions.js 内の重複回復ロジックを削除し、EffectResolver.resolve() へ置換
+  - 検証: Gate 1 ＋ Gate 3（実機戦闘で回復アイテム・呪文使用確認）通過
 
 ### Phase 3: 汎用ステート・アクター・データ層のCore化 (Core/entities, state, data)
 目的: アクターモデルの確立、フラグ・変数のヘッドレス管理、DataRepository によるデータ参照の統一。
@@ -152,13 +152,15 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （dbe6523）
+完了コミット: （b30a355）
 完了内容:
-- js/menu.js 内のアイテム・呪文の重複回復/解毒ロジックを EffectResolver へ委譲
-- 非回復系アイテム・呪文の既存挙動およびUI・演出処理を完全保護
+- js/battleActions.js 内のアイテム・呪文の重複回復/解毒ロジックを EffectResolver へ委譲
+- 攻撃呪文、状態変化呪文、および戦闘演出処理の既存挙動を完全保護
 - Gate 1（Node.js構文チェック）および Gate 3（ブラウザ実機動作検証）通過
+- Phase 2（効果解決系の垂直スライス抽出）の全工程完了
+
 次タスク:
-- Phase 2 Step 2-6: battleActions.js（戦闘使用）の委譲切り替え
-  - 目的: battleActions.js 内の重複回復ロジックを削除し、EffectResolver.resolve() へ置換する
-  - 前提: プロトコル第6条第4項に基づき、実装セッションに先立ち「探査セッション」を実施し、該当箇所の最小コードブロック（10〜20行）と外部依存を抽出する
-  - 検証: Gate 1 ＋ Gate 3（ブラウザ実機戦闘での回復アイテム・呪文使用確認）
+- Phase 3: 汎用ステート・アクター・データ層のCore化 (Core/entities, state, data)
+  - Step 3-1: js/engine/state/GenericFlags.js, VariableStore.js の新規作成
+  - 目的: ブール値フラグおよび Key-Value 変数管理を Core 層にヘッドレス実装する
+  - 検証: Gate 1 ＋ Gate 2（単体機能テスト）
