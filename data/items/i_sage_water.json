@@ -6,5 +6,12 @@
     "ja": "賢者の聖水",
     "en": "Sage's Water",
     "es": "Agua de sabio"
+  },
+  "effect": {
+    "type": "heal_mp",
+    "params": {
+      "base": 40,
+      "variance": 0
+    }
   }
 }

@@ -6,5 +6,12 @@
     "ja": "魔法の聖水",
     "en": "Magic Water",
     "es": "Agua mágica"
+  },
+  "effect": {
+    "type": "heal_mp",
+    "params": {
+      "base": 15,
+      "variance": 0
+    }
   }
 }
