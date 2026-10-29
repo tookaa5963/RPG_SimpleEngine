@@ -11,3 +11,4 @@
 [202610291450] Step 2-6: battleActions.js（戦闘使用）の委譲切り替え/b30a355e17b99875b5a51987e92629cff6d29907
 [202610291720] Step 3-1: js/engine/state/GenericFlags.js, VariableStore.js の新規作成/8083a47ed302047935efe0057f6e0639d1afc00e
 [202610291956] Step 3-2: js/engine/entities/Actor.js の新規作成e67c4650fb8b863449f9f3551eef2812731f0743
+[202610292020] Step 3-3: js/engine/state/Inventory.js の新規作成/14fe435be2a24ccb0bb79902bf07594e3db0a78b

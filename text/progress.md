@@ -109,10 +109,10 @@
 - [202610291956] Step 3-2: js/engine/entities/Actor.js の新規作成
   - 規模: 約 360 行（ステータス保持、境界防護、状態遷移、イベント通知、toJSON/fromJSON）
   - 検証: Gate 1 ＋ Gate 2 通過
-  
-- Step 3-3: js/engine/state/Inventory.js の新規作成
-  - 規模: 約 80 行（アイテムID・数量管理、装備枠の抽象管理）
-  - 検証: Gate 1 ＋ Gate 2 通過
+- [202610292020] Step 3-3: js/engine/state/Inventory.js の新規作成
+  - 規模: 約 330 行（アイテムID・数量管理、装備スロット抽象管理、容量境界防護、イベント通知）
+  - 検証: Gate 1 ＋ Gate 2（16件の単体テスト）通過  
+
 - Step 3-4: js/engine/data/DataRepository.js の新規作成
   - 規模: 約 80 行（JSON データのロード・検証・キャッシュ）
   - 検証: Gate 1 ＋ Gate 2 通過
@@ -153,14 +153,14 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （e67c465）
+完了コミット: （git log -1 --oneline で得られたハッシュを記載）
 完了内容:
-- js/engine/entities/Actor.js を新規作成
-- tools/test_actor.mjs（Windows ESM パス正規化対応）を配備
-- Gate 1（静的構文・境界検証：対象 9 件）および Gate 2（単体機能テスト：66件）通過
-- Core層における基底アクターモデル（HP/MP境界防護、状態異常管理、イベント通知）を配備
+- js/engine/state/Inventory.js を新規作成（完全ヘッドレス、Tier 3構文準拠）
+- tools/test_inventory.mjs を配備
+- Gate 1（静的構文・境界検証：対象 10 件）および Gate 2（単体機能テスト：16件）通過
+- 所持品スタック管理、装備スロット管理、バッグ占有数計算（既存 getInventoryCount 互換）、シリアライズ機能を配備
 
 次タスク:
-- Phase 3 Step 3-3: js/engine/state/Inventory.js の新規作成
-  - 規模: 約 80 行（アイテムID・数量管理、装備枠の抽象管理）
+- Phase 3 Step 3-4: js/engine/data/DataRepository.js の新規作成
+  - 規模: 約 80 行（JSON データのロード・検証・キャッシュ）
   - 検証: Gate 1 ＋ Gate 2 通過
