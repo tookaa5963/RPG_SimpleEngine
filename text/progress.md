@@ -115,10 +115,10 @@
 - [202610292115] Step 3-4: js/engine/data/DataRepository.js の新規作成
   - 規模: 約 190 行（マスタデータのインメモリ保持・バリデーション・高速検索、完全ヘッドレス・Tier 3構文準拠）
   - 検証: Gate 1 ＋ Gate 2（9件の単体テスト）通過
-
-- Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲
-  - 規模: player.js の内部ステータス（HP, MP, 毒）および関連メソッドを Actor へ委譲。直接参照・代入用の getter/setter 配備
-  - 検証: Gate 1 ＋ Gate 2（Actor連携単体テスト）＋ Gate 3（実機での戦闘被弾・回復・全滅動作確認）
+- [202610300145] Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲
+  - 規模: player.js の hp, mp, maxHp, maxMp, isPoisoned および関連メソッドを Actor へ委譲。getter/setter による後方互換性維持
+  - 検証: Gate 1 ＋ Gate 2（全12件単体テスト）＋ Gate 3（実機での戦闘被弾・回復・全滅動作確認）通過
+ 
 - Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲
   - 規模: addItem, removeItem, getInventoryCount, isInventoryFull, equipment を Inventory インスタンスへ委譲
   - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（アイテム入手・消費・装備変更の実機確認）
@@ -162,22 +162,15 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （0ecf08c）
+完了コミット: （aeb29c2）
 完了内容:
-- js/engine/data/DataRepository.js を新規作成（完全ヘッドレス、Tier 3構文準拠）
-- tools/test_data_repository.mjs を配備
-- Gate 1（静的構文・境界検証：対象 11 件）および Gate 2（単体機能テスト：9件）通過
-- インメモリデータ保持、一括登録（registerAll）、存在確認、安全な取得インターフェースを配備
-- [探査完了] Step 3-5 委譲探査フェーズ
-  - player.js（665行）の責務構造を特定し、Step 3-5a〜3-5d に4分割
-  - 外部結合の特定: main.js:207-208 による player.hp/mp 直接代入、battle.js:530 による isPoisoned 直接代入
-  - Actor 仕様差異の特定: 
-    1. amount <= 0 および浮動小数点に対する例外スロー（Player Adapter 側での整数化・0以下早期リターンが必須）
-    2. 死亡状態（!isAlive）での回復不可（Player Adapter 側での revive 連携または setter 制御が必須）
+- js/player.js に Actor インスタンスを配備し、基本ステータス（hp, mp, maxHp, maxMp, isPoisoned）および関連メソッド（damage, heal, healMp, consumeMp, fullRecovery, curePoison）を Core層へ委譲
+- tools/test_player_actor_adapter.mjs を配備（全12項目の単体機能テスト合格）
+- Gate 1（静的構文・境界検証）、Gate 2（単体機能テスト）、Gate 3（実機動作検証）全件通過
 
 次タスク:
-- Phase 3 Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲
-  - 対象メソッド: damage, heal, healMp, consumeMp, fullRecovery, curePoison
-  - 対象プロパティ: hp, mp, maxHp, maxMp, isPoisoned（getter/setter による後方互換性維持）
-  - 前提制約: main.js / inn.js / battle.js の外部コードを一切変更せず、Adapter 内部で吸収すること
-  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（被ダメージ、アイテム/呪文回復、毒付与/治癒、宿屋全快、全滅復帰）
+- Phase 3 Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲
+  - 対象メソッド: addItem, removeItem, getInventoryCount, isInventoryFull, equipment
+  - 対象プロパティ: inventory, equipment（getter/setter または Inventory 連携）
+  - 前提制約: 外部コード（menu.js, battleActions.js, shop.js 等）の後方互換性維持
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（アイテム入手・消費・装備変更の実機確認）
