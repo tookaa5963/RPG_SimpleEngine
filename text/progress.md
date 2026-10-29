@@ -159,6 +159,25 @@
 - tools/test_data_repository.mjs を配備
 - Gate 1（静的構文・境界検証：対象 11 件）および Gate 2（単体機能テスト：9件）通過
 - インメモリデータ保持、一括登録（registerAll）、存在確認、安全な取得インターフェースを配備
+- [探査完了] Step 3-5 委譲探査フェーズ
+  - player.js（665行）の責務構造を特定し、Step 3-5a〜3-5d に4分割
+  - 外部結合の特定: main.js:207-208 による player.hp/mp 直接代入、battle.js:530 による isPoisoned 直接代入
+  - Actor 仕様差異の特定: 
+    1. amount <= 0 および浮動小数点に対する例外スロー（Player Adapter 側での整数化・0以下早期リターンが必須）
+    2. 死亡状態（!isAlive）での回復不可（Player Adapter 側での revive 連携または setter 制御が必須）
+
+次タスク:
+- Phase 3 Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲
+  - 対象メソッド: damage, heal, healMp, consumeMp, fullRecovery, curePoison
+  - 対象プロパティ: hp, mp, maxHp, maxMp, isPoisoned（getter/setter による後方互換性維持）
+  - 前提制約: main.js / inn.js / battle.js の外部コードを一切変更せず、Adapter 内部で吸収すること
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（被ダメージ、アイテム/呪文回復、毒付与/治癒、宿屋全快、全滅復帰）
+完了コミット: （0ecf08c）
+完了内容:
+- js/engine/data/DataRepository.js を新規作成（完全ヘッドレス、Tier 3構文準拠）
+- tools/test_data_repository.mjs を配備
+- Gate 1（静的構文・境界検証：対象 11 件）および Gate 2（単体機能テスト：9件）通過
+- インメモリデータ保持、一括登録（registerAll）、存在確認、安全な取得インターフェースを配備
 
 次タスク:
 - Phase 3 Step 3-5: player.js の内部委譲リファクタリング
