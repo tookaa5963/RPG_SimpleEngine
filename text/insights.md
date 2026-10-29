@@ -9,3 +9,7 @@
   -アイテムおよび呪文の実行時マスターデータは data/items/i_${id}.json および data/spells/s_${id}.json の個別ファイル群である。
 
   -ルート直下の data/items.json および data/spells.json はコードから参照されていないため、変更対象から除外してSSOTを維持する。
+
+ -progressにて実行環境を明示、protocolにて制約も加えた。
+
+ 
