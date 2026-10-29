@@ -1,8 +1,11 @@
-﻿// FILE_ENTRY: js/battleActions.js
+// FILE_ENTRY: js/battleActions.js
 import { logFormatter } from './logFormatter.js';
 import { audioService } from './audioService.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
 import { i18n } from './i18n.js';
+import { EffectResolver } from './engine/effects/EffectResolver.js';
+
+const effectResolver = new EffectResolver();
 
 /**
  * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
@@ -66,51 +69,47 @@ function executeItemAction(bm, itemId) {
     }
     const itemName = itemDef.name;
 
-    if (itemId === 'herb') {
-        player.removeItem('herb', 1);
-        player.heal(30);
-        audioService.playSe('heal');
-        bm.queueMessages([i18n.t('battle_action.used_herb', { item: itemName })], () => { bm.runEnemyTurn(); });
-        return;
-    }
-    if (itemId === 'strong_herb') {
-        player.removeItem('strong_herb', 1);
-        player.heal(70);
-        audioService.playSe('heal');
-        bm.queueMessages([i18n.t('battle_action.used_strong_herb', { item: itemName })], () => { bm.runEnemyTurn(); });
-        return;
-    }
-    if (itemId === 'special_herb') {
-        player.removeItem('special_herb', 1);
-        player.heal(120);
-        audioService.playSe('heal');
-        bm.queueMessages([i18n.t('battle_action.used_strong_herb', { item: itemName })], () => { bm.runEnemyTurn(); });
-        return;
-    }
-    if (itemId === 'magic_water') {
-        player.removeItem('magic_water', 1);
-        player.healMp(15);
-        audioService.playSe('heal');
-        bm.queueMessages([i18n.t('battle_action.drank_magic_water', { item: itemName, mp: '15' })], () => { bm.runEnemyTurn(); });
-        return;
-    }
-    if (itemId === 'sage_water') {
-        player.removeItem('sage_water', 1);
-        player.healMp(40);
-        audioService.playSe('heal');
-        bm.queueMessages([i18n.t('battle_action.drank_magic_water', { item: itemName, mp: '40' })], () => { bm.runEnemyTurn(); });
-        return;
-    }
-    if (itemId === 'antidote') {
-        player.removeItem('antidote', 1);
-        audioService.playSe('heal');
-        if (player.isPoisoned) {
-            player.curePoison();
-            bm.queueMessages([i18n.t('battle_action.cured_poison')], () => { bm.runEnemyTurn(); });
-        } else {
-            bm.queueMessages([i18n.t('battle_action.not_poisoned')], () => { bm.runEnemyTurn(); });
+    const effectDef = itemDef.effect;
+    if (typeof effectDef === 'object' && effectDef !== null) {
+        player.removeItem(itemId, 1);
+        const result = effectResolver.resolve(effectDef, player, player);
+
+        if (result.strategy === 'heal_hp') {
+            player.heal(result.effectiveAmount);
+            audioService.playSe('heal');
+            let msgKey = 'battle_action.used_herb';
+            if (itemId === 'strong_herb' || itemId === 'special_herb') {
+                msgKey = 'battle_action.used_strong_herb';
+            }
+            bm.queueMessages([i18n.t(msgKey, { item: itemName })], () => {
+                bm.runEnemyTurn();
+            });
+            return;
         }
-        return;
+
+        if (result.strategy === 'heal_mp') {
+            player.healMp(result.effectiveAmount);
+            audioService.playSe('heal');
+            bm.queueMessages([i18n.t('battle_action.drank_magic_water', { item: itemName, mp: String(result.effectiveAmount) })], () => {
+                bm.runEnemyTurn();
+            });
+            return;
+        }
+
+        if (result.strategy === 'cure_status') {
+            audioService.playSe('heal');
+            if (result.cured) {
+                player.curePoison();
+                bm.queueMessages([i18n.t('battle_action.cured_poison')], () => {
+                    bm.runEnemyTurn();
+                });
+            } else {
+                bm.queueMessages([i18n.t('battle_action.not_poisoned')], () => {
+                    bm.runEnemyTurn();
+                });
+            }
+            return;
+        }
     }
 
     throw createProtocolError('NotFoundError', 'battleActions.js:executeItemAction', 'itemId', itemId);
@@ -167,26 +166,49 @@ function executeMagicAction(bm, spell) {
 
     const castMsg = i18n.t('battle_action.cast_spell', { spell: spellName });
 
-    if (spell.id === 'hoimi') {
-        const healAmount = Math.floor(Math.random() * 8) + 25;
-        player.heal(healAmount);
-        audioService.playSe('heal');
-        bm.queueMessages([castMsg, i18n.t('battle_action.healed')], () => { bm.runEnemyTurn(); });
-        return;
+    let effectDef = null;
+    if (typeof spellDef === 'object' && spellDef !== null && spellDef.effect) {
+        effectDef = spellDef.effect;
+    } else if (typeof spell.effect === 'object' && spell.effect !== null) {
+        effectDef = spell.effect;
     }
-    if (spell.id === 'behoimi') {
-        const healAmount = Math.floor(Math.random() * 16) + 75;
-        player.heal(healAmount);
-        audioService.playSe('heal');
-        bm.queueMessages([castMsg, i18n.t('battle_action.greatly_healed')], () => { bm.runEnemyTurn(); });
-        return;
+
+    if (effectDef !== null && typeof effectDef === 'object') {
+        if (effectDef.type === 'heal_hp') {
+            const result = effectResolver.resolve(effectDef, player, player);
+            player.heal(result.effectiveAmount);
+            audioService.playSe('heal');
+
+            let healMsgKey = 'battle_action.healed';
+            if (spell.id === 'behoimi') {
+                healMsgKey = 'battle_action.greatly_healed';
+            } else if (spell.id === 'behoma') {
+                healMsgKey = 'battle_action.fully_healed';
+            }
+
+            bm.queueMessages([castMsg, i18n.t(healMsgKey)], () => {
+                bm.runEnemyTurn();
+            });
+            return;
+        }
+
+        if (effectDef.type === 'cure_status') {
+            const result = effectResolver.resolve(effectDef, player, player);
+            if (result.cured) {
+                player.curePoison();
+                audioService.playSe('heal');
+                bm.queueMessages([castMsg, logFormatter.format('menu_action.antidote_2')], () => {
+                    bm.runEnemyTurn();
+                });
+            } else {
+                bm.queueMessages([castMsg, logFormatter.format('menu_action.antidote_not_poisoned')], () => {
+                    bm.runEnemyTurn();
+                });
+            }
+            return;
+        }
     }
-    if (spell.id === 'behoma') {
-        player.heal(player.maxHp);
-        audioService.playSe('heal');
-        bm.queueMessages([castMsg, i18n.t('battle_action.fully_healed')], () => { bm.runEnemyTurn(); });
-        return;
-    }
+
     if (spell.id === 'mera') {
         let magicDmg = Math.floor(Math.random() * 5) + 10;
         if (enemy) {
@@ -311,16 +333,6 @@ function executeMagicAction(bm, spell) {
         bm.queueMessages(messages, () => {
             bm.runEnemyTurn();
         });
-        return;
-    }
-    if (spell.id === 'kiari') {
-        if (player.isPoisoned) {
-            player.curePoison();
-            audioService.playSe('heal');
-            bm.queueMessages([castMsg, logFormatter.format('menu_action.antidote_2')], () => { bm.runEnemyTurn(); });
-        } else {
-            bm.queueMessages([castMsg, logFormatter.format('menu_action.antidote_not_poisoned')], () => { bm.runEnemyTurn(); });
-        }
         return;
     }
 
