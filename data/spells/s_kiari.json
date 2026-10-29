@@ -9,5 +9,11 @@
     "ja": "キアリー",
     "en": "Squelch",
     "es": "Purifica"
+  },
+  "effect": {
+    "type": "cure_status",
+    "params": {
+      "status": "poison"
+    }
   }
 }

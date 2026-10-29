@@ -6,5 +6,11 @@
     "ja": "毒消し草",
     "en": "Antidotal Herb",
     "es": "Hierba amarga"
+  },
+  "effect": {
+    "type": "cure_status",
+    "params": {
+      "status": "poison"
+    }
   }
 }
