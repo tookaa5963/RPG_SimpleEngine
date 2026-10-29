@@ -6,6 +6,9 @@ import { maps } from './maps.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
 import { drawListBox, drawMessageBox } from './ui.js';
 import { i18n } from './i18n.js';
+import { EffectResolver } from './engine/effects/EffectResolver.js';
+
+const effectResolver = new EffectResolver();
 
 export class MenuManager {
   constructor(player, messageWindow, onEndCallback, onOpenSlot, changeMap, getCurrentMap, onReturnToTitle = null) {
@@ -340,62 +343,62 @@ handleKeyDown(key) {
   }
 
   useItem(item) {
-    if (item.id === 'herb') {
-      if (this.player.hp >= this.player.maxHp) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.full_hp')]);
-        return;
+    const effectDef = item.effect || (ITEM_DB[item.id] ? ITEM_DB[item.id].effect : null);
+
+    if (effectDef) {
+      if (effectDef.type === 'heal_hp') {
+        if (this.player.hp >= this.player.maxHp) {
+          this.onEnd();
+          this.msgWin.open([i18n.t('menu.full_hp')]);
+          return;
+        }
+      } else if (effectDef.type === 'heal_mp') {
+        if (this.player.mp >= this.player.maxMp) {
+          this.onEnd();
+          this.msgWin.open([i18n.t('menu.full_mp')]);
+          return;
+        }
       }
-      this.player.removeItem('herb', 1);
-      this.player.heal(30);
-      sound.playHeal();
+
+      const result = effectResolver.resolve(effectDef, this.player, this.player);
+      this.player.removeItem(item.id, 1);
       this.onEnd();
-      this.msgWin.open([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
-    } else if (item.id === 'strong_herb') {
-      if (this.player.hp >= this.player.maxHp) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.full_hp')]);
-        return;
+
+      if (result.strategy === 'heal_hp') {
+        this.player.heal(result.effectiveAmount);
+        sound.playHeal();
+        if (item.id === 'herb') {
+          this.msgWin.open([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
+        } else if (item.id === 'strong_herb') {
+          this.msgWin.open([logFormatter.format('menu_action.used_strong_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
+        } else if (item.id === 'special_herb') {
+          this.msgWin.open([logFormatter.format('menu_action.used_special_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
+        } else {
+          this.msgWin.open([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
+        }
+      } else if (result.strategy === 'heal_mp') {
+        this.player.healMp(result.effectiveAmount);
+        sound.playHeal();
+        if (item.id === 'magic_water') {
+          this.msgWin.open([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
+        } else if (item.id === 'sage_water') {
+          this.msgWin.open([logFormatter.format('menu_action.drank_sage_water_1'), logFormatter.format('menu_action.drank_sage_water_2')]);
+        } else {
+          this.msgWin.open([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
+        }
+      } else if (result.strategy === 'cure_status') {
+        sound.playHeal();
+        if (result.cured) {
+          this.player.curePoison();
+          this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_2')]);
+        } else {
+          this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_not_poisoned')]);
+        }
       }
-      this.player.removeItem('strong_herb', 1);
-      this.player.heal(70);
-      sound.playHeal();
-      this.onEnd();
-      this.msgWin.open([logFormatter.format('menu_action.used_strong_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
-    } else if (item.id === 'special_herb') {
-      if (this.player.hp >= this.player.maxHp) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.full_hp')]);
-        return;
-      }
-      this.player.removeItem('special_herb', 1);
-      this.player.heal(120);
-      sound.playHeal();
-      this.onEnd();
-      this.msgWin.open([logFormatter.format('menu_action.used_special_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
-    } else if (item.id === 'magic_water') {
-      if (this.player.mp >= this.player.maxMp) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.full_mp')]);
-        return;
-      }
-      this.player.removeItem('magic_water', 1);
-      this.player.healMp(15);
-      sound.playHeal();
-      this.onEnd();
-      this.msgWin.open([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
-    } else if (item.id === 'sage_water') {
-      if (this.player.mp >= this.player.maxMp) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.full_mp')]);
-        return;
-      }
-      this.player.removeItem('sage_water', 1);
-      this.player.healMp(40);
-      sound.playHeal();
-      this.onEnd();
-      this.msgWin.open([logFormatter.format('menu_action.drank_sage_water_1'), logFormatter.format('menu_action.drank_sage_water_2')]);
-    } else if (item.id === 'holy_water') {
+      return;
+    }
+
+    if (item.id === 'holy_water') {
       this.player.removeItem('holy_water', 1);
       this.player.holyWaterSteps = 128;
       sound.playMagic();
@@ -415,17 +418,6 @@ handleKeyDown(key) {
         this.msgWin.open([logFormatter.format('menu_action.lantern_on')]);
       } else {
         this.msgWin.open([logFormatter.format('menu_action.lantern_off')]);
-      }
-    } else if (item.id === 'antidote') {
-      this.player.removeItem('antidote', 1);
-      this.onEnd();
-      if (this.player.isPoisoned) {
-        this.player.curePoison();
-        sound.playHeal();
-        this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_2')]);
-      } else {
-        sound.playHeal();
-        this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_not_poisoned')]);
       }
     } else if (item.id === 'forest_guide') {
       const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
@@ -447,7 +439,8 @@ handleKeyDown(key) {
   }
 
 useMagic(spell) {
-    if (spell.id === 'hoimi' || spell.id === 'behoimi' || spell.id === 'behoma') {
+    const effectDef = spell.effect || (SPELL_DB[spell.id] ? SPELL_DB[spell.id].effect : null);
+    if (effectDef && effectDef.type === 'heal_hp') {
       if (this.player.hp >= this.player.maxHp) {
         this.onEnd();
         this.msgWin.open([i18n.t('menu.full_hp')]);
@@ -495,24 +488,35 @@ useMagic(spell) {
     const spellName = SPELL_DB[spell.id]?.name || spell.name;
     const castMsg = logFormatter.format('menu_action.spell_cast', { spell: spellName });
 
-    if (spell.id === 'hoimi') {
-      const healAmount = Math.floor(Math.random() * 8) + 25;
-      this.player.heal(healAmount);
-      sound.playHeal();
+    if (effectDef && (effectDef.type === 'heal_hp' || effectDef.type === 'cure_status')) {
+      const result = effectResolver.resolve(effectDef, this.player, this.player);
       this.onEnd();
-      this.msgWin.open([castMsg, logFormatter.format('menu_action.healed')]);
-    } else if (spell.id === 'behoimi') {
-      const healAmount = Math.floor(Math.random() * 16) + 75;
-      this.player.heal(healAmount);
-      sound.playHeal();
-      this.onEnd();
-      this.msgWin.open([castMsg, logFormatter.format('menu_action.greatly_healed')]);
-    } else if (spell.id === 'behoma') {
-      this.player.heal(this.player.maxHp);
-      sound.playHeal();
-      this.onEnd();
-      this.msgWin.open([castMsg, logFormatter.format('menu_action.fully_healed')]);
-    } else if (spell.id === 'remira') {
+
+      if (result.strategy === 'heal_hp') {
+        this.player.heal(result.effectiveAmount);
+        sound.playHeal();
+        if (spell.id === 'hoimi') {
+          this.msgWin.open([castMsg, logFormatter.format('menu_action.healed')]);
+        } else if (spell.id === 'behoimi') {
+          this.msgWin.open([castMsg, logFormatter.format('menu_action.greatly_healed')]);
+        } else if (spell.id === 'behoma') {
+          this.msgWin.open([castMsg, logFormatter.format('menu_action.fully_healed')]);
+        } else {
+          this.msgWin.open([castMsg, logFormatter.format('menu_action.healed')]);
+        }
+      } else if (result.strategy === 'cure_status') {
+        if (result.cured) {
+          this.player.curePoison();
+          sound.playHeal();
+          this.msgWin.open([castMsg, logFormatter.format('menu_action.antidote_2')]);
+        } else {
+          this.msgWin.open([castMsg, logFormatter.format('menu_action.antidote_not_poisoned')]);
+        }
+      }
+      return;
+    }
+
+    if (spell.id === 'remira') {
       this.player.remiraSteps = 120;
       this.onEnd();
       this.msgWin.open([castMsg, logFormatter.format('menu_action.remira_shine')]);
@@ -520,15 +524,6 @@ useMagic(spell) {
       this.player.holyWaterSteps = 128;
       this.onEnd();
       this.msgWin.open([castMsg, logFormatter.format('menu_action.holy_water_2')]);
-    } else if (spell.id === 'kiari') {
-      this.onEnd();
-      if (this.player.isPoisoned) {
-        this.player.curePoison();
-        sound.playHeal();
-        this.msgWin.open([castMsg, logFormatter.format('menu_action.antidote_2')]);
-      } else {
-        this.msgWin.open([castMsg, logFormatter.format('menu_action.antidote_not_poisoned')]);
-      }
     } else if (spell.id === 'liremito') {
       const escape = this.getCurrentMap().escapeTarget;
       this.onEnd();
