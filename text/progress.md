@@ -132,20 +132,42 @@
 ## 5. 引き継ぎ部
 完了コミット: aeb29c2 (Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲)
 完了内容:
-- js/player.js に Actor インスタンスを配備し、基本ステータス（hp, mp, maxHp, maxMp, isPoisoned）および関連メソッドを Core層へ委譲
-- tools/test_player_actor_adapter.mjs を配備（全12項目の単体機能テスト合格）
-- Gate 1, Gate 2, Gate 3 全件通過、クリーン状態を確認済み
+- Step 3-5b 探査セッション完了: Inventory.js 公開IF、player.js 内部実装、外部結合度（直接参照箇所）の静的特定完了
+- 委譲方針および Proxy/Adapter パターンによる後方互換性設計合意済み
 
 次タスク:
-- Phase 3 Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲
+- Phase 3 Step 3-5b 実装セッション: player.js のインベントリ・装備系の Inventory 委譲
   - 対象メソッド: addItem, removeItem, getInventoryCount, isInventoryFull, equipment
-  - 対象プロパティ: inventory, equipment（getter/setter または Inventory 連携）
-  - 前提制約: 外部コード（menu.js, battleActions.js, shop.js 等）の後方互換性維持
+  - 対象プロパティ: inventory, equipment（Proxy による透過的同期と後方互換性担保）
   - 運用必須要件:
-    1. 事前探査（Inventory.js の公開IF、外部からの .inventory/.equipment 参照箇所の静的特定）
-    2. 反映時の `git diff -U1 js/player.js` による差分局所性の検証
+    1. 環境保全確認（git status クリーン確認、ステージング作成）
+    2. 反映時の git diff -U1 js/player.js による差分局所性の検証
     3. tools/test_player_actor_adapter.mjs へのテスト累積追加（全テスト一括パス確認）
 
-
-プロトコル第6条4に基づき、Phase 3 Step 3-5b（インベントリ・装備系の Inventory 委譲）の探査フェーズを開始してください。
-800行規模コードの運用要件（git diff -U1 によるスコープ外改変検知、Gate 2 テストの累積検証）を厳格に適用してください。
+【探査結果: 委譲対象最小コードブロック】
+```javascript
+// js/player.js: インベントリ計算・操作ブロック
+getInventoryCount() {
+  let total = 0;
+  for (const [id, count] of Object.entries(this.inventory)) {
+    if (typeof count === 'number' && count > 0 && id in ITEM_DB) total += count;
+  }
+  if (this.equipment.weapon) total--;
+  if (this.equipment.armor) total--;
+  if (this.equipment.shield) total--;
+  return Math.max(0, total);
+}
+isInventoryFull(additional = 1) {
+  return (this.getInventoryCount() + additional) > MAX_INVENTORY_CAPACITY;
+}
+addItem(id, count = 1) {
+  if (!(id in this.inventory)) this.inventory[id] = 0;
+  this.inventory[id] += count;
+  return this.inventory[id];
+}
+removeItem(id, count = 1) {
+  if (!(id in this.inventory) || this.inventory[id] < count) return false;
+  this.inventory[id] -= count;
+  if (id === 'lantern' && this.inventory.lantern <= 0) this.isLanternLit = false;
+  return true;
+}
