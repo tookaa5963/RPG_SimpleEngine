@@ -146,6 +146,6 @@
     2. 反映時の `git diff -U1 js/player.js` による差分局所性の検証
     3. tools/test_player_actor_adapter.mjs へのテスト累積追加（全テスト一括パス確認）
 
-進捗台帳（progress.md）を提示します。
+
 プロトコル第6条4に基づき、Phase 3 Step 3-5b（インベントリ・装備系の Inventory 委譲）の探査フェーズを開始してください。
 800行規模コードの運用要件（git diff -U1 によるスコープ外改変検知、Gate 2 テストの累積検証）を厳格に適用してください。
