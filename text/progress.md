@@ -103,8 +103,8 @@
 
 ### Phase 3: 汎用ステート・アクター・データ層のCore化 (Core/entities, state, data)
 目的: アクターモデルの確立、フラグ・変数のヘッドレス管理、DataRepository によるデータ参照の統一。
-- Step 3-1: js/engine/state/GenericFlags.js, VariableStore.js の新規作成
-  - 規模: 各 約 60 行（ブール値ストア、汎用 Key-Value ストア）
+- [202610291720] Step 3-1: js/engine/state/GenericFlags.js, VariableStore.js の新規作成
+  - 規模: 各 約 110〜160 行（ブール値ストア、汎用 Key-Value ストア）
   - 検証: Gate 1 ＋ Gate 2 通過
 - Step 3-2: js/engine/entities/Actor.js の新規作成
   - 規模: 約 150 行（ステータス保持、applyDamage, applyHeal の境界防護・イベント通知）
@@ -152,15 +152,13 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （b30a355）
+完了コミット: （8083a47）
 完了内容:
-- js/battleActions.js 内のアイテム・呪文の重複回復/解毒ロジックを EffectResolver へ委譲
-- 攻撃呪文、状態変化呪文、および戦闘演出処理の既存挙動を完全保護
-- Gate 1（Node.js構文チェック）および Gate 3（ブラウザ実機動作検証）通過
-- Phase 2（効果解決系の垂直スライス抽出）の全工程完了
+- js/engine/state/GenericFlags.js および VariableStore.js を新規作成
+- Gate 1（静的構文・境界検証：対象 8 件）および Gate 2（単体機能テスト）通過
+- Core層におけるフラグ・変数のヘッドレス管理基盤を配備
 
 次タスク:
-- Phase 3: 汎用ステート・アクター・データ層のCore化 (Core/entities, state, data)
-  - Step 3-1: js/engine/state/GenericFlags.js, VariableStore.js の新規作成
-  - 目的: ブール値フラグおよび Key-Value 変数管理を Core 層にヘッドレス実装する
-  - 検証: Gate 1 ＋ Gate 2（単体機能テスト）
+- Phase 3 Step 3-2: js/engine/entities/Actor.js の新規作成
+  - 規模: 約 150 行（ステータス保持、applyDamage, applyHeal の境界防護・イベント通知）
+  - 検証: Gate 1 ＋ Gate 2 通過
