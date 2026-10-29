@@ -91,7 +91,7 @@
 - [202610291133] Step 2-4d: データスキーマ拡張（状態異常解除系: i_antidote.json, s_kiari.json）
   - 規模: アイテム1件、呪文1件への cure_status effect 定義付与
   - 検証: Gate 1（JSON構文・境界検証）通過
-- Step 2-4e: EffectResolver への全ストラテジー登録配線
+- [202610291225] Step 2-4e: EffectResolver への全ストラテジー登録配線
   - 規模: EffectResolver または初期化箇所にて HealMpEffect / CureStatusEffect を登録
   - 検証: Gate 1 ＋ Gate 2（全ストラテジーのディスパッチ疎通テスト）通過
 - Step 2-5: menu.js（フィールド使用）の委譲切り替え
@@ -152,11 +152,13 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: 1dc9902
+完了コミット: （cf8c8f1）
 完了内容:
-- data/items/i_antidote.json および data/spells/s_kiari.json への cure_status effect 定義付与
+- js/engine/effects/EffectResolver.js への HealHpEffect, HealMpEffect, CureStatusEffect のデフォルト登録配線
 - Gate 1 静的構文・境界検証 通過
+- Gate 2 単体機能テスト（各ストラテジーのディスパッチ疎通、副作用ゼロ、フェイルファスト）通過
 次タスク:
-- Phase 2 Step 2-4e: EffectResolver への全ストラテジー登録配線
-  - 目的: EffectResolver に HealHpEffect に加え HealMpEffect および CureStatusEffect を登録・初期化し、各種 effect 定義からのディスパッチを可能にする
-  - 検証: Gate 1 ＋ Gate 2（ディスパッチおよび計算結果の単体テスト）
+- Phase 2 Step 2-5: menu.js（フィールド使用）の委譲切り替え
+  - 目的: menu.js 内の回復処理重複分岐を削除し、EffectResolver.resolve() への委譲に置換する
+  - 前提: プロトコル第6条第4項に基づき、実装セッションに先立ち「探査セッション」を実施し、該当箇所の最小コードブロック（10〜20行）と外部依存を抽出する
+  - 検証: Gate 1 ＋ Gate 3（ブラウザ実機フィールド上での回復アイテム・呪文使用確認）

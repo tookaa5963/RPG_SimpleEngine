@@ -7,3 +7,4 @@
 202610290306/js/engine/effects/HealMpEffect.js の新規配備/bb04b0712a6813757dd0a06b92ebf80b315fb225
 202610291120/data/items/i_magic_water.json および i_sage_water.json への heal_mp effect 定義付与/8d53028b58aa39c37cf7b3248a333991d62f021b
 [202610291133] Step 2-4d: データスキーマ拡張（状態異常解除系: i_antidote.json, s_kiari.json）/1dc99023e3d1a8e4a1bdff8cf797652ddb0cf3a3
+[202610291225] Step 2-4e: EffectResolver への全ストラテジー登録配線/cf8c8f1c1251de30be62749488d7693119b80dfd
