@@ -1,6 +1,7 @@
-﻿// FILE_ENTRY: js/player.js
+// FILE_ENTRY: js/player.js
 import { ITEM_DB, SPELL_DB } from './items.js';
 import { logFormatter } from './logFormatter.js';
+import { Actor } from './engine/entities/Actor.js';
 
 /**
  * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
@@ -17,7 +18,7 @@ export function createProtocolError(type, contextId, propName, val) {
 export const MAX_INVENTORY_CAPACITY = 12;
 
 export class Player {
-  constructor(gridX = 3, gridY = 4, tileSize = 64) {
+  constructor(gridX = 3, gridY = 4, tileSize = 64, eventBus = null) {
     if (typeof gridX !== 'number') {
       throw createProtocolError('TypeError', 'player.js:constructor', 'gridX', gridX);
     }
@@ -52,15 +53,32 @@ export class Player {
     this.bumpCoolDown = 0;
 
     this.level = 1;
-    this.hp = 15;
-    this.maxHp = 15;
-    this.mp = 0;
-    this.maxMp = 0;
     this.baseAtk = 6;
     this.baseDef = 5;
     this.spd = 5;
     this.exp = 0;
     this.gold = 0;
+
+    let bus = null;
+    if (eventBus !== undefined) {
+      if (eventBus !== null) {
+        bus = eventBus;
+      }
+    }
+    this.eventBus = bus;
+
+    this.actor = new Actor({
+      id: 'player',
+      name: 'Player',
+      maxHp: 15,
+      hp: 15,
+      maxMp: 0,
+      mp: 0,
+      attack: 6,
+      defense: 5,
+      agility: 5,
+      statusEffects: []
+    }, this.eventBus);
 
     this.spells = [];
     this.inventory = { herb: 1, stick: 1, cloth_armor: 1 };
@@ -71,7 +89,6 @@ export class Player {
     this.holyWaterSteps = 0;
     this.isLanternLit = false;
 
-    this.isPoisoned = false;
     this.poisonFlashTimer = 0;
     this.poisonShakeTimer = 0;
 
@@ -101,6 +118,174 @@ export class Player {
       receivedWaterShield: false,
       heardOfDwarf: false
     };
+  }
+
+  _updateActorStats(overrides = {}) {
+    const currentHp = this.actor.hp;
+    const currentMp = this.actor.mp;
+
+    let targetMaxHp = this.actor.maxHp;
+    if (typeof overrides.maxHp === 'number') {
+      if (!Number.isNaN(overrides.maxHp)) {
+        if (overrides.maxHp > 0) {
+          targetMaxHp = Math.floor(overrides.maxHp);
+        }
+      }
+    }
+
+    let targetMaxMp = this.actor.maxMp;
+    if (typeof overrides.maxMp === 'number') {
+      if (!Number.isNaN(overrides.maxMp)) {
+        if (overrides.maxMp >= 0) {
+          targetMaxMp = Math.floor(overrides.maxMp);
+        }
+      }
+    }
+
+    const newHp = Math.min(currentHp, targetMaxHp);
+    const newMp = Math.min(currentMp, targetMaxMp);
+
+    const rawStatus = [];
+    const currentStatus = this.actor.statusEffects;
+    for (let i = 0; i < currentStatus.length; i++) {
+      rawStatus.push(currentStatus[i]);
+    }
+
+    this.actor = new Actor({
+      id: this.actor.id,
+      name: this.actor.name,
+      maxHp: targetMaxHp,
+      hp: newHp,
+      maxMp: targetMaxMp,
+      mp: newMp,
+      attack: this.baseAtk,
+      defense: this.baseDef,
+      agility: this.spd,
+      statusEffects: rawStatus
+    }, this.eventBus);
+  }
+
+  get hp() {
+    return this.actor.hp;
+  }
+
+  set hp(value) {
+    if (typeof value !== 'number') {
+      return;
+    }
+    if (Number.isNaN(value)) {
+      return;
+    }
+
+    const targetHp = Math.max(0, Math.min(this.actor.maxHp, Math.floor(value)));
+    const currentHp = this.actor.hp;
+
+    if (targetHp === currentHp) {
+      return;
+    }
+
+    if (targetHp === 0) {
+      if (this.actor.isAlive) {
+        this.actor.applyDamage(this.actor.hp);
+      }
+      return;
+    }
+
+    if (!this.actor.isAlive) {
+      this.actor.revive(targetHp);
+    } else if (targetHp > currentHp) {
+      this.actor.applyHeal(targetHp - currentHp);
+    } else {
+      this.actor.applyDamage(currentHp - targetHp);
+    }
+  }
+
+  get maxHp() {
+    return this.actor.maxHp;
+  }
+
+  set maxHp(value) {
+    if (typeof value !== 'number') {
+      return;
+    }
+    if (Number.isNaN(value)) {
+      return;
+    }
+    if (value <= 0) {
+      return;
+    }
+    const newMaxHp = Math.floor(value);
+    if (newMaxHp === this.actor.maxHp) {
+      return;
+    }
+    this._updateActorStats({ maxHp: newMaxHp });
+  }
+
+  get mp() {
+    return this.actor.mp;
+  }
+
+  set mp(value) {
+    if (typeof value !== 'number') {
+      return;
+    }
+    if (Number.isNaN(value)) {
+      return;
+    }
+
+    const targetMp = Math.max(0, Math.min(this.actor.maxMp, Math.floor(value)));
+    const currentMp = this.actor.mp;
+
+    if (targetMp === currentMp) {
+      return;
+    }
+
+    if (!this.actor.isAlive) {
+      return;
+    }
+
+    if (targetMp > currentMp) {
+      this.actor.recoverMp(targetMp - currentMp);
+    } else {
+      this.actor.consumeMp(currentMp - targetMp);
+    }
+  }
+
+  get maxMp() {
+    return this.actor.maxMp;
+  }
+
+  set maxMp(value) {
+    if (typeof value !== 'number') {
+      return;
+    }
+    if (Number.isNaN(value)) {
+      return;
+    }
+    if (value < 0) {
+      return;
+    }
+    const newMaxMp = Math.floor(value);
+    if (newMaxMp === this.actor.maxMp) {
+      return;
+    }
+    this._updateActorStats({ maxMp: newMaxMp });
+  }
+
+  get isPoisoned() {
+    return this.actor.hasStatusEffect('poison');
+  }
+
+  set isPoisoned(val) {
+    if (Boolean(val)) {
+      if (!this.actor.hasStatusEffect('poison')) {
+        this.actor.addStatusEffect('poison');
+      }
+    } else {
+      if (this.actor.hasStatusEffect('poison')) {
+        this.actor.removeStatusEffect('poison');
+      }
+    }
   }
 
   get atk() {
@@ -291,9 +476,15 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:damage', 'amount', amount);
     }
 
-    const actual = Math.max(0, Math.min(this.hp, Math.floor(amount)));
-    this.hp -= actual;
-    return actual;
+    const intAmount = Math.floor(amount);
+    if (intAmount <= 0) {
+      return 0;
+    }
+    if (!this.actor.isAlive) {
+      return 0;
+    }
+
+    return this.actor.applyDamage(intAmount);
   }
 
   heal(amount) {
@@ -304,9 +495,15 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:heal', 'amount', amount);
     }
 
-    const actual = Math.max(0, Math.min(this.maxHp - this.hp, Math.floor(amount)));
-    this.hp += actual;
-    return actual;
+    const intAmount = Math.floor(amount);
+    if (intAmount <= 0) {
+      return 0;
+    }
+    if (!this.actor.isAlive) {
+      return 0;
+    }
+
+    return this.actor.applyHeal(intAmount);
   }
 
   healMp(amount) {
@@ -317,9 +514,15 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:healMp', 'amount', amount);
     }
 
-    const actual = Math.max(0, Math.min(this.maxMp - this.mp, Math.floor(amount)));
-    this.mp += actual;
-    return actual;
+    const intAmount = Math.floor(amount);
+    if (intAmount <= 0) {
+      return 0;
+    }
+    if (!this.actor.isAlive) {
+      return 0;
+    }
+
+    return this.actor.recoverMp(intAmount);
   }
 
   consumeMp(amount) {
@@ -330,16 +533,37 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:consumeMp', 'amount', amount);
     }
 
-    if (this.mp < amount) {
+    const intAmount = Math.floor(amount);
+    if (intAmount < 0) {
       return false;
     }
-    this.mp -= amount;
+    if (!this.actor.isAlive) {
+      return false;
+    }
+    if (intAmount === 0) {
+      return true;
+    }
+    if (this.actor.mp < intAmount) {
+      return false;
+    }
+
+    this.actor.consumeMp(intAmount);
     return true;
   }
 
   fullRecovery() {
-    this.hp = this.maxHp;
-    this.mp = this.maxMp;
+    if (!this.actor.isAlive) {
+      this.actor.revive(this.actor.maxHp);
+    } else {
+      const missingHp = this.actor.maxHp - this.actor.hp;
+      if (missingHp > 0) {
+        this.actor.applyHeal(missingHp);
+      }
+    }
+    const missingMp = this.actor.maxMp - this.actor.mp;
+    if (missingMp > 0) {
+      this.actor.recoverMp(missingMp);
+    }
   }
 
   curePoison() {
@@ -555,7 +779,7 @@ export class Player {
     }
 
     const numberProps = [
-      'level', 'hp', 'maxHp', 'mp', 'maxMp',
+      'level', 'maxHp', 'maxMp', 'hp', 'mp',
       'baseAtk', 'baseDef', 'spd', 'exp', 'gold',
       'remiraSteps', 'torchSteps', 'holyWaterSteps'
     ];
