@@ -116,9 +116,18 @@
   - 規模: 約 190 行（マスタデータのインメモリ保持・バリデーション・高速検索、完全ヘッドレス・Tier 3構文準拠）
   - 検証: Gate 1 ＋ Gate 2（9件の単体テスト）通過
 
-- Step 3-5: player.js の内部委譲リファクタリング
-  - 規模: player.js の内部プロパティを Actor, GenericFlags, Inventory へ委譲
-  - 検証: Gate 3（ゲーム起動、移動、セーブ・ロードで既存挙動と一致することを確認）
+- Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲
+  - 規模: player.js の内部ステータス（HP, MP, 毒）および関連メソッドを Actor へ委譲。直接参照・代入用の getter/setter 配備
+  - 検証: Gate 1 ＋ Gate 2（Actor連携単体テスト）＋ Gate 3（実機での戦闘被弾・回復・全滅動作確認）
+- Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲
+  - 規模: addItem, removeItem, getInventoryCount, isInventoryFull, equipment を Inventory インスタンスへ委譲
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（アイテム入手・消費・装備変更の実機確認）
+- Step 3-5c: player.js の経験値・成長・ゴールド系の委譲
+  - 規模: addExp, addGold, useGold の委譲とレベルアップ時の Actor ステータス同期
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（戦闘勝利後の経験値・ゴールド獲得・レベルアップ確認）
+- Step 3-5d: player.js のシリアライズ・デシリアライズ統合
+  - 規模: serialize, deserialize を各 Core（Actor, Inventory, GenericFlags）の toJSON/fromJSON と統合
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（セーブデータの保存・復元・境界互換性検証）
 
 ### Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)
 目的: ロジック層から sound.js / ui.js の直接インポートを物理削除し、イベント駆動へ完全置換。
