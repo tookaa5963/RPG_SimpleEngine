@@ -174,3 +174,5 @@
   - 対象プロパティ: inventory, equipment（getter/setter または Inventory 連携）
   - 前提制約: 外部コード（menu.js, battleActions.js, shop.js 等）の後方互換性維持
   - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（アイテム入手・消費・装備変更の実機確認）
+
+  今回は探査セッションとし次セッションでの移譲がスムーズに進めるようにしてください。
