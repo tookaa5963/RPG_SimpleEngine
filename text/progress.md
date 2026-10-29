@@ -94,9 +94,9 @@
 - [202610291225] Step 2-4e: EffectResolver への全ストラテジー登録配線
   - 規模: EffectResolver または初期化箇所にて HealMpEffect / CureStatusEffect を登録
   - 検証: Gate 1 ＋ Gate 2（全ストラテジーのディスパッチ疎通テスト）通過
-- Step 2-5: menu.js（フィールド使用）の委譲切り替え
-  - 規模: menu.js 内の重複分岐を削除し、EffectResolver.apply() へ置換
-  - 検証: Gate 3（実機フィールド上で回復アイテム・呪文使用確認）
+- [202610291410] Step 2-5: menu.js（フィールド使用）の委譲切り替え
+  - 規模: menu.js 内の重複分岐を削除し、EffectResolver.resolve() へ置換
+  - 検証: Gate 1 ＋ Gate 3（実機フィールド上で回復アイテム・呪文使用確認）通過
 - Step 2-6: battleActions.js（戦闘使用）の委譲切り替え
   - 規模: battleActions.js 内の重複分岐を削除し、同一の EffectResolver.apply() へ置換
   - 検証: Gate 3（実機戦闘で回復アイテム・呪文が同一計算で動くことを確認）
@@ -152,13 +152,13 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （cf8c8f1）
+完了コミット: （dbe6523）
 完了内容:
-- js/engine/effects/EffectResolver.js への HealHpEffect, HealMpEffect, CureStatusEffect のデフォルト登録配線
-- Gate 1 静的構文・境界検証 通過
-- Gate 2 単体機能テスト（各ストラテジーのディスパッチ疎通、副作用ゼロ、フェイルファスト）通過
+- js/menu.js 内のアイテム・呪文の重複回復/解毒ロジックを EffectResolver へ委譲
+- 非回復系アイテム・呪文の既存挙動およびUI・演出処理を完全保護
+- Gate 1（Node.js構文チェック）および Gate 3（ブラウザ実機動作検証）通過
 次タスク:
-- Phase 2 Step 2-5: menu.js（フィールド使用）の委譲切り替え
-  - 目的: menu.js 内の回復処理重複分岐を削除し、EffectResolver.resolve() への委譲に置換する
+- Phase 2 Step 2-6: battleActions.js（戦闘使用）の委譲切り替え
+  - 目的: battleActions.js 内の重複回復ロジックを削除し、EffectResolver.resolve() へ置換する
   - 前提: プロトコル第6条第4項に基づき、実装セッションに先立ち「探査セッション」を実施し、該当箇所の最小コードブロック（10〜20行）と外部依存を抽出する
-  - 検証: Gate 1 ＋ Gate 3（ブラウザ実機フィールド上での回復アイテム・呪文使用確認）
+  - 検証: Gate 1 ＋ Gate 3（ブラウザ実機戦闘での回復アイテム・呪文使用確認）
