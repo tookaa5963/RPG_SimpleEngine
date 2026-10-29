@@ -10,6 +10,6 @@
 
   -ルート直下の data/items.json および data/spells.json はコードから参照されていないため、変更対象から除外してSSOTを維持する。
 
- -progressにて実行環境を明示、protocolにて制約も加えた。
+  -progressにて実行環境を明示、protocolにて制約も加えた。
 
- 
+　-PowerShell での文字列破壊を防ぐ「シングルクォート・ヒアドキュメント（@'...'@）の使用」
