@@ -2,6 +2,7 @@
 import { ITEM_DB, SPELL_DB } from './items.js';
 import { logFormatter } from './logFormatter.js';
 import { Actor } from './engine/entities/Actor.js';
+import { Inventory, DEFAULT_MAX_CAPACITY } from './engine/state/Inventory.js';
 
 /**
  * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
@@ -16,6 +17,143 @@ export function createProtocolError(type, contextId, propName, val) {
 }
 
 export const MAX_INVENTORY_CAPACITY = 12;
+
+const VALID_EQUIP_SLOTS = ['weapon', 'armor', 'shield'];
+
+/**
+ * Inventory インスタンスと透過的に同期するインベントリ互換 Proxy の生成
+ * @param {Inventory} inventoryInstance
+ * @returns {Proxy}
+ */
+function createInventoryProxy(inventoryInstance) {
+  return new Proxy({}, {
+    get(target, prop) {
+      if (typeof prop === 'string') {
+        return inventoryInstance.getItemCount(prop);
+      }
+      return Reflect.get(target, prop);
+    },
+    set(target, prop, value) {
+      if (typeof prop === 'string') {
+        const current = inventoryInstance.getItemCount(prop);
+        if (typeof value === 'number') {
+          if (!Number.isNaN(value)) {
+            const intVal = Math.floor(value);
+            if (intVal > current) {
+              inventoryInstance.addItem(prop, intVal - current);
+            } else if (intVal < current) {
+              if (intVal <= 0) {
+                if (current > 0) {
+                  inventoryInstance.removeItem(prop, current);
+                }
+              } else {
+                inventoryInstance.removeItem(prop, current - intVal);
+              }
+            }
+            return true;
+          }
+        }
+      }
+      return true;
+    },
+    has(target, prop) {
+      if (typeof prop === 'string') {
+        return inventoryInstance.hasItem(prop);
+      }
+      return Reflect.has(target, prop);
+    },
+    deleteProperty(target, prop) {
+      if (typeof prop === 'string') {
+        const current = inventoryInstance.getItemCount(prop);
+        if (current > 0) {
+          inventoryInstance.removeItem(prop, current);
+        }
+        return true;
+      }
+      return Reflect.deleteProperty(target, prop);
+    },
+    ownKeys(target) {
+      return Object.keys(inventoryInstance.getItems());
+    },
+    getOwnPropertyDescriptor(target, prop) {
+      if (typeof prop === 'string') {
+        if (inventoryInstance.hasItem(prop)) {
+          return {
+            value: inventoryInstance.getItemCount(prop),
+            writable: true,
+            enumerable: true,
+            configurable: true
+          };
+        }
+      }
+      return undefined;
+    }
+  });
+}
+
+/**
+ * Inventory インスタンスと透過的に同期する装備互換 Proxy の生成
+ * @param {Inventory} inventoryInstance
+ * @returns {Proxy}
+ */
+function createEquipmentProxy(inventoryInstance) {
+  return new Proxy({}, {
+    get(target, prop) {
+      if (typeof prop === 'string') {
+        if (VALID_EQUIP_SLOTS.includes(prop)) {
+          return inventoryInstance.getEquipment(prop);
+        }
+      }
+      return Reflect.get(target, prop);
+    },
+    set(target, prop, value) {
+      if (typeof prop === 'string') {
+        if (VALID_EQUIP_SLOTS.includes(prop)) {
+          if (value === null) {
+            inventoryInstance.unequip(prop);
+            return true;
+          }
+          if (value === undefined) {
+            inventoryInstance.unequip(prop);
+            return true;
+          }
+          if (typeof value === 'string') {
+            if (!inventoryInstance.hasItem(value)) {
+              inventoryInstance.addItem(value, 1);
+            }
+            inventoryInstance.equip(prop, value);
+            return true;
+          }
+        }
+      }
+      return Reflect.set(target, prop, value);
+    },
+    has(target, prop) {
+      if (typeof prop === 'string') {
+        if (VALID_EQUIP_SLOTS.includes(prop)) {
+          return true;
+        }
+      }
+      return Reflect.has(target, prop);
+    },
+    ownKeys(target) {
+      return [...VALID_EQUIP_SLOTS];
+    },
+    getOwnPropertyDescriptor(target, prop) {
+      if (typeof prop === 'string') {
+        if (VALID_EQUIP_SLOTS.includes(prop)) {
+          return {
+            value: inventoryInstance.getEquipment(prop),
+            writable: true,
+            enumerable: true,
+            configurable: true
+          };
+        }
+      }
+      return undefined;
+    }
+  });
+}
 
 export class Player {
   constructor(gridX = 3, gridY = 4, tileSize = 64, eventBus = null) {
@@ -80,9 +218,17 @@ export class Player {
       statusEffects: []
     }, this.eventBus);
 
+    this.inventoryInstance = new Inventory({
+      maxCapacity: MAX_INVENTORY_CAPACITY,
+      eventBus: this.eventBus,
+      initialItems: { herb: 1, stick: 1, cloth_armor: 1 },
+      initialEquipment: { weapon: 'stick', armor: 'cloth_armor', shield: null }
+    });
+
+    this._inventoryProxy = createInventoryProxy(this.inventoryInstance);
+    this._equipmentProxy = createEquipmentProxy(this.inventoryInstance);
+
     this.spells = [];
-    this.inventory = { herb: 1, stick: 1, cloth_armor: 1 };
-    this.equipment = { weapon: 'stick', armor: 'cloth_armor', shield: null };
 
     this.remiraSteps = 0;
     this.torchSteps = 0;
@@ -118,6 +264,70 @@ export class Player {
       receivedWaterShield: false,
       heardOfDwarf: false
     };
+  }
+
+  get inventory() {
+    return this._inventoryProxy;
+  }
+
+  set inventory(val) {
+    if (val === null) {
+      return;
+    }
+    if (typeof val !== 'object') {
+      return;
+    }
+    if (Array.isArray(val)) {
+      return;
+    }
+
+    const currentEquip = this.inventoryInstance.getEquipment();
+    this.inventoryInstance.fromJSON({
+      maxCapacity: MAX_INVENTORY_CAPACITY,
+      items: val,
+      equipment: currentEquip
+    });
+  }
+
+  get equipment() {
+    return this._equipmentProxy;
+  }
+
+  set equipment(val) {
+    if (val === null) {
+      return;
+    }
+    if (typeof val !== 'object') {
+      return;
+    }
+    if (Array.isArray(val)) {
+      return;
+    }
+
+    const currentItems = this.inventoryInstance.getItems();
+    let weaponVal = null;
+    let armorVal = null;
+    let shieldVal = null;
+
+    if (val.weapon !== undefined) {
+      weaponVal = val.weapon;
+    }
+    if (val.armor !== undefined) {
+      armorVal = val.armor;
+    }
+    if (val.shield !== undefined) {
+      shieldVal = val.shield;
+    }
+
+    this.inventoryInstance.fromJSON({
+      maxCapacity: MAX_INVENTORY_CAPACITY,
+      items: currentItems,
+      equipment: {
+        weapon: weaponVal,
+        armor: armorVal,
+        shield: shieldVal
+      }
+    });
   }
 
   _updateActorStats(overrides = {}) {
@@ -329,32 +539,7 @@ export class Player {
   }
 
   getInventoryCount() {
-    let total = 0;
-    for (const [id, count] of Object.entries(this.inventory)) {
-      if (typeof count === 'number') {
-        if (count > 0) {
-          if (id in ITEM_DB) {
-            total += count;
-          }
-        }
-      }
-    }
-    if (this.equipment.weapon !== null) {
-      if (this.equipment.weapon !== undefined) {
-        total--;
-      }
-    }
-    if (this.equipment.armor !== null) {
-      if (this.equipment.armor !== undefined) {
-        total--;
-      }
-    }
-    if (this.equipment.shield !== null) {
-      if (this.equipment.shield !== undefined) {
-        total--;
-      }
-    }
-    return Math.max(0, total);
+    return this.inventoryInstance.getBagCount();
   }
 
   isInventoryFull(additional = 1) {
@@ -364,7 +549,15 @@ export class Player {
     if (Number.isNaN(additional)) {
       throw createProtocolError('RangeError', 'player.js:isInventoryFull', 'additional', additional);
     }
-    return (this.getInventoryCount() + additional) > MAX_INVENTORY_CAPACITY;
+    return this.inventoryInstance.isFull(additional);
+  }
+
+  equip(slot, itemId) {
+    return this.inventoryInstance.equip(slot, itemId);
+  }
+
+  unequip(slot) {
+    return this.inventoryInstance.unequip(slot);
   }
 
   getRequiredExpForLevel(level) {
@@ -611,11 +804,7 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:addItem', 'count', count);
     }
 
-    if (!(id in this.inventory)) {
-      this.inventory[id] = 0;
-    }
-    this.inventory[id] += count;
-    return this.inventory[id];
+    return this.inventoryInstance.addItem(id, count);
   }
 
   removeItem(id, count = 1) {
@@ -632,20 +821,15 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:removeItem', 'count', count);
     }
 
-    if (!(id in this.inventory)) {
-      return false;
-    }
-    if (this.inventory[id] < count) {
-      return false;
-    }
-
-    this.inventory[id] -= count;
-    if (id === 'lantern') {
-      if (this.inventory.lantern <= 0) {
-        this.isLanternLit = false;
+    const success = this.inventoryInstance.removeItem(id, count);
+    if (success) {
+      if (id === 'lantern') {
+        if (this.inventoryInstance.getItemCount('lantern') <= 0) {
+          this.isLanternLit = false;
+        }
       }
     }
-    return true;
+    return success;
   }
 
   updateSteps() {

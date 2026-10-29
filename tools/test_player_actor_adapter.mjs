@@ -13,7 +13,7 @@ function test(name, fn) {
   }
 }
 
-console.log('--- Player Actor Adapter Gate 2 Test Start ---');
+console.log('--- Player Actor & Inventory Adapter Gate 2 Test Start ---');
 
 test('1. 初期ステータスおよび Actor 内部整合性', () => {
   const p = new Player(3, 4, 64);
@@ -196,6 +196,144 @@ test('12. serialize() および deserialize() の双方向復元性', () => {
   assert.equal(p2.actor.maxHp, 30);
   assert.equal(p2.actor.hp, 22);
   assert.equal(p2.actor.hasStatusEffect('poison'), true);
+});
+
+// --- Step 3-5b: Inventory 委譲累積テスト ---
+
+test('13. Inventory 初期状態および Proxy 互換性', () => {
+  const p = new Player();
+  assert.ok(p.inventoryInstance);
+  assert.equal(p.inventory.herb, 1);
+  assert.equal(p.inventory.stick, 1);
+  assert.equal(p.inventory.cloth_armor, 1);
+  assert.equal(p.inventory.unknown_item, 0);
+  assert.equal('herb' in p.inventory, true);
+  assert.equal('unknown_item' in p.inventory, false);
+
+  // 装備の初期状態
+  assert.equal(p.equipment.weapon, 'stick');
+  assert.equal(p.equipment.armor, 'cloth_armor');
+  assert.equal(p.equipment.shield, null);
+
+  // バッグ占有数: 所持総数3 - 装備中2 = 1 (herbのみ)
+  assert.equal(p.getInventoryCount(), 1);
+  assert.equal(p.isInventoryFull(1), false);
+});
+
+test('14. addItem() 正常系・引数検証および Proxy 反映', () => {
+  const p = new Player();
+  const c1 = p.addItem('herb', 2);
+  assert.equal(c1, 3);
+  assert.equal(p.inventory.herb, 3);
+  assert.equal(p.inventoryInstance.getItemCount('herb'), 3);
+
+  const c2 = p.addItem('potion', 1);
+  assert.equal(c2, 1);
+  assert.equal(p.inventory.potion, 1);
+  assert.equal('potion' in p.inventory, true);
+
+  // バリデーション
+  assert.throws(() => p.addItem(123), /TypeError/);
+  assert.throws(() => p.addItem(''), /EmptyStringError/);
+  assert.throws(() => p.addItem('herb', '1'), /TypeError/);
+  assert.throws(() => p.addItem('herb', NaN), /RangeError/);
+});
+
+test('15. removeItem() 正常系・異常系・所持数0時装備自動解除・ランタン副作用', () => {
+  const p = new Player();
+  assert.equal(p.removeItem('herb', 1), true);
+  assert.equal(p.inventory.herb, 0);
+  assert.equal('herb' in p.inventory, false);
+
+  // 未所持削除
+  assert.equal(p.removeItem('herb', 1), false);
+
+  // 数量超過削除
+  assert.equal(p.removeItem('stick', 5), false);
+  assert.equal(p.inventory.stick, 1);
+
+  // 装備中アイテム（stick）を削除して個数0にした場合、装備が自動解除されること
+  assert.equal(p.equipment.weapon, 'stick');
+  assert.equal(p.removeItem('stick', 1), true);
+  assert.equal(p.inventory.stick, 0);
+  assert.equal(p.equipment.weapon, null);
+
+  // ランタンの灯火連動
+  p.addItem('lantern', 1);
+  p.isLanternLit = true;
+  assert.equal(p.isLanternLit, true);
+  p.removeItem('lantern', 1);
+  assert.equal(p.isLanternLit, false);
+});
+
+test('16. getInventoryCount() および isInventoryFull() の容量境界判定', () => {
+  const p = new Player();
+  // 初期: herb(1), stick(1, 装備中), cloth_armor(1, 装備中) -> bagCount = 1
+  assert.equal(p.getInventoryCount(), 1);
+
+  // 上限12個まで追加（残り11個空き）
+  p.addItem('herb', 10); // herb合計11個 -> bagCount = 11
+  assert.equal(p.getInventoryCount(), 11);
+  assert.equal(p.isInventoryFull(1), false);
+  assert.equal(p.isInventoryFull(2), true);
+
+  p.addItem('herb', 1); // bagCount = 12 (満杯)
+  assert.equal(p.getInventoryCount(), 12);
+  assert.equal(p.isInventoryFull(1), true);
+
+  // バリデーション
+  assert.throws(() => p.isInventoryFull('1'), /TypeError/);
+  assert.throws(() => p.isInventoryFull(NaN), /RangeError/);
+});
+
+test('17. equip() / unequip() および equipment プロパティ直接アクセス・連動', () => {
+  const p = new Player();
+  p.addItem('bronze_sword', 1);
+  p.addItem('leather_shield', 1);
+
+  // equip メソッド経由（成功時 true を返却）
+  assert.equal(p.equip('weapon', 'bronze_sword'), true);
+  assert.equal(p.equipment.weapon, 'bronze_sword');
+  assert.equal(p.inventoryInstance.getEquipment('weapon'), 'bronze_sword');
+
+  // unequip メソッド経由（解除されたアイテムID 'bronze_sword' を返却）
+  assert.equal(p.unequip('weapon'), 'bronze_sword');
+  assert.equal(p.equipment.weapon, null);
+
+  // 未装備スロットの unequip（null を返却）
+  assert.equal(p.unequip('shield'), null);
+
+  // equipment Proxy 経由の直接代入
+  p.equipment.shield = 'leather_shield';
+  assert.equal(p.equipment.shield, 'leather_shield');
+  assert.equal(p.inventoryInstance.getEquipment('shield'), 'leather_shield');
+
+  p.equipment.shield = null;
+  assert.equal(p.equipment.shield, null);
+
+  // 未所持アイテムの装備試行（Proxy経由代入時は自動追加されて装備）
+  p.equipment.weapon = 'iron_blade';
+  assert.equal(p.equipment.weapon, 'iron_blade');
+  assert.equal(p.inventory.iron_blade, 1);
+});
+
+test('18. serialize() / deserialize() によるインベントリ・装備完全復帰', () => {
+  const p = new Player();
+  p.addItem('magic_potion', 3);
+  p.addItem('iron_shield', 1);
+  p.equip('shield', 'iron_shield');
+
+  const serialized = p.serialize();
+  assert.equal(serialized.inventory.magic_potion, 3);
+  assert.equal(serialized.equipment.shield, 'iron_shield');
+
+  const p2 = new Player();
+  p2.deserialize(serialized);
+
+  assert.equal(p2.inventory.magic_potion, 3);
+  assert.equal(p2.equipment.shield, 'iron_shield');
+  assert.equal(p2.inventoryInstance.getItemCount('magic_potion'), 3);
+  assert.equal(p2.inventoryInstance.getEquipment('shield'), 'iron_shield');
 });
 
 console.log(`--- All ${testsPassed} Tests Passed Successfully ---`);
