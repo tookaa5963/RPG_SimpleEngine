@@ -86,10 +86,10 @@
 - [202610300145] Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲
   - 規模: player.js の hp, mp, maxHp, maxMp, isPoisoned および関連メソッドを Actor へ委譲。getter/setter による後方互換性維持
   - 検証: Gate 1 ＋ Gate 2（全12件単体テスト）＋ Gate 3（実機での戦闘被弾・回復・全滅動作確認）通過
- 
-- Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲
-  - 規模: addItem, removeItem, getInventoryCount, isInventoryFull, equipment を Inventory インスタンスへ委譲
-  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（アイテム入手・消費・装備変更の実機確認）
+- [202610300326] Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲
+  - 規模: addItem, removeItem, getInventoryCount, isInventoryFull, equip, unequip, equipment を Inventory インスタンスへ委譲。Proxy による透過的同期と後方互換性担保
+  - 検証: Gate 1 ＋ Gate 2（全18件単体テスト累積）＋ Gate 3（実機でのアイテム消費・装備着脱確認）通過
+
 - Step 3-5c: player.js の経験値・成長・ゴールド系の委譲
   - 規模: addExp, addGold, useGold の委譲とレベルアップ時の Actor ステータス同期
   - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（戦闘勝利後の経験値・ゴールド獲得・レベルアップ確認）
@@ -130,44 +130,17 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: aeb29c2 (Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲)
+完了コミット: 03a2525 (Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲)
 完了内容:
-- Step 3-5b 探査セッション完了: Inventory.js 公開IF、player.js 内部実装、外部結合度（直接参照箇所）の静的特定完了
-- 委譲方針および Proxy/Adapter パターンによる後方互換性設計合意済み
+- player.js のインベントリおよび装備管理ロジックを Core層 Inventory インスタンスへ完全委譲
+- Proxy パターンによる既存プロパティ（player.inventory, player.equipment）の透過的同期および後方互換性担保
+- Gate 1（構文・境界検証）、Gate 2（単体テスト全18件累積実行 Exit Code 0）、Gate 3（実機動作検証）全通過確認
 
 次タスク:
-- Phase 3 Step 3-5b 実装セッション: player.js のインベントリ・装備系の Inventory 委譲
-  - 対象メソッド: addItem, removeItem, getInventoryCount, isInventoryFull, equipment
-  - 対象プロパティ: inventory, equipment（Proxy による透過的同期と後方互換性担保）
+- Phase 3 Step 3-5c: player.js の経験値・成長・ゴールド系の委譲
+  - 対象メソッド: addExp, addGold, useGold, applyExpDeathPenalty, getRequiredExpForLevel
+  - 目的: 経験値・ゴールドの管理およびレベルアップ時のステータス成長処理と Actor の同期構造整理
   - 運用必須要件:
-    1. 環境保全確認（git status クリーン確認、ステージング作成）
-    2. 反映時の git diff -U1 js/player.js による差分局所性の検証
-    3. tools/test_player_actor_adapter.mjs へのテスト累積追加（全テスト一括パス確認）
-
-【探査結果: 委譲対象最小コードブロック】
-```javascript
-// js/player.js: インベントリ計算・操作ブロック
-getInventoryCount() {
-  let total = 0;
-  for (const [id, count] of Object.entries(this.inventory)) {
-    if (typeof count === 'number' && count > 0 && id in ITEM_DB) total += count;
-  }
-  if (this.equipment.weapon) total--;
-  if (this.equipment.armor) total--;
-  if (this.equipment.shield) total--;
-  return Math.max(0, total);
-}
-isInventoryFull(additional = 1) {
-  return (this.getInventoryCount() + additional) > MAX_INVENTORY_CAPACITY;
-}
-addItem(id, count = 1) {
-  if (!(id in this.inventory)) this.inventory[id] = 0;
-  this.inventory[id] += count;
-  return this.inventory[id];
-}
-removeItem(id, count = 1) {
-  if (!(id in this.inventory) || this.inventory[id] < count) return false;
-  this.inventory[id] -= count;
-  if (id === 'lantern' && this.inventory.lantern <= 0) this.isLanternLit = false;
-  return true;
-}
+    1. 事前探査セッション（該当コードブロックおよび外部参照の抽出）
+    2. ステージング隔離環境による作業と累積テスト追加
+    3. 反映時の差分局所性検証（git diff -U1 js/player.js）
