@@ -1,3 +1,7 @@
+import { HealHpEffect } from './HealHpEffect.js';
+import { HealMpEffect } from './HealMpEffect.js';
+import { CureStatusEffect } from './CureStatusEffect.js';
+
 /**
  * 効果解決ディスパッチャ
  * 各種効果計算ストラテジーを管理し、データ定義に基づいて計算処理を振り分ける純粋コアモジュール。
@@ -5,11 +9,21 @@
 export class EffectResolver {
     constructor() {
         this.strategies = new Map();
+        this.registerDefaultStrategies();
+    }
+
+    /**
+     * 標準効果計算ストラテジーを初期登録する
+     */
+    registerDefaultStrategies() {
+        this.registerStrategy('heal_hp', new HealHpEffect());
+        this.registerStrategy('heal_mp', new HealMpEffect());
+        this.registerStrategy('cure_status', new CureStatusEffect());
     }
 
     /**
      * 効果計算ストラテジーを登録する
-     * @param {string} type - 効果識別子（例: 'HEAL_HP', 'HEAL_MP'）
+     * @param {string} type - 効果識別子（例: 'heal_hp', 'heal_mp', 'cure_status'）
      * @param {Object} strategy - calculate メソッドを実装したストラテジーインスタンス
      */
     registerStrategy(type, strategy) {
