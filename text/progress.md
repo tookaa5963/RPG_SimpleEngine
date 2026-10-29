@@ -163,13 +163,3 @@
   - 規模: 約 150 行（ステータス保持、applyDamage, applyHeal の境界防護・イベント通知）
   - 検証: Gate 1 ＋ Gate 2 通過
 
-  ### Phase 3 Step 3-2（`Actor.js` の新規作成）の再開
-
-改定されたプロトコルに基づき、最初のステップである**「本番環境の事前静的確認」**から着手します。
-
-以下の PowerShell コマンドを実行し、配置予定先ディレクトリの物理状態、および既存ファイルの有無を確認した結果を共有してください。
-
-```powershell
-# 本番配置予定ディレクトリ (js/engine/entities) の状態および既存ファイルを確認
-Test-Path "js/engine/entities"
-if (Test-Path "js/engine/entities") { Get-ChildItem "js/engine/entities" }
