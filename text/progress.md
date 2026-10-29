@@ -106,9 +106,10 @@
 - [202610291720] Step 3-1: js/engine/state/GenericFlags.js, VariableStore.js の新規作成
   - 規模: 各 約 110〜160 行（ブール値ストア、汎用 Key-Value ストア）
   - 検証: Gate 1 ＋ Gate 2 通過
-- Step 3-2: js/engine/entities/Actor.js の新規作成
-  - 規模: 約 150 行（ステータス保持、applyDamage, applyHeal の境界防護・イベント通知）
+- [202610291956] Step 3-2: js/engine/entities/Actor.js の新規作成
+  - 規模: 約 360 行（ステータス保持、境界防護、状態遷移、イベント通知、toJSON/fromJSON）
   - 検証: Gate 1 ＋ Gate 2 通過
+  
 - Step 3-3: js/engine/state/Inventory.js の新規作成
   - 規模: 約 80 行（アイテムID・数量管理、装備枠の抽象管理）
   - 検証: Gate 1 ＋ Gate 2 通過
@@ -152,14 +153,14 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （8083a47）
+完了コミット: （e67c465）
 完了内容:
-- js/engine/state/GenericFlags.js および VariableStore.js を新規作成
-- Gate 1（静的構文・境界検証：対象 8 件）および Gate 2（単体機能テスト）通過
-- Core層におけるフラグ・変数のヘッドレス管理基盤を配備
+- js/engine/entities/Actor.js を新規作成
+- tools/test_actor.mjs（Windows ESM パス正規化対応）を配備
+- Gate 1（静的構文・境界検証：対象 9 件）および Gate 2（単体機能テスト：66件）通過
+- Core層における基底アクターモデル（HP/MP境界防護、状態異常管理、イベント通知）を配備
 
 次タスク:
-- Phase 3 Step 3-2: js/engine/entities/Actor.js の新規作成
-  - 規模: 約 150 行（ステータス保持、applyDamage, applyHeal の境界防護・イベント通知）
+- Phase 3 Step 3-3: js/engine/state/Inventory.js の新規作成
+  - 規模: 約 80 行（アイテムID・数量管理、装備枠の抽象管理）
   - 検証: Gate 1 ＋ Gate 2 通過
-
