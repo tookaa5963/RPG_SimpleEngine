@@ -112,10 +112,10 @@
 - [202610292020] Step 3-3: js/engine/state/Inventory.js の新規作成
   - 規模: 約 330 行（アイテムID・数量管理、装備スロット抽象管理、容量境界防護、イベント通知）
   - 検証: Gate 1 ＋ Gate 2（16件の単体テスト）通過  
+- [202610292115] Step 3-4: js/engine/data/DataRepository.js の新規作成
+  - 規模: 約 190 行（マスタデータのインメモリ保持・バリデーション・高速検索、完全ヘッドレス・Tier 3構文準拠）
+  - 検証: Gate 1 ＋ Gate 2（9件の単体テスト）通過
 
-- Step 3-4: js/engine/data/DataRepository.js の新規作成
-  - 規模: 約 80 行（JSON データのロード・検証・キャッシュ）
-  - 検証: Gate 1 ＋ Gate 2 通過
 - Step 3-5: player.js の内部委譲リファクタリング
   - 規模: player.js の内部プロパティを Actor, GenericFlags, Inventory へ委譲
   - 検証: Gate 3（ゲーム起動、移動、セーブ・ロードで既存挙動と一致することを確認）
@@ -153,14 +153,14 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （git log -1 --oneline で得られたハッシュを記載）
+完了コミット: （0ecf08c）
 完了内容:
-- js/engine/state/Inventory.js を新規作成（完全ヘッドレス、Tier 3構文準拠）
-- tools/test_inventory.mjs を配備
-- Gate 1（静的構文・境界検証：対象 10 件）および Gate 2（単体機能テスト：16件）通過
-- 所持品スタック管理、装備スロット管理、バッグ占有数計算（既存 getInventoryCount 互換）、シリアライズ機能を配備
+- js/engine/data/DataRepository.js を新規作成（完全ヘッドレス、Tier 3構文準拠）
+- tools/test_data_repository.mjs を配備
+- Gate 1（静的構文・境界検証：対象 11 件）および Gate 2（単体機能テスト：9件）通過
+- インメモリデータ保持、一括登録（registerAll）、存在確認、安全な取得インターフェースを配備
 
 次タスク:
-- Phase 3 Step 3-4: js/engine/data/DataRepository.js の新規作成
-  - 規模: 約 80 行（JSON データのロード・検証・キャッシュ）
-  - 検証: Gate 1 ＋ Gate 2 通過
+- Phase 3 Step 3-5: player.js の内部委譲リファクタリング
+  - 規模: player.js の内部プロパティを Actor, GenericFlags, Inventory, DataRepository へ委譲
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（ゲーム起動、移動、セーブ・ロードで既存挙動と一致することを確認）
