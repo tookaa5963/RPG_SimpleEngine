@@ -13,3 +13,4 @@
 [202610291956] Step 3-2: js/engine/entities/Actor.js の新規作成e67c4650fb8b863449f9f3551eef2812731f0743
 [202610292020] Step 3-3: js/engine/state/Inventory.js の新規作成/14fe435be2a24ccb0bb79902bf07594e3db0a78b
 [202610292115] Step 3-4: js/engine/data/DataRepository.js の新規作成/0ecf08cfeeed2b5f66807bab4ba2c97a21c62a50
+[202610300145] Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲/d3a2298b2f6af28c4a1164a0879b61b12206bf5a

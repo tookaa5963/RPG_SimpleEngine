@@ -17,6 +17,12 @@
    - 既存の呼び出し元（例: player.heal(30)）のシグネチャは維持し、内部実装のみを新コアへ委譲する。呼び出し元の全体書き換えは行わない。
 4. **コンテキスト局所化**
    - 1回の作業でプロンプトに読み込むファイルは「新規作成する対象ファイル 1 つ」と「接続先のインターフェース定義（数行）」のみに限定する。
+5. **スコープ外差分の静的検知義務:**
+     ステージングから本番反映後、コミット前に必ず以下のコマンドを実行し、意図しないファイル変更および対象外ロジックの改変・欠落が混入していないことを確認する。
+     1. `git diff --name-only`: 変更対象以外のファイルが含まれていないことを確認。
+     2. `git diff -U1 js/`: 当該ステップの対象メソッド・プロパティ以外に差分が存在しないことを確認。
+   - **Gate 2 単体テストの累積実行:**
+     新規テストを追加する際、過去ステップのテストケースを削除・分離せず累積させ、既存の全検証項目が Exit Code 0 でパスすることを確認する（先祖返りの即時検知）。
 
 ## 2. フェーズ別詳細タスクブレークダウン
 
@@ -43,63 +49,25 @@
 ## 4. フェーズ別チェックリスト
 
 ### Phase 0: 環境準備
-- [202610271800] Gate 1 静的検証ランナー (tools/verify_gate1.mjs) の配備
-- [202610271800] .gitignore による ai_staging/ の隔離
-- [202610271800] 初期動作検証（Gate 1 の正常系・異常系テスト実行）
+- [202610271800] Gate 1 静的検証ランナー (tools/verify_gate1.mjs) の配備・初期検証完了
+- [202610271800] .gitignore による ai_staging/ の隔離完了
 
 ### Phase 1: メッセージング基盤配備 (Core/core)
-目的: Core が画面・音声・DOMを知らずに状態変化を通知できる「共通受け皿」を配置する。
-- [202610281900]Step 1-1: js/engine/core/EventTypes.js の新規作成
-  - 規模: 約 30 行（システム全体で利用するイベント名定数定義）
-  - 検証: Gate 1（構文・境界検証）通過
-- [202610281900] Step 1-2: js/engine/core/EngineEventBus.js の新規作成
-  - 規模: 約 60 行（外部依存ゼロの純粋 Pub/Sub ハブ: on, off, emit, clear）
-  - 検証: Gate 1 通過 ＋ Gate 2（単体テストスクリプトによる動作検証）
-- [202610282045] Step 1-3: main.js へのグローバル/コンテキスト配線
-  - 規模: 既存 main.js にインスタンス生成と保持（約 5 行追加）
-  - 検証: Gate 3（ブラウザ実機起動・既存動作無影響確認）
-
-※Phase 2（効果解決）と Phase 3（Actor）の依存関係の逆転リスク   の課題あり
-再検討の上でPhase 2  に移行すること
+- [202610281900] Step 1-1: js/engine/core/EventTypes.js 新規作成（イベント定数定義 / Gate 1通過）
+- [202610281900] Step 1-2: js/engine/core/EngineEventBus.js 新規作成（Pub/Subハブ / Gate 1, 2通過）
+- [202610282045] Step 1-3: main.js へのグローバル/コンテキスト配線（Gate 3通過）
 
 ### Phase 2: 効果解決系（EffectSystem）垂直スライス抽出 (Core/effects)
-【Phase 2 固有設計制約】
-1. 副作用（Mutation）の完全禁止:
-   - EffectResolver および各 Effect クラスは、引数で渡された Target（Player や Monster）のプロパティを直接変更してはならない（`target.hp += x` 等の禁止）。
-   - 計算結果（変動量、成否、付随情報）を含むプレーンな Result オブジェクトのみを呼び出し元へ返却すること。
-2. イベント発火の分離:
-   - Effect 内部で `EngineEventBus.emit()` を直接呼ばない。状態の変更およびイベントの発火は、Result を受け取った呼び出し側（menu.js, battleActions.js、将来の Actor）が担う
-
--[202610282231] Step 2-1: データスキーマ拡張（data/items/i_*.json, data/spells/s_*.json）
-  - 規模: 回復アイテム3件、回復呪文3件への effect 定義付与（集約JSONの二重定義は排除）
-  - 検証: Gate 1（JSON構文・構造検証）通過
--[202610290130] Step 2-2: js/engine/effects/EffectResolver.js の新規作成
-  - 規模: 約 80 行（strategy 名を解釈し対応クラスへ委譲するディスパッチャ）
-  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3 通過
-- [202610290215] Step 2-3: js/engine/effects/HealHpEffect.js の新規作成
-  - 規模: 約 170 行（HP回復計算ストラテジー、完全ヘッドレス・副作用ゼロ・Tier 3構文準拠）
-  - 検証: Gate 1 ＋ Gate 2 通過
-- [202610290245] Step 2-4a: js/engine/effects/HealMpEffect.js の新規作成
-  - 規模: 約 160 行（MP回復計算ストラテジー、完全ヘッドレス・副作用ゼロ・Tier 3構文準拠）
-  - 検証: Gate 1 ＋ Gate 2 通過
-- [202610290333] Step 2-4b: js/engine/effects/CureStatusEffect.js の新規作成
-  - 規模: 約 120 行（状態異常解除ストラテジー、完全ヘッドレス・副作用ゼロ・Tier 3構文準拠）
-  - 検証: Gate 1 ＋ Gate 2 通過
-- [202610291120] Step 2-4c: データスキーマ拡張（MP回復系アイテム: i_magic_water.json, i_sage_water.json）
-  - 規模: MP回復アイテム2件への heal_mp effect 定義付与
-  - 検証: Gate 1（JSON構文・境界検証）通過
-- [202610291133] Step 2-4d: データスキーマ拡張（状態異常解除系: i_antidote.json, s_kiari.json）
-  - 規模: アイテム1件、呪文1件への cure_status effect 定義付与
-  - 検証: Gate 1（JSON構文・境界検証）通過
-- [202610291225] Step 2-4e: EffectResolver への全ストラテジー登録配線
-  - 規模: EffectResolver または初期化箇所にて HealMpEffect / CureStatusEffect を登録
-  - 検証: Gate 1 ＋ Gate 2（全ストラテジーのディスパッチ疎通テスト）通過
-- [202610291410] Step 2-5: menu.js（フィールド使用）の委譲切り替え
-  - 規模: menu.js 内の重複分岐を削除し、EffectResolver.resolve() へ置換
-  - 検証: Gate 1 ＋ Gate 3（実機フィールド上で回復アイテム・呪文使用確認）通過
-- [202610291450] Step 2-6: battleActions.js（戦闘使用）の委譲切り替え
-  - 規模: battleActions.js 内の重複回復ロジックを削除し、EffectResolver.resolve() へ置換
-  - 検証: Gate 1 ＋ Gate 3（実機戦闘で回復アイテム・呪文使用確認）通過
+- [202610282231] Step 2-1: データスキーマ拡張（回復アイテム3件・呪文3件へのeffect定義 / Gate 1通過）
+- [202610290130] Step 2-2: js/engine/effects/EffectResolver.js 新規作成（ディスパッチャ / Gate 1, 2, 3通過）
+- [202610290215] Step 2-3: js/engine/effects/HealHpEffect.js 新規作成（HP回復計算ストラテジー / Gate 1, 2通過）
+- [202610290245] Step 2-4a: js/engine/effects/HealMpEffect.js 新規作成（MP回復計算ストラテジー / Gate 1, 2通過）
+- [202610290333] Step 2-4b: js/engine/effects/CureStatusEffect.js 新規作成（状態異常解除ストラテジー / Gate 1, 2通過）
+- [202610291120] Step 2-4c: データスキーマ拡張（MP回復アイテム2件 / Gate 1通過）
+- [202610291133] Step 2-4d: データスキーマ拡張（状態異常解除アイテム・呪文各1件 / Gate 1通過）
+- [202610291225] Step 2-4e: EffectResolver への全ストラテジー登録配線（Gate 1, 2通過）
+- [202610291410] Step 2-5: menu.js のフィールド使用委譲切り替え（Gate 1, 3通過）
+- [202610291450] Step 2-6: battleActions.js の戦闘使用委譲切り替え（Gate 1, 3通過）
 
 ### Phase 3: 汎用ステート・アクター・データ層のCore化 (Core/entities, state, data)
 目的: アクターモデルの確立、フラグ・変数のヘッドレス管理、DataRepository によるデータ参照の統一。
@@ -162,17 +130,22 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （aeb29c2）
+完了コミット: aeb29c2 (Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲)
 完了内容:
-- js/player.js に Actor インスタンスを配備し、基本ステータス（hp, mp, maxHp, maxMp, isPoisoned）および関連メソッド（damage, heal, healMp, consumeMp, fullRecovery, curePoison）を Core層へ委譲
+- js/player.js に Actor インスタンスを配備し、基本ステータス（hp, mp, maxHp, maxMp, isPoisoned）および関連メソッドを Core層へ委譲
 - tools/test_player_actor_adapter.mjs を配備（全12項目の単体機能テスト合格）
-- Gate 1（静的構文・境界検証）、Gate 2（単体機能テスト）、Gate 3（実機動作検証）全件通過
+- Gate 1, Gate 2, Gate 3 全件通過、クリーン状態を確認済み
 
 次タスク:
 - Phase 3 Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲
   - 対象メソッド: addItem, removeItem, getInventoryCount, isInventoryFull, equipment
   - 対象プロパティ: inventory, equipment（getter/setter または Inventory 連携）
   - 前提制約: 外部コード（menu.js, battleActions.js, shop.js 等）の後方互換性維持
-  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（アイテム入手・消費・装備変更の実機確認）
+  - 運用必須要件:
+    1. 事前探査（Inventory.js の公開IF、外部からの .inventory/.equipment 参照箇所の静的特定）
+    2. 反映時の `git diff -U1 js/player.js` による差分局所性の検証
+    3. tools/test_player_actor_adapter.mjs へのテスト累積追加（全テスト一括パス確認）
 
-  今回は探査セッションとし次セッションでの移譲がスムーズに進めるようにしてください。
+進捗台帳（progress.md）を提示します。
+プロトコル第6条4に基づき、Phase 3 Step 3-5b（インベントリ・装備系の Inventory 委譲）の探査フェーズを開始してください。
+800行規模コードの運用要件（git diff -U1 によるスコープ外改変検知、Gate 2 テストの累積検証）を厳格に適用してください。
