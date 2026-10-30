@@ -89,10 +89,10 @@
 - [202610300326] Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲
   - 規模: addItem, removeItem, getInventoryCount, isInventoryFull, equip, unequip, equipment を Inventory インスタンスへ委譲。Proxy による透過的同期と後方互換性担保
   - 検証: Gate 1 ＋ Gate 2（全18件単体テスト累積）＋ Gate 3（実機でのアイテム消費・装備着脱確認）通過
+- [202610302053] Step 3-5c: player.js の経験値・成長・ゴールド系の委譲
+  - 規模: addExp, addGold, useGold, applyExpDeathPenalty, getRequiredExpForLevel を Actor へ委譲。level, exp, gold の getter/setter 配備および成長時メッセージ生成（logFormatter）の維持
+  - 検証: Gate 1 ＋ Gate 2（全23件単体テスト累積 Exit Code 0）＋ Gate 3（実機戦闘勝利後の経験値・ゴールド獲得・レベルアップ確認）通過
 
-- Step 3-5c: player.js の経験値・成長・ゴールド系の委譲
-  - 規模: addExp, addGold, useGold の委譲とレベルアップ時の Actor ステータス同期
-  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（戦闘勝利後の経験値・ゴールド獲得・レベルアップ確認）
 - Step 3-5d: player.js のシリアライズ・デシリアライズ統合
   - 規模: serialize, deserialize を各 Core（Actor, Inventory, GenericFlags）の toJSON/fromJSON と統合
   - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（セーブデータの保存・復元・境界互換性検証）
@@ -130,17 +130,13 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: 03a2525 (Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲)
+完了コミット: （e465ca1cc7e28e6e42d9c5898a20ae775ff795d3）
 完了内容:
-- player.js のインベントリおよび装備管理ロジックを Core層 Inventory インスタンスへ完全委譲
-- Proxy パターンによる既存プロパティ（player.inventory, player.equipment）の透過的同期および後方互換性担保
-- Gate 1（構文・境界検証）、Gate 2（単体テスト全18件累積実行 Exit Code 0）、Gate 3（実機動作検証）全通過確認
+- player.js の経験値・レベル・成長計算・ゴールド管理ロジックを Core層 Actor インスタンスへ完全委譲
+- level, exp, gold のアクセサ（getter/setter）配備による後方互換性および既存UI・セーブ同期の担保
+- Gate 1（構文・境界検証）、Gate 2（単体テスト全23件累積実行 Exit Code 0）、Gate 3（実機動作検証）全通過確認
 
 次タスク:
-- Phase 3 Step 3-5c: player.js の経験値・成長・ゴールド系の委譲
-  - 対象メソッド: addExp, addGold, useGold, applyExpDeathPenalty, getRequiredExpForLevel
-  - 目的: 経験値・ゴールドの管理およびレベルアップ時のステータス成長処理と Actor の同期構造整理
-  - 運用必須要件:
-    1. 事前探査セッション（該当コードブロックおよび外部参照の抽出）
-    2. ステージング隔離環境による作業と累積テスト追加
-    3. 反映時の差分局所性検証（git diff -U1 js/player.js）
+- Phase 3 Step 3-5d: player.js のシリアライズ・デシリアライズ統合
+  - 規模: serialize, deserialize を各 Core（Actor, Inventory, GenericFlags）の toJSON/fromJSON と統合
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（セーブデータの保存・復元・境界互換性検証）
