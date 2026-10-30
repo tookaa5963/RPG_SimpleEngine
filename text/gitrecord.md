@@ -16,3 +16,4 @@
 [202610300145] Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲/d3a2298b2f6af28c4a1164a0879b61b12206bf5a
 [202610300326] Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲/03a252591fed43c17084133eae6763e04a5cc051
 [202610302053] Step 3-5c: player.js の経験値・成長・ゴールド系の委譲/e465ca1cc7e28e6e42d9c5898a20ae775ff795d3
+[202610310230] Step 3-5d: player.js のステータス・インベントリ系シリアライズ統合/e7ca30a0b57887b3fd7093b5e64b7d79854a5002
