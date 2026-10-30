@@ -15,3 +15,4 @@
 [202610292115] Step 3-4: js/engine/data/DataRepository.js の新規作成/0ecf08cfeeed2b5f66807bab4ba2c97a21c62a50
 [202610300145] Step 3-5a: player.js の基本ステータス・回復/ダメージ系の Actor 委譲/d3a2298b2f6af28c4a1164a0879b61b12206bf5a
 [202610300326] Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲/03a252591fed43c17084133eae6763e04a5cc051
+[202610302053] Step 3-5c: player.js の経験値・成長・ゴールド系の委譲/e465ca1cc7e28e6e42d9c5898a20ae775ff795d3
