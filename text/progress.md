@@ -93,9 +93,12 @@
   - 規模: addExp, addGold, useGold, applyExpDeathPenalty, getRequiredExpForLevel を Actor へ委譲。level, exp, gold の getter/setter 配備および成長時メッセージ生成（logFormatter）の維持
   - 検証: Gate 1 ＋ Gate 2（全23件単体テスト累積 Exit Code 0）＋ Gate 3（実機戦闘勝利後の経験値・ゴールド獲得・レベルアップ確認）通過
 
-- Step 3-5d: player.js のシリアライズ・デシリアライズ統合
-  - 規模: serialize, deserialize を各 Core（Actor, Inventory, GenericFlags）の toJSON/fromJSON と統合
-  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（セーブデータの保存・復元・境界互換性検証）
+- Step 3-5d: player.js のステータス・インベントリ系シリアライズ統合
+  - 規模: serialize, deserialize を Actor および Inventory の toJSON/fromJSON と統合。既存セーブ構造との完全互換性を維持
+  - 検証: Gate 1 ＋ Gate 2（累積単体テスト）＋ Gate 3（実機セーブ・ロード動作検証）
+- Step 3-5e: player.js のシナリオフラグ系の GenericFlags 委譲
+  - 規模: GenericFlags の導入、Proxy による既存 player.flags 参照・代入の透過委譲、およびシリアライズ統合
+  - 検証: Gate 1 ＋ Gate 2（累積単体テスト）＋ Gate 3（実機イベント進行・フラグ永続化検証）
 
 ### Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)
 目的: ロジック層から sound.js / ui.js の直接インポートを物理削除し、イベント駆動へ完全置換。
@@ -137,6 +140,127 @@
 - Gate 1（構文・境界検証）、Gate 2（単体テスト全23件累積実行 Exit Code 0）、Gate 3（実機動作検証）全通過確認
 
 次タスク:
-- Phase 3 Step 3-5d: player.js のシリアライズ・デシリアライズ統合
-  - 規模: serialize, deserialize を各 Core（Actor, Inventory, GenericFlags）の toJSON/fromJSON と統合
-  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（セーブデータの保存・復元・境界互換性検証）
+- Phase 3 Step 3-5d: player.js のステータス・インベントリ系シリアライズ統合
+  - 規模: serialize, deserialize を Actor および Inventory の toJSON/fromJSON と統合。既存セーブ構造との完全互換性を維持
+  - 検証: Gate 1 ＋ Gate 2（累積単体テスト）＋ Gate 3（実機セーブ・ロード動作検証）
+
+## Step 3-5d 実装セッション用 引き継ぎデータ
+
+1. 最小コードブロック（対象の現行実装：Before）
+JavaScript
+// js/player.js (serialize / deserialize)
+serialize() {
+  let returnPointCopy = null;
+  if (this.returnPoint !== null && typeof this.returnPoint === 'object') {
+    returnPointCopy = { ...this.returnPoint };
+  }
+  return {
+    level: this.level,
+    hp: this.hp,
+    maxHp: this.maxHp,
+    mp: this.mp,
+    maxMp: this.maxMp,
+    baseAtk: this.baseAtk,
+    baseDef: this.baseDef,
+    spd: this.spd,
+    exp: this.exp,
+    gold: this.gold,
+    spells: [...this.spells],
+    inventory: { ...this.inventory },
+    equipment: { ...this.equipment },
+    remiraSteps: this.remiraSteps,
+    torchSteps: this.torchSteps,
+    holyWaterSteps: this.holyWaterSteps,
+    isLanternLit: this.isLanternLit,
+    isPoisoned: this.isPoisoned,
+    returnPoint: returnPointCopy,
+    flags: { ...this.flags }
+  };
+}
+
+deserialize(data) {
+  if (data === null || typeof data !== 'object') return;
+  let ps = (data.playerStats && typeof data.playerStats === 'object') ? data.playerStats : data;
+
+  const numberProps = [
+    'level', 'maxHp', 'maxMp', 'hp', 'mp',
+    'baseAtk', 'baseDef', 'spd', 'exp', 'gold',
+    'remiraSteps', 'torchSteps', 'holyWaterSteps'
+  ];
+  numberProps.forEach(prop => {
+    if (prop in ps && typeof ps[prop] === 'number' && !Number.isNaN(ps[prop])) {
+      this[prop] = ps[prop];
+    }
+  });
+
+  if (typeof ps.isLanternLit === 'boolean') this.isLanternLit = ps.isLanternLit;
+  if (typeof ps.isPoisoned === 'boolean') this.isPoisoned = ps.isPoisoned;
+  this.spells = Array.isArray(ps.spells) ? [...ps.spells] : [];
+  if (ps.inventory && typeof ps.inventory === 'object' && !Array.isArray(ps.inventory)) {
+    this.inventory = { ...ps.inventory };
+  }
+  let defaultEquipment = { weapon: null, armor: null, shield: null };
+  if (ps.equipment && typeof ps.equipment === 'object' && !Array.isArray(ps.equipment)) {
+    defaultEquipment = { ...ps.equipment };
+  }
+  if (defaultEquipment.shield === undefined) defaultEquipment.shield = null;
+  this.equipment = defaultEquipment;
+
+  let defaultReturnPoint = { mapId: 'lighthousekeeper_cottage', gridX: 3, gridY: 4, direction: 'up' };
+  if (ps.returnPoint && typeof ps.returnPoint === 'object' && !Array.isArray(ps.returnPoint)) {
+    defaultReturnPoint = { ...ps.returnPoint };
+  }
+  this.returnPoint = defaultReturnPoint;
+
+  const defaultFlags = {
+    talkedToSister: false, receivedSisterHerb: false, talkedToScholar: false,
+    reportedMonumentToScholar: false, heardPassRequirement: false, kidnappingEventStarted: false,
+    rescuedGirl: false, hasPass: false, heardOfTizona: false, hasTizona: false,
+    defeatedDragon: false, hasLeftInitialCottage: false, elfQuestStarted: false,
+    returnedLoversRing: false, receivedWaterShield: false, heardOfDwarf: false
+  };
+  if (ps.flags && typeof ps.flags === 'object' && !Array.isArray(ps.flags)) {
+    Object.assign(defaultFlags, ps.flags);
+  }
+  this.flags = defaultFlags;
+
+  Object.values(SPELL_DB).forEach(spell => {
+    if (typeof spell.learnLevel === 'number' && this.level >= spell.learnLevel) {
+      if (!this.spells.includes(spell.id)) this.spells.push(spell.id);
+    }
+  });
+}
+2. アクセスしている外部変数・内部プロパティ一覧
+Core管理プロパティ: this.actor（level, exp, gold, hp, maxHp, mp, maxMp, statusEffects/isPoisoned）、this.inventoryInstance（items, equipment）
+
+Player独自管理プロパティ: baseAtk, baseDef, spd, spells, remiraSteps, torchSteps, holyWaterSteps, isLanternLit, returnPoint, flags
+
+外部依存: SPELL_DB（習得魔法の再計算）
+
+呼び出し元契約: js/save.js 139行目（playerStats: player.serialize()）および 210行目（player.deserialize(saveData)）
+
+3. 処理内容の平易な解説（3行以内）
+serialize はプレイヤーの全パラメータを1つのプレーンオブジェクトにまとめてセーブデータ用に出力する。
+
+deserialize はセーブデータから各数値を検証・復元し、初期値の補完やレベルに応じた習得魔法の再計算を行う。
+
+今回はステータスとインベントリの保存・復元処理を、Core層の toJSON/fromJSON 正規インターフェースに統合する。
+
+4. 接続先 Core インターフェース仕様
+Actor:
+
+this.actor.toJSON(): { id, name, maxHp, hp, maxMp, mp, attack, defense, agility, level, exp, gold, isAlive, statusEffects } を返却。
+
+Inventory:
+
+this.inventoryInstance.toJSON(): { maxCapacity, items, equipment } を返却。
+
+this.inventoryInstance.fromJSON(data): { maxCapacity, items, equipment } を受け取りインベントリ・装備を完全復元。
+
+## Step 3-5e 用 探査所見メモ（後続ステップ用）
+
+現状: this.flags はプレーンオブジェクトとして保持されており、church.js、fieldManager.js、main.js、menu.js から player.flags.xxx = true / player.flags.xxx の形式で直接読み書きされている。
+
+移行先: GenericFlags.js（get(key), set(key, val), getAll(), load(obj) を備える）。
+
+接続方針: Step 3-5e にて createFlagsProxy(this.flagsInstance) を導入し、既存の直接参照を1行も改変することなく Core へ透過委譲する。
