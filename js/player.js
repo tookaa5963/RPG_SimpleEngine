@@ -190,12 +190,9 @@ export class Player {
     this.turnDelay = 0;
     this.bumpCoolDown = 0;
 
-    this.level = 1;
     this.baseAtk = 6;
     this.baseDef = 5;
     this.spd = 5;
-    this.exp = 0;
-    this.gold = 0;
 
     let bus = null;
     if (eventBus !== undefined) {
@@ -215,6 +212,9 @@ export class Player {
       attack: 6,
       defense: 5,
       agility: 5,
+      level: 1,
+      exp: 0,
+      gold: 0,
       statusEffects: []
     }, this.eventBus);
 
@@ -371,6 +371,9 @@ export class Player {
       attack: this.baseAtk,
       defense: this.baseDef,
       agility: this.spd,
+      level: this.actor.level,
+      exp: this.actor.exp,
+      gold: this.actor.gold,
       statusEffects: rawStatus
     }, this.eventBus);
   }
@@ -482,6 +485,57 @@ export class Player {
     this._updateActorStats({ maxMp: newMaxMp });
   }
 
+  get level() {
+    return this.actor.level;
+  }
+
+  set level(value) {
+    if (typeof value !== 'number') {
+      return;
+    }
+    if (Number.isNaN(value)) {
+      return;
+    }
+    if (value < 1) {
+      return;
+    }
+    this.actor.setLevel(Math.floor(value));
+  }
+
+  get exp() {
+    return this.actor.exp;
+  }
+
+  set exp(value) {
+    if (typeof value !== 'number') {
+      return;
+    }
+    if (Number.isNaN(value)) {
+      return;
+    }
+    if (value < 0) {
+      return;
+    }
+    this.actor.setExp(Math.floor(value));
+  }
+
+  get gold() {
+    return this.actor.gold;
+  }
+
+  set gold(value) {
+    if (typeof value !== 'number') {
+      return;
+    }
+    if (Number.isNaN(value)) {
+      return;
+    }
+    if (value < 0) {
+      return;
+    }
+    this.actor.setGold(Math.floor(value));
+  }
+
   get isPoisoned() {
     return this.actor.hasStatusEffect('poison');
   }
@@ -567,21 +621,7 @@ export class Player {
     if (Number.isNaN(level)) {
       throw createProtocolError('RangeError', 'player.js:getRequiredExpForLevel', 'level', level);
     }
-    if (level <= 1) {
-      return 0;
-    }
-
-    if (level <= 9) {
-      return Math.floor(10 * Math.pow(2, level - 2));
-    }
-
-    let total = 1280;
-    let diff = 1200;
-    for (let l = 10; l <= level; l++) {
-      total += diff;
-      diff += 250;
-    }
-    return total;
+    return this.actor.getRequiredExpForLevel(level);
   }
 
   addExp(amount) {
@@ -592,44 +632,36 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:addExp', 'amount', amount);
     }
 
-    this.exp += Math.max(0, amount);
-    let leveledUp = false;
+    const oldLevel = this.actor.level;
     const oldMaxHp = this.maxHp;
     const oldMaxMp = this.maxMp;
     const oldAtk = this.baseAtk;
     const oldDef = this.baseDef;
     const oldSpd = this.spd;
-    const newlyLearnedSpells = [];
 
-    while (this.exp >= this.getRequiredExpForLevel(this.level + 1)) {
-      this.level++;
-      leveledUp = true;
-      this.maxHp += Math.floor(Math.random() * 4) + 4;
-      this.maxMp += Math.floor(Math.random() * 3) + 2;
-      this.baseAtk += Math.floor(Math.random() * 2) + 2;
-      this.baseDef += Math.floor(Math.random() * 2) + 1;
-      this.spd += Math.floor(Math.random() * 2) + 1;
-
-      Object.values(SPELL_DB).forEach(spell => {
-        if (typeof spell.learnLevel === 'number') {
-          if (spell.learnLevel === this.level) {
-            if (!this.spells.includes(spell.id)) {
-              this.spells.push(spell.id);
-              newlyLearnedSpells.push(spell.name);
-            }
-          }
-        }
-      });
-    }
+    const growthResult = this.actor.addExp(amount);
 
     const messages = [];
-    if (leveledUp) {
-      // レベルアップ時にHP・MPを最大値まで完全回復し、毒も治癒
-      this.hp = this.maxHp;
-      this.mp = this.maxMp;
-      this.curePoison();
+    if (growthResult.leveledUp) {
+      this.baseAtk += growthResult.statGains.attack;
+      this.baseDef += growthResult.statGains.defense;
+      this.spd += growthResult.statGains.agility;
 
-      messages.push(logFormatter.format('player.level_up', { level: String(this.level) }));
+      const newlyLearnedSpells = [];
+      for (let lvl = oldLevel + 1; lvl <= this.actor.level; lvl++) {
+        Object.values(SPELL_DB).forEach(spell => {
+          if (typeof spell.learnLevel === 'number') {
+            if (spell.learnLevel === lvl) {
+              if (!this.spells.includes(spell.id)) {
+                this.spells.push(spell.id);
+                newlyLearnedSpells.push(spell.name);
+              }
+            }
+          }
+        });
+      }
+
+      messages.push(logFormatter.format('player.level_up', { level: String(this.actor.level) }));
       messages.push(
         logFormatter.format('player.stat_gain', {
           hp: String(this.maxHp - oldMaxHp),
@@ -643,6 +675,7 @@ export class Player {
         messages.push(logFormatter.format('player.learned_spell', { spell: spellName }));
       });
     }
+
     return messages;
   }
 
@@ -654,11 +687,7 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:applyExpDeathPenalty', 'ratio', ratio);
     }
 
-    const baseExp = this.getRequiredExpForLevel(this.level);
-    const surplusExp = Math.max(0, this.exp - baseExp);
-    const lostExp = Math.floor(surplusExp * ratio);
-    this.exp -= lostExp;
-    return lostExp;
+    return this.actor.applyExpDeathPenalty(ratio);
   }
 
   damage(amount) {
@@ -771,8 +800,7 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:addGold', 'amount', amount);
     }
 
-    this.gold += Math.max(0, Math.floor(amount));
-    return this.gold;
+    return this.actor.addGold(amount);
   }
 
   useGold(amount) {
@@ -783,11 +811,7 @@ export class Player {
       throw createProtocolError('RangeError', 'player.js:useGold', 'amount', amount);
     }
 
-    if (this.gold < amount) {
-      return false;
-    }
-    this.gold -= amount;
-    return true;
+    return this.actor.useGold(amount);
   }
 
   addItem(id, count = 1) {

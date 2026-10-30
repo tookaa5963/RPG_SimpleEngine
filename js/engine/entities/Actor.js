@@ -17,6 +17,9 @@ export class Actor {
    * @param {number} [params.attack] - 攻撃力（0以上の整数。省略時は0）
    * @param {number} [params.defense] - 守備力（0以上の整数。省略時は0）
    * @param {number} [params.agility] - 素早さ（0以上の整数。省略時は0）
+   * @param {number} [params.level] - レベル（1以上の整数。省略時は1）
+   * @param {number} [params.exp] - 経験値（0以上の整数。省略時は0）
+   * @param {number} [params.gold] - 所持金（0以上の整数。省略時は0）
    * @param {Array<string>} [params.statusEffects] - 初期状態異常配列
    * @param {Object|null} [eventBus=null] - EngineEventBus インスタンス（任意注入）
    */
@@ -160,6 +163,54 @@ export class Actor {
     }
     this._agility = initialAgility;
 
+    // 任意数値検証: level
+    let initialLevel = 1;
+    if (params.level !== undefined) {
+      if (typeof params.level !== 'number') {
+        throw new Error('Actor: level must be a number');
+      }
+      if (!Number.isInteger(params.level)) {
+        throw new Error('Actor: level must be an integer');
+      }
+      if (params.level < 1) {
+        throw new Error('Actor: level must be at least 1');
+      }
+      initialLevel = params.level;
+    }
+    this._level = initialLevel;
+
+    // 任意数値検証: exp
+    let initialExp = 0;
+    if (params.exp !== undefined) {
+      if (typeof params.exp !== 'number') {
+        throw new Error('Actor: exp must be a number');
+      }
+      if (!Number.isInteger(params.exp)) {
+        throw new Error('Actor: exp must be an integer');
+      }
+      if (params.exp < 0) {
+        throw new Error('Actor: exp must not be negative');
+      }
+      initialExp = params.exp;
+    }
+    this._exp = initialExp;
+
+    // 任意数値検証: gold
+    let initialGold = 0;
+    if (params.gold !== undefined) {
+      if (typeof params.gold !== 'number') {
+        throw new Error('Actor: gold must be a number');
+      }
+      if (!Number.isInteger(params.gold)) {
+        throw new Error('Actor: gold must be an integer');
+      }
+      if (params.gold < 0) {
+        throw new Error('Actor: gold must not be negative');
+      }
+      initialGold = params.gold;
+    }
+    this._gold = initialGold;
+
     // 任意配列検証: statusEffects
     const safeStatusEffects = [];
     if (params.statusEffects !== undefined) {
@@ -232,12 +283,248 @@ export class Actor {
     return this._agility;
   }
 
+  get level() {
+    return this._level;
+  }
+
+  get exp() {
+    return this._exp;
+  }
+
+  get gold() {
+    return this._gold;
+  }
+
   get isAlive() {
     return this._isAlive;
   }
 
   get statusEffects() {
     return this._statusEffects.slice();
+  }
+
+  /**
+   * レベル直接設定（デシリアライズ用）
+   * @param {number} level
+   */
+  setLevel(level) {
+    if (typeof level !== 'number') {
+      throw new Error('Actor.setLevel: level must be a number');
+    }
+    if (!Number.isInteger(level)) {
+      throw new Error('Actor.setLevel: level must be an integer');
+    }
+    if (level < 1) {
+      throw new Error('Actor.setLevel: level must be at least 1');
+    }
+    this._level = level;
+  }
+
+  /**
+   * 経験値直接設定（デシリアライズ用）
+   * @param {number} exp
+   */
+  setExp(exp) {
+    if (typeof exp !== 'number') {
+      throw new Error('Actor.setExp: exp must be a number');
+    }
+    if (!Number.isInteger(exp)) {
+      throw new Error('Actor.setExp: exp must be an integer');
+    }
+    if (exp < 0) {
+      throw new Error('Actor.setExp: exp must not be negative');
+    }
+    this._exp = exp;
+  }
+
+  /**
+   * 所持金直接設定（デシリアライズ用）
+   * @param {number} gold
+   */
+  setGold(gold) {
+    if (typeof gold !== 'number') {
+      throw new Error('Actor.setGold: gold must be a number');
+    }
+    if (!Number.isInteger(gold)) {
+      throw new Error('Actor.setGold: gold must be an integer');
+    }
+    if (gold < 0) {
+      throw new Error('Actor.setGold: gold must not be negative');
+    }
+    this._gold = gold;
+  }
+
+  /**
+   * 所持金加算処理
+   * @param {number} amount - 加算量（0以上の数値）
+   * @returns {number} 加算後の所持金
+   */
+  addGold(amount) {
+    if (typeof amount !== 'number') {
+      throw new Error('Actor.addGold: amount must be a number');
+    }
+    if (Number.isNaN(amount)) {
+      throw new Error('Actor.addGold: amount must not be NaN');
+    }
+    let addValue = Math.floor(amount);
+    if (addValue < 0) {
+      addValue = 0;
+    }
+    this._gold = this._gold + addValue;
+    return this._gold;
+  }
+
+  /**
+   * 所持金消費処理
+   * @param {number} amount - 消費量（0以上の数値）
+   * @returns {boolean} 消費成否
+   */
+  useGold(amount) {
+    if (typeof amount !== 'number') {
+      throw new Error('Actor.useGold: amount must be a number');
+    }
+    if (Number.isNaN(amount)) {
+      throw new Error('Actor.useGold: amount must not be NaN');
+    }
+    if (amount < 0) {
+      throw new Error('Actor.useGold: amount must not be negative');
+    }
+    if (this._gold < amount) {
+      return false;
+    }
+    this._gold = this._gold - amount;
+    return true;
+  }
+
+  /**
+   * 指定レベルへの到達に必要な累積経験値計算
+   * @param {number} level - 目標レベル
+   * @returns {number} 必要累積経験値
+   */
+  getRequiredExpForLevel(level) {
+    if (typeof level !== 'number') {
+      throw new Error('Actor.getRequiredExpForLevel: level must be a number');
+    }
+    if (Number.isNaN(level)) {
+      throw new Error('Actor.getRequiredExpForLevel: level must not be NaN');
+    }
+    if (level <= 1) {
+      return 0;
+    }
+    if (level <= 9) {
+      return Math.floor(10 * Math.pow(2, level - 2));
+    }
+    let total = 1280;
+    let diff = 1200;
+    for (let l = 10; l <= level; l++) {
+      total = total + diff;
+      diff = diff + 250;
+    }
+    return total;
+  }
+
+  /**
+   * 死亡時経験値ペナルティ適用処理
+   * @param {number} [ratio=0.5] - 減少割合
+   * @returns {number} 喪失した経験値量
+   */
+  applyExpDeathPenalty(ratio) {
+    let r = 0.5;
+    if (ratio !== undefined) {
+      if (typeof ratio !== 'number') {
+        throw new Error('Actor.applyExpDeathPenalty: ratio must be a number');
+      }
+      if (Number.isNaN(ratio)) {
+        throw new Error('Actor.applyExpDeathPenalty: ratio must not be NaN');
+      }
+      if (ratio < 0) {
+        throw new Error('Actor.applyExpDeathPenalty: ratio must not be negative');
+      }
+      r = ratio;
+    }
+    const baseExp = this.getRequiredExpForLevel(this._level);
+    let surplusExp = this._exp - baseExp;
+    if (surplusExp < 0) {
+      surplusExp = 0;
+    }
+    const lostExp = Math.floor(surplusExp * r);
+    this._exp = this._exp - lostExp;
+    return lostExp;
+  }
+
+  /**
+   * 経験値加算およびレベルアップ・ステータス成長処理
+   * @param {number} amount - 加算経験値
+   * @param {Function|null} [growthCalculator=null] - レベルアップごとの能力上昇量計算関数 (level) => { hp, mp, attack, defense, agility }
+   * @returns {Object} 成長結果オブジェクト
+   */
+  addExp(amount, growthCalculator) {
+    if (typeof amount !== 'number') {
+      throw new Error('Actor.addExp: amount must be a number');
+    }
+    if (Number.isNaN(amount)) {
+      throw new Error('Actor.addExp: amount must not be NaN');
+    }
+
+    let addValue = Math.floor(amount);
+    if (addValue < 0) {
+      addValue = 0;
+    }
+    this._exp = this._exp + addValue;
+
+    let leveledUp = false;
+    const oldLevel = this._level;
+    const totalGains = {
+      hp: 0,
+      mp: 0,
+      attack: 0,
+      defense: 0,
+      agility: 0
+    };
+
+    while (this._exp >= this.getRequiredExpForLevel(this._level + 1)) {
+      this._level = this._level + 1;
+      leveledUp = true;
+
+      let gain = null;
+      if (typeof growthCalculator === 'function') {
+        gain = growthCalculator(this._level);
+      }
+      if (gain === null) {
+        gain = {
+          hp: Math.floor(Math.random() * 4) + 4,
+          mp: Math.floor(Math.random() * 3) + 2,
+          attack: Math.floor(Math.random() * 2) + 2,
+          defense: Math.floor(Math.random() * 2) + 1,
+          agility: Math.floor(Math.random() * 2) + 1
+        };
+      }
+
+      this._maxHp = this._maxHp + gain.hp;
+      this._maxMp = this._maxMp + gain.mp;
+      this._attack = this._attack + gain.attack;
+      this._defense = this._defense + gain.defense;
+      this._agility = this._agility + gain.agility;
+
+      totalGains.hp = totalGains.hp + gain.hp;
+      totalGains.mp = totalGains.mp + gain.mp;
+      totalGains.attack = totalGains.attack + gain.attack;
+      totalGains.defense = totalGains.defense + gain.defense;
+      totalGains.agility = totalGains.agility + gain.agility;
+    }
+
+    if (leveledUp) {
+      this._hp = this._maxHp;
+      this._mp = this._maxMp;
+      this.removeStatusEffect('poison');
+    }
+
+    return {
+      leveledUp: leveledUp,
+      oldLevel: oldLevel,
+      newLevel: this._level,
+      statGains: totalGains
+    };
   }
 
   /**
@@ -549,6 +836,9 @@ export class Actor {
       attack: this._attack,
       defense: this._defense,
       agility: this._agility,
+      level: this._level,
+      exp: this._exp,
+      gold: this._gold,
       isAlive: this._isAlive,
       statusEffects: this._statusEffects.slice()
     };

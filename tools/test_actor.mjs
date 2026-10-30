@@ -70,6 +70,9 @@ console.log(`[TEST] Running Actor tests against: ${targetUrl}`);
   assert(actor.attack === 15, 'actor.attack should match');
   assert(actor.defense === 10, 'actor.defense should match');
   assert(actor.agility === 8, 'actor.agility should match');
+  assert(actor.level === 1, 'actor.level should default to 1');
+  assert(actor.exp === 0, 'actor.exp should default to 0');
+  assert(actor.gold === 0, 'actor.gold should default to 0');
   assert(actor.isAlive === true, 'actor.isAlive should be true');
   assert(actor.statusEffects.length === 0, 'actor.statusEffects should default to empty');
 }
@@ -180,6 +183,9 @@ console.log(`[TEST] Running Actor tests against: ${targetUrl}`);
     attack: 30,
     defense: 25,
     agility: 12,
+    level: 3,
+    exp: 150,
+    gold: 320,
     statusEffects: ['curse']
   });
   const json = actor.toJSON();
@@ -188,6 +194,9 @@ console.log(`[TEST] Running Actor tests against: ${targetUrl}`);
   assert(restored.name === '記録者', 'Restored name should match');
   assert(restored.hp === 80, 'Restored hp should match');
   assert(restored.mp === 15, 'Restored mp should match');
+  assert(restored.level === 3, 'Restored level should match');
+  assert(restored.exp === 150, 'Restored exp should match');
+  assert(restored.gold === 320, 'Restored gold should match');
   assert(restored.hasStatusEffect('curse') === true, 'Restored status should match');
 }
 
@@ -207,6 +216,133 @@ console.log(`[TEST] Running Actor tests against: ${targetUrl}`);
   assertThrows(() => actor.applyHeal(-5), 'heal < 0 should throw');
   assertThrows(() => actor.consumeMp(-1), 'consume negative mp should throw');
   assertThrows(() => actor.addStatusEffect(''), 'empty statusId should throw');
+}
+
+// Test 9: 正常系 ゴールド操作（addGold / useGold）
+{
+  const actor = new Actor({ id: 'gold_test', name: '商人', maxHp: 20, gold: 100 });
+  assert(actor.gold === 100, 'initial gold should match');
+
+  const g1 = actor.addGold(50);
+  assert(g1 === 150, 'addGold should return new total');
+  assert(actor.gold === 150, 'actor.gold should be updated');
+
+  // 小数点の切り捨て加算
+  actor.addGold(10.8);
+  assert(actor.gold === 160, 'addGold should floor amount');
+
+  // 負数加算は0扱い
+  actor.addGold(-20);
+  assert(actor.gold === 160, 'negative addGold should be clamped to 0');
+
+  // 消費成功
+  const ok1 = actor.useGold(60);
+  assert(ok1 === true, 'useGold should succeed when funds are sufficient');
+  assert(actor.gold === 100, 'gold should decrease after useGold');
+
+  // 残高不足
+  const ok2 = actor.useGold(150);
+  assert(ok2 === false, 'useGold should return false when funds are insufficient');
+  assert(actor.gold === 100, 'gold should remain unchanged on insufficient funds');
+
+  // setGold による直接更新
+  actor.setGold(500);
+  assert(actor.gold === 500, 'setGold should update gold');
+}
+
+// Test 10: 正常系 必要経験値計算およびデスペナルティ計算
+{
+  const actor = new Actor({ id: 'exp_test', name: '見習い', maxHp: 20, level: 1, exp: 0 });
+  assert(actor.getRequiredExpForLevel(1) === 0, 'reqExp level 1 should be 0');
+  assert(actor.getRequiredExpForLevel(2) === 10, 'reqExp level 2 should be 10');
+  assert(actor.getRequiredExpForLevel(3) === 20, 'reqExp level 3 should be 20');
+  assert(actor.getRequiredExpForLevel(9) === 1280, 'reqExp level 9 should be 1280');
+  assert(actor.getRequiredExpForLevel(10) === 2480, 'reqExp level 10 should be 2480');
+
+  // デスペナルティ計算
+  actor.setLevel(2);
+  actor.setExp(18); // level 2 base is 10. surplus = 8. lost = floor(8 * 0.5) = 4
+  const lost = actor.applyExpDeathPenalty(0.5);
+  assert(lost === 4, 'lostExp should be 4');
+  assert(actor.exp === 14, 'exp after penalty should be 14');
+}
+
+// Test 11: 正常系 経験値加算・レベルアップ・ステータス成長・全快・毒解除
+{
+  const actor = new Actor({
+    id: 'hero_growth',
+    name: '成長勇者',
+    maxHp: 20,
+    hp: 5,
+    maxMp: 10,
+    mp: 2,
+    attack: 8,
+    defense: 6,
+    agility: 4,
+    level: 1,
+    exp: 0,
+    statusEffects: ['poison']
+  });
+
+  // レベルアップしない経験値加算
+  const res1 = actor.addExp(5);
+  assert(res1.leveledUp === false, 'should not level up yet');
+  assert(actor.exp === 5, 'exp should be 5');
+  assert(actor.level === 1, 'level should remain 1');
+
+  // 固定成長関数を用いたレベルアップ（level 2への必要累積expは10）
+  const fixedGrowth = (lvl) => ({
+    hp: 6,
+    mp: 4,
+    attack: 3,
+    defense: 2,
+    agility: 1
+  });
+  const res2 = actor.addExp(10, fixedGrowth); // exp becomes 15 (>= 10)
+  assert(res2.leveledUp === true, 'should level up');
+  assert(res2.oldLevel === 1, 'oldLevel should be 1');
+  assert(res2.newLevel === 2, 'newLevel should be 2');
+  assert(res2.statGains.hp === 6, 'statGains.hp should match fixedGrowth');
+  assert(actor.maxHp === 26, 'maxHp should increase by 6');
+  assert(actor.maxMp === 14, 'maxMp should increase by 4');
+  assert(actor.attack === 11, 'attack should increase by 3');
+  assert(actor.defense === 8, 'defense should increase by 2');
+  assert(actor.agility === 5, 'agility should increase by 1');
+
+  // 副作用: HP・MP全快および毒解除
+  assert(actor.hp === 26, 'hp should be fully restored to maxHp');
+  assert(actor.mp === 14, 'mp should be fully restored to maxMp');
+  assert(actor.hasStatusEffect('poison') === false, 'poison should be cured upon level up');
+}
+
+// Test 12: 正常系 連続レベルアップ
+{
+  const actor = new Actor({ id: 'fast_hero', name: '俊足', maxHp: 20, level: 1, exp: 0 });
+  // level 3 への到達必要expは20。一気に25投入
+  const fixedGrowth = () => ({ hp: 5, mp: 3, attack: 2, defense: 1, agility: 1 });
+  const res = actor.addExp(25, fixedGrowth);
+  assert(res.leveledUp === true, 'should level up');
+  assert(res.newLevel === 3, 'newLevel should be 3');
+  assert(res.statGains.hp === 10, 'statGains.hp should be 10 (2 levels)');
+  assert(actor.maxHp === 30, 'maxHp should be 30');
+}
+
+// Test 13: 異常系 バリデーション
+{
+  assertThrows(() => new Actor({ id: 't', name: 't', maxHp: 10, level: 0 }), 'level < 1 should throw');
+  assertThrows(() => new Actor({ id: 't', name: 't', maxHp: 10, exp: -1 }), 'negative exp should throw');
+  assertThrows(() => new Actor({ id: 't', name: 't', maxHp: 10, gold: -1 }), 'negative gold should throw');
+
+  const actor = new Actor({ id: 't', name: 't', maxHp: 10 });
+  assertThrows(() => actor.setLevel(0), 'setLevel < 1 should throw');
+  assertThrows(() => actor.setExp(-1), 'setExp < 0 should throw');
+  assertThrows(() => actor.setGold(-1), 'setGold < 0 should throw');
+  assertThrows(() => actor.addGold('10'), 'addGold non-number should throw');
+  assertThrows(() => actor.addGold(NaN), 'addGold NaN should throw');
+  assertThrows(() => actor.useGold(-5), 'useGold negative should throw');
+  assertThrows(() => actor.getRequiredExpForLevel('2'), 'getRequiredExpForLevel non-number should throw');
+  assertThrows(() => actor.applyExpDeathPenalty('0.5'), 'applyExpDeathPenalty non-number should throw');
+  assertThrows(() => actor.addExp('10'), 'addExp non-number should throw');
 }
 
 console.log(`[PASS] All ${testsPassed}/${testsRun} assertions passed.`);

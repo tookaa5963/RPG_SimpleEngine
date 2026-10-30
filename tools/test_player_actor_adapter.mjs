@@ -1,5 +1,13 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import assert from 'node:assert/strict';
 import { Player } from '../js/player.js';
+import { logFormatter } from '../js/logFormatter.js';
+
+// Node.js テスト環境用: logFormatter の player ドメイン同期登録
+const playerLogPath = path.resolve('data/logs/player.json');
+const playerLogData = JSON.parse(fs.readFileSync(playerLogPath, 'utf8'));
+logFormatter.registerDomain('player', playerLogData);
 
 let testsPassed = 0;
 function test(name, fn) {
@@ -210,12 +218,10 @@ test('13. Inventory 初期状態および Proxy 互換性', () => {
   assert.equal('herb' in p.inventory, true);
   assert.equal('unknown_item' in p.inventory, false);
 
-  // 装備の初期状態
   assert.equal(p.equipment.weapon, 'stick');
   assert.equal(p.equipment.armor, 'cloth_armor');
   assert.equal(p.equipment.shield, null);
 
-  // バッグ占有数: 所持総数3 - 装備中2 = 1 (herbのみ)
   assert.equal(p.getInventoryCount(), 1);
   assert.equal(p.isInventoryFull(1), false);
 });
@@ -232,7 +238,6 @@ test('14. addItem() 正常系・引数検証および Proxy 反映', () => {
   assert.equal(p.inventory.potion, 1);
   assert.equal('potion' in p.inventory, true);
 
-  // バリデーション
   assert.throws(() => p.addItem(123), /TypeError/);
   assert.throws(() => p.addItem(''), /EmptyStringError/);
   assert.throws(() => p.addItem('herb', '1'), /TypeError/);
@@ -245,20 +250,15 @@ test('15. removeItem() 正常系・異常系・所持数0時装備自動解除�
   assert.equal(p.inventory.herb, 0);
   assert.equal('herb' in p.inventory, false);
 
-  // 未所持削除
   assert.equal(p.removeItem('herb', 1), false);
-
-  // 数量超過削除
   assert.equal(p.removeItem('stick', 5), false);
   assert.equal(p.inventory.stick, 1);
 
-  // 装備中アイテム（stick）を削除して個数0にした場合、装備が自動解除されること
   assert.equal(p.equipment.weapon, 'stick');
   assert.equal(p.removeItem('stick', 1), true);
   assert.equal(p.inventory.stick, 0);
   assert.equal(p.equipment.weapon, null);
 
-  // ランタンの灯火連動
   p.addItem('lantern', 1);
   p.isLanternLit = true;
   assert.equal(p.isLanternLit, true);
@@ -268,20 +268,17 @@ test('15. removeItem() 正常系・異常系・所持数0時装備自動解除�
 
 test('16. getInventoryCount() および isInventoryFull() の容量境界判定', () => {
   const p = new Player();
-  // 初期: herb(1), stick(1, 装備中), cloth_armor(1, 装備中) -> bagCount = 1
   assert.equal(p.getInventoryCount(), 1);
 
-  // 上限12個まで追加（残り11個空き）
-  p.addItem('herb', 10); // herb合計11個 -> bagCount = 11
+  p.addItem('herb', 10);
   assert.equal(p.getInventoryCount(), 11);
   assert.equal(p.isInventoryFull(1), false);
   assert.equal(p.isInventoryFull(2), true);
 
-  p.addItem('herb', 1); // bagCount = 12 (満杯)
+  p.addItem('herb', 1);
   assert.equal(p.getInventoryCount(), 12);
   assert.equal(p.isInventoryFull(1), true);
 
-  // バリデーション
   assert.throws(() => p.isInventoryFull('1'), /TypeError/);
   assert.throws(() => p.isInventoryFull(NaN), /RangeError/);
 });
@@ -291,19 +288,15 @@ test('17. equip() / unequip() および equipment プロパティ直接アクセ
   p.addItem('bronze_sword', 1);
   p.addItem('leather_shield', 1);
 
-  // equip メソッド経由（成功時 true を返却）
   assert.equal(p.equip('weapon', 'bronze_sword'), true);
   assert.equal(p.equipment.weapon, 'bronze_sword');
   assert.equal(p.inventoryInstance.getEquipment('weapon'), 'bronze_sword');
 
-  // unequip メソッド経由（解除されたアイテムID 'bronze_sword' を返却）
   assert.equal(p.unequip('weapon'), 'bronze_sword');
   assert.equal(p.equipment.weapon, null);
 
-  // 未装備スロットの unequip（null を返却）
   assert.equal(p.unequip('shield'), null);
 
-  // equipment Proxy 経由の直接代入
   p.equipment.shield = 'leather_shield';
   assert.equal(p.equipment.shield, 'leather_shield');
   assert.equal(p.inventoryInstance.getEquipment('shield'), 'leather_shield');
@@ -311,7 +304,6 @@ test('17. equip() / unequip() および equipment プロパティ直接アクセ
   p.equipment.shield = null;
   assert.equal(p.equipment.shield, null);
 
-  // 未所持アイテムの装備試行（Proxy経由代入時は自動追加されて装備）
   p.equipment.weapon = 'iron_blade';
   assert.equal(p.equipment.weapon, 'iron_blade');
   assert.equal(p.inventory.iron_blade, 1);
@@ -334,6 +326,114 @@ test('18. serialize() / deserialize() によるインベントリ・装備完全
   assert.equal(p2.equipment.shield, 'iron_shield');
   assert.equal(p2.inventoryInstance.getItemCount('magic_potion'), 3);
   assert.equal(p2.inventoryInstance.getEquipment('shield'), 'iron_shield');
+});
+
+// --- Step 3-5c: 経験値・成長・ゴールド委譲累積テスト ---
+
+test('19. ゴールド操作（addGold / useGold / gold setter / getter）および Actor 連動', () => {
+  const p = new Player();
+  assert.equal(p.gold, 0);
+  assert.equal(p.actor.gold, 0);
+
+  const g1 = p.addGold(150);
+  assert.equal(g1, 150);
+  assert.equal(p.gold, 150);
+  assert.equal(p.actor.gold, 150);
+
+  p.addGold(20.9);
+  assert.equal(p.gold, 170);
+
+  p.addGold(-50);
+  assert.equal(p.gold, 170);
+
+  assert.equal(p.useGold(70), true);
+  assert.equal(p.gold, 100);
+  assert.equal(p.actor.gold, 100);
+
+  assert.equal(p.useGold(200), false);
+  assert.equal(p.gold, 100);
+
+  p.gold = 500;
+  assert.equal(p.gold, 500);
+  assert.equal(p.actor.gold, 500);
+
+  assert.throws(() => p.addGold('100'), /TypeError/);
+  assert.throws(() => p.addGold(NaN), /RangeError/);
+  assert.throws(() => p.useGold('50'), /TypeError/);
+  assert.throws(() => p.useGold(NaN), /RangeError/);
+});
+
+test('20. getRequiredExpForLevel() の委譲計算および境界バリデーション', () => {
+  const p = new Player();
+  assert.equal(p.getRequiredExpForLevel(1), 0);
+  assert.equal(p.getRequiredExpForLevel(2), 10);
+  assert.equal(p.getRequiredExpForLevel(3), 20);
+  assert.equal(p.getRequiredExpForLevel(9), 1280);
+  assert.equal(p.getRequiredExpForLevel(10), 2480);
+
+  assert.throws(() => p.getRequiredExpForLevel('2'), /TypeError/);
+  assert.throws(() => p.getRequiredExpForLevel(NaN), /RangeError/);
+});
+
+test('21. applyExpDeathPenalty() の委譲計算および境界バリデーション', () => {
+  const p = new Player();
+  p.level = 2;
+  p.exp = 18;
+  const lost = p.applyExpDeathPenalty(0.5);
+  assert.equal(lost, 4);
+  assert.equal(p.exp, 14);
+  assert.equal(p.actor.exp, 14);
+
+  assert.throws(() => p.applyExpDeathPenalty('0.5'), /TypeError/);
+  assert.throws(() => p.applyExpDeathPenalty(NaN), /RangeError/);
+});
+
+test('22. addExp() によるレベルアップ、能力値成長、全快・毒解除、およびメッセージ返却', () => {
+  const p = new Player();
+  p.damage(10);
+  p.isPoisoned = true;
+
+  const msgs1 = p.addExp(5);
+  assert.equal(msgs1.length, 0);
+  assert.equal(p.exp, 5);
+  assert.equal(p.level, 1);
+  assert.equal(p.isPoisoned, true);
+
+  const oldMaxHp = p.maxHp;
+  const oldMaxMp = p.maxMp;
+  const msgs2 = p.addExp(10);
+  assert.equal(p.level, 2);
+  assert.equal(p.actor.level, 2);
+  assert.equal(p.maxHp > oldMaxHp, true);
+  assert.equal(p.maxMp > oldMaxMp, true);
+
+  assert.equal(p.hp, p.maxHp);
+  assert.equal(p.mp, p.maxMp);
+  assert.equal(p.isPoisoned, false);
+  assert.equal(p.actor.hasStatusEffect('poison'), false);
+
+  assert.equal(msgs2.length >= 2, true);
+});
+
+test('23. serialize() / deserialize() による level, exp, gold の完全復元', () => {
+  const p = new Player();
+  p.level = 4;
+  p.exp = 350;
+  p.gold = 1200;
+
+  const data = p.serialize();
+  assert.equal(data.level, 4);
+  assert.equal(data.exp, 350);
+  assert.equal(data.gold, 1200);
+
+  const p2 = new Player();
+  p2.deserialize(data);
+  assert.equal(p2.level, 4);
+  assert.equal(p2.exp, 350);
+  assert.equal(p2.gold, 1200);
+  assert.equal(p2.actor.level, 4);
+  assert.equal(p2.actor.exp, 350);
+  assert.equal(p2.actor.gold, 1200);
 });
 
 console.log(`--- All ${testsPassed} Tests Passed Successfully ---`);
