@@ -238,7 +238,6 @@ export class Player {
     this.poisonFlashTimer = 0;
     this.poisonShakeTimer = 0;
 
-    // 初期帰還地を「灯台守の小屋」に設定
     this.returnPoint = {
       mapId: 'lighthousekeeper_cottage',
       gridX: 3,
@@ -945,25 +944,28 @@ export class Player {
       }
     }
 
+    const actorData = this.actor.toJSON();
+    const invData = this.inventoryInstance.toJSON();
+
     return {
-      level: this.level,
-      hp: this.hp,
-      maxHp: this.maxHp,
-      mp: this.mp,
-      maxMp: this.maxMp,
+      level: actorData.level,
+      hp: actorData.hp,
+      maxHp: actorData.maxHp,
+      mp: actorData.mp,
+      maxMp: actorData.maxMp,
       baseAtk: this.baseAtk,
       baseDef: this.baseDef,
       spd: this.spd,
-      exp: this.exp,
-      gold: this.gold,
+      exp: actorData.exp,
+      gold: actorData.gold,
       spells: [...this.spells],
-      inventory: { ...this.inventory },
-      equipment: { ...this.equipment },
+      inventory: { ...invData.items },
+      equipment: { ...invData.equipment },
       remiraSteps: this.remiraSteps,
       torchSteps: this.torchSteps,
       holyWaterSteps: this.holyWaterSteps,
       isLanternLit: this.isLanternLit,
-      isPoisoned: this.isPoisoned,
+      isPoisoned: actorData.statusEffects.includes('poison'),
       returnPoint: returnPointCopy,
       flags: { ...this.flags }
     };
@@ -987,9 +989,9 @@ export class Player {
     }
 
     const numberProps = [
-      'level', 'maxHp', 'maxMp', 'hp', 'mp',
-      'baseAtk', 'baseDef', 'spd', 'exp', 'gold',
-      'remiraSteps', 'torchSteps', 'holyWaterSteps'
+      'baseAtk', 'baseDef', 'spd',
+      'remiraSteps', 'torchSteps', 'holyWaterSteps',
+      'level', 'maxHp', 'maxMp', 'hp', 'mp', 'exp', 'gold'
     ];
 
     numberProps.forEach(prop => {
@@ -1020,10 +1022,11 @@ export class Player {
       this.spells = [];
     }
 
+    let invItems = {};
     if (ps.inventory !== null) {
       if (typeof ps.inventory === 'object') {
         if (!Array.isArray(ps.inventory)) {
-          this.inventory = { ...ps.inventory };
+          invItems = { ...ps.inventory };
         }
       }
     }
@@ -1039,7 +1042,12 @@ export class Player {
     if (defaultEquipment.shield === undefined) {
       defaultEquipment.shield = null;
     }
-    this.equipment = defaultEquipment;
+
+    this.inventoryInstance.fromJSON({
+      maxCapacity: MAX_INVENTORY_CAPACITY,
+      items: invItems,
+      equipment: defaultEquipment
+    });
 
     let defaultReturnPoint = {
       mapId: 'lighthousekeeper_cottage',

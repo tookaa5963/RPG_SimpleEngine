@@ -1,3 +1,4 @@
+// FILE_ENTRY: ai_staging/tools/test_player_actor_adapter.mjs
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -21,7 +22,7 @@ function test(name, fn) {
   }
 }
 
-console.log('--- Player Actor & Inventory Adapter Gate 2 Test Start ---');
+console.log('--- Player Actor, Inventory & Serialization Adapter Gate 2 Test Start ---');
 
 test('1. 初期ステータスおよび Actor 内部整合性', () => {
   const p = new Player(3, 4, 64);
@@ -99,7 +100,6 @@ test('6. hp 直接代入セッター（ダメージ・回復・蘇生）', () =>
   assert.equal(p.hp, 0);
   assert.equal(p.actor.isAlive, false);
 
-  // 死亡状態からの直接代入による蘇生
   p.hp = 10;
   assert.equal(p.hp, 10);
   assert.equal(p.actor.isAlive, true);
@@ -115,7 +115,6 @@ test('7. maxHp 直接代入セッターおよび Actor 同期', () => {
   p.heal(10);
   assert.equal(p.hp, 25);
 
-  // 縮小時に現在HPが上限を超えないこと
   p.maxHp = 20;
   assert.equal(p.maxHp, 20);
   assert.equal(p.hp, 20);
@@ -161,7 +160,7 @@ test('9. 毒フラグ（isPoisoned, curePoison）および Actor 状態異常連
 test('10. fullRecovery() による HP/MP 全快および死亡復帰', () => {
   const p = new Player();
   p.maxMp = 10;
-  p.damage(15); // 死亡
+  p.damage(15);
   p.consumeMp(0);
   assert.equal(p.actor.isAlive, false);
 
@@ -205,8 +204,6 @@ test('12. serialize() および deserialize() の双方向復元性', () => {
   assert.equal(p2.actor.hp, 22);
   assert.equal(p2.actor.hasStatusEffect('poison'), true);
 });
-
-// --- Step 3-5b: Inventory 委譲累積テスト ---
 
 test('13. Inventory 初期状態および Proxy 互換性', () => {
   const p = new Player();
@@ -328,8 +325,6 @@ test('18. serialize() / deserialize() によるインベントリ・装備完全
   assert.equal(p2.inventoryInstance.getEquipment('shield'), 'iron_shield');
 });
 
-// --- Step 3-5c: 経験値・成長・ゴールド委譲累積テスト ---
-
 test('19. ゴールド操作（addGold / useGold / gold setter / getter）および Actor 連動', () => {
   const p = new Player();
   assert.equal(p.gold, 0);
@@ -434,6 +429,81 @@ test('23. serialize() / deserialize() による level, exp, gold の完全復元
   assert.equal(p2.actor.level, 4);
   assert.equal(p2.actor.exp, 350);
   assert.equal(p2.actor.gold, 1200);
+});
+
+// --- Step 3-5d: 実機セーブデータによるシリアライズ統合累積テスト ---
+
+const fixtureSlot1 = {
+  level: 3, hp: 25, maxHp: 25, mp: 4, maxMp: 4, baseAtk: 10, baseDef: 7, spd: 8, exp: 21, gold: 6,
+  spells: ["hoimi"],
+  inventory: { herb: 2, stick: 1, cloth_armor: 1, torch: 5 },
+  equipment: { weapon: "stick", armor: "cloth_armor", shield: null },
+  remiraSteps: 0, torchSteps: 0, holyWaterSteps: 0, isLanternLit: false, isPoisoned: false,
+  returnPoint: { mapId: "first_church", gridX: 3, gridY: 5, direction: "up" },
+  flags: { talkedToSister: true, receivedSisterHerb: true }
+};
+
+const fixtureSlot2 = {
+  level: 19, hp: 93, maxHp: 116, mp: 48, maxMp: 54, baseAtk: 52, baseDef: 33, spd: 29, exp: 26305, gold: 16419,
+  spells: ["hoimi", "mera", "remira", "kiari", "rariho", "gira", "liremito", "mahoton", "behoimi", "toherosu", "rula", "begirama", "behoma"],
+  inventory: { lantern: 1, pass: 1, sage_water: 7, forest_guide: 1, water_shield: 1, poison_charm: 1, corrada: 1, fire_charm: 1, dragon_armor: 1 },
+  equipment: { weapon: "corrada", armor: "dragon_armor", shield: "water_shield" },
+  remiraSteps: 0, torchSteps: 0, holyWaterSteps: 0, isLanternLit: true, isPoisoned: false,
+  returnPoint: { mapId: "port_church", gridX: 3, gridY: 5, direction: "up" },
+  flags: { talkedToSister: true, defeatedDragon: false }
+};
+
+test('24. 実機データ (序盤 slot_1) のデシリアライズと Actor/Inventory 整合性', () => {
+  const p = new Player();
+  p.deserialize(fixtureSlot1);
+
+  assert.equal(p.level, 3);
+  assert.equal(p.hp, 25);
+  assert.equal(p.inventory.torch, 5);
+  assert.equal(p.equipment.weapon, 'stick');
+
+  assert.equal(p.actor.level, 3);
+  assert.equal(p.actor.hp, 25);
+  assert.equal(p.inventoryInstance.getItemCount('torch'), 5);
+  assert.equal(p.inventoryInstance.getEquipment('weapon'), 'stick');
+  assert.ok(p.spells.includes('hoimi'));
+});
+
+test('25. 実機データ (終盤 slot_2) のデシリアライズと Actor/Inventory 整合性', () => {
+  const p = new Player();
+  p.deserialize(fixtureSlot2);
+
+  assert.equal(p.level, 19);
+  assert.equal(p.hp, 93);
+  assert.equal(p.maxHp, 116);
+  assert.equal(p.inventory.sage_water, 7);
+  assert.equal(p.equipment.shield, 'water_shield');
+
+  assert.equal(p.actor.exp, 26305);
+  assert.equal(p.inventoryInstance.getItemCount('corrada'), 1);
+  assert.equal(p.inventoryInstance.getEquipment('armor'), 'dragon_armor');
+  assert.equal(p.isLanternLit, true);
+});
+
+test('26. 再シリアライズ時の整合性検証', () => {
+  const p = new Player();
+  p.deserialize(fixtureSlot1);
+  const data = p.serialize();
+
+  assert.equal(data.level, fixtureSlot1.level);
+  assert.equal(data.hp, fixtureSlot1.hp);
+  assert.equal(data.maxHp, fixtureSlot1.maxHp);
+  assert.equal(data.mp, fixtureSlot1.mp);
+  assert.equal(data.maxMp, fixtureSlot1.maxMp);
+  assert.equal(data.gold, fixtureSlot1.gold);
+  assert.equal(data.exp, fixtureSlot1.exp);
+  assert.equal(data.inventory.torch, 5);
+  assert.equal(data.inventory.herb, 2);
+  assert.equal(data.equipment.weapon, fixtureSlot1.equipment.weapon);
+  assert.equal(data.equipment.armor, fixtureSlot1.equipment.armor);
+  assert.equal(data.equipment.shield, fixtureSlot1.equipment.shield);
+  assert.equal(data.isLanternLit, fixtureSlot1.isLanternLit);
+  assert.equal(data.returnPoint.mapId, fixtureSlot1.returnPoint.mapId);
 });
 
 console.log(`--- All ${testsPassed} Tests Passed Successfully ---`);
