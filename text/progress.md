@@ -95,9 +95,9 @@
 - [202610310230] Step 3-5d: player.js のステータス・インベントリ系シリアライズ統合
   - 規模: serialize / deserialize を Actor.toJSON() および Inventory.toJSON() / fromJSON() に統合。既存セーブ構造との完全互換性を維持
   - 検証: Gate 1 ＋ Gate 2（累積単体テスト全26件 Exit Code 0）＋ Gate 3（実機セーブ・ロード確認）通過
-- Step 3-5e: player.js のシナリオフラグ系の GenericFlags 委譲
-  - 規模: GenericFlags の導入、Proxy による既存 player.flags 参照・代入の透過委譲、およびシリアライズ統合
-  - 検証: Gate 1 ＋ Gate 2（累積単体テスト）＋ Gate 3（実機イベント進行・フラグ永続化検証）
+- [202610310425] Step 3-5e: player.js のシナリオフラグ系の GenericFlags 委譲
+  - 規模: GenericFlags 導入、Proxy による player.flags 参照・代入の透過委譲、serialize/deserialize 統合、および旧セーブデータ数量0アイテムのサニタイズ処理配備
+  - 検証: Gate 1 ＋ Gate 2（累積単体テスト全32件 Exit Code 0）＋ Gate 3（実機旧セーブデータロード・イベント進行・永続化確認）通過
 
 
 ### Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)
@@ -133,16 +133,15 @@
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
 ## 5. 引き継ぎ部
-完了コミット: （<e7ca30a0b57887b3fd7093b5e64b7d79854a5002>）
+完了コミット: eeafb5e (feat(player): delegate scenario flags to GenericFlags and sanitize zero-count items in inventory)
 完了内容:
-- player.js の serialize / deserialize を Core 層（Actor / Inventory）の正規シリアライズ機構へ完全統合
-- 実機バックアップセーブデータを用いた累積単体テスト（全26件）による完全復元性の実証
-- Gate 1（構文・境界検証）、Gate 2（単体テスト）、Gate 3（実機セーブ・ロード動作）全通過確認
+- player.js のシナリオフラグ管理を GenericFlags に完全委譲（Proxy による後方互換性維持）
+- 旧セーブデータに混入していた数量0の不要アイテムに対するサニタイズ処理を配備し、全スロットの正常復元性を確保
+- 実機バックアップセーブデータを用いた単体テスト（累計32件）およびブラウザ実機検証（Gate 1, 2, 3）全通過確認
+- prepare_staging.mjs における正規表現 lastIndex 競合バグを解消し、依存モジュールの自動ミラーリング機構を安定化
 
 次タスク:
-- Phase 3 Step 3-5e: player.js のシナリオフラグ系の GenericFlags 委譲
-  - 規模: GenericFlags の導入、Proxy による既存 player.flags 参照・代入の透過委譲、およびシリアライズ統合
-  - 検証: Gate 1 ＋ Gate 2（累積単体テスト）＋ Gate 3（実機イベント進行・フラグ永続化検証）
-
-追加ツール:
-- tools/prepare_staging.mjs: ai_staging への依存モジュール自動ミラーリング用スクリプト（Gate 2 実行前に使用）
+- Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)
+  - Step 4-1: js/drivers/audio/WebAudioDriver.js の配線
+    - 目的: ロジック層からの sound.js 直接呼び出しを廃止し、EngineEventBus 経由の音声再生要求イベントを購読・再生する専用ドライバを配備
+    - 検証: Gate 1 通過 ＋ 実機SE/BGM発火確認
