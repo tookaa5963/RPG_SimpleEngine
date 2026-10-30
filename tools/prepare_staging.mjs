@@ -64,17 +64,22 @@ function analyzeDependencies(relPath) {
 
   const dir = path.dirname(normRelPath);
 
+  // 再帰呼び出しによる lastIndex 競合を防ぐため、当該ファイルのインポートパスを事前にローカル抽出
+  const importedPaths = [];
   for (const regex of IMPORT_PATTERNS) {
-    let match;
-    while ((match = regex.exec(content)) !== null) {
-      const importPath = match[1];
-      // 相対インポートからプロジェクトルート基準の相対パスを算出
-      const resolvedAbs = path.resolve(projectRoot, dir, importPath);
-      const childRelPath = toPosix(path.relative(projectRoot, resolvedAbs));
-
-      dependencies.add(childRelPath);
-      analyzeDependencies(childRelPath);
+    const matches = content.matchAll(regex);
+    for (const match of matches) {
+      importedPaths.push(match[1]);
     }
+  }
+
+  // 抽出完了後に再帰走査を実行
+  for (const importPath of importedPaths) {
+    const resolvedAbs = path.resolve(projectRoot, dir, importPath);
+    const childRelPath = toPosix(path.relative(projectRoot, resolvedAbs));
+
+    dependencies.add(childRelPath);
+    analyzeDependencies(childRelPath);
   }
 }
 

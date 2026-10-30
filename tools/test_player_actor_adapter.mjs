@@ -506,4 +506,152 @@ test('26. 再シリアライズ時の整合性検証', () => {
   assert.equal(data.returnPoint.mapId, fixtureSlot1.returnPoint.mapId);
 });
 
+// --- Step 3-5e: GenericFlags 委譲・Proxy 透過・シリアライズ統合テスト ---
+
+test('27. 初期フラグ（16件）の読み取りおよび GenericFlags 内部整合性', () => {
+  const p = new Player();
+  assert.ok(p._flagsInstance);
+  assert.equal(p.flags.talkedToSister, false);
+  assert.equal(p.flags.rescuedGirl, false);
+  assert.equal(p.flags.heardOfDwarf, false);
+  assert.equal(p.flags.unknownFlag, false);
+});
+
+test('28. Proxy 経由のフラグ更新と GenericFlags 反映・フェイルファスト検証', () => {
+  const p = new Player();
+  
+  p.flags.hasPass = true;
+  assert.equal(p.flags.hasPass, true);
+  assert.equal(p._flagsInstance.get('hasPass'), true);
+
+  p.flags.newCustomFlag = true;
+  assert.equal(p.flags.newCustomFlag, true);
+  assert.equal(p._flagsInstance.get('newCustomFlag'), true);
+
+  assert.throws(() => { p.flags.talkedToSister = 'true'; }, /TypeError/);
+  assert.throws(() => { p.flags.hasPass = 1; }, /TypeError/);
+  assert.throws(() => { p.flags.rescuedGirl = null; }, /TypeError/);
+});
+
+test('29. Proxy オブジェクトの列挙とスプレッド展開', () => {
+  const p = new Player();
+  p.flags.talkedToSister = true;
+  
+  const spreadFlags = { ...p.flags };
+  assert.equal(spreadFlags.talkedToSister, true);
+  assert.equal(spreadFlags.hasPass, false);
+  assert.ok(Object.keys(spreadFlags).length >= 16);
+});
+
+test('30. serialize() および deserialize() によるフラグ復元・不正データ拒絶', () => {
+  const p = new Player();
+  p.flags.defeatedDragon = true;
+  p.flags.elfQuestStarted = true;
+  
+  const serialized = p.serialize();
+  assert.equal(serialized.flags.defeatedDragon, true);
+  assert.equal(serialized.flags.elfQuestStarted, true);
+  
+  const p2 = new Player();
+  p2.deserialize(serialized);
+  
+  assert.equal(p2.flags.defeatedDragon, true);
+  assert.equal(p2.flags.elfQuestStarted, true);
+  assert.equal(p2.flags.talkedToSister, false);
+  assert.equal(p2._flagsInstance.get('defeatedDragon'), true);
+
+  const badData = { flags: { talkedToSister: 'yes', hasPass: 1, rescuedGirl: true } };
+  const p3 = new Player();
+  p3.deserialize(badData);
+  
+  assert.equal(p3.flags.rescuedGirl, true);
+  assert.equal(p3.flags.talkedToSister, false);
+  assert.equal(p3.flags.hasPass, false);
+});
+
+test('31. flags getter / setter 全体代入の後方互換性', () => {
+  const p = new Player();
+  p.flags = {
+    talkedToSister: true,
+    hasPass: true,
+    customKey: false
+  };
+  
+  assert.equal(p.flags.talkedToSister, true);
+  assert.equal(p.flags.hasPass, true);
+  assert.equal(p.flags.customKey, false);
+  assert.equal(p.flags.rescuedGirl, false);
+});
+
+// --- 実機バックアップセーブデータ (数量0アイテム混入) のサニタイズ復元テスト ---
+
+const fixtureWithZeroCountsSlot1 = {
+  level: 10, hp: 62, maxHp: 62, mp: 25, maxMp: 25, baseAtk: 28, baseDef: 19, spd: 19, exp: 2899, gold: 472,
+  spells: ["hoimi", "mera", "kiari", "remira", "rariho", "gira", "liremito", "mahoton"],
+  inventory: { herb: 0, stick: 0, cloth_armor: 0, torch: 0, antique_key: 1, iron_sword: 0, iron_armor: 0, iron_shield: 0, magic_water: 7, strong_herb: 2, lantern: 1, pass: 1, steel_sword: 1, steel_armor: 1, steel_shield: 1 },
+  equipment: { weapon: "steel_sword", armor: "steel_armor", shield: "steel_shield" },
+  remiraSteps: 0, torchSteps: 0, holyWaterSteps: 0, isLanternLit: true, isPoisoned: false,
+  returnPoint: { mapId: "port_church", gridX: 3, gridY: 5, direction: "up" },
+  flags: { talkedToSister: true, receivedSisterHerb: true, talkedToScholar: true, reportedMonumentToScholar: true, heardPassRequirement: true, kidnappingEventStarted: true, rescuedGirl: true, hasPass: true, heardOfTizona: true, hasTizona: false, defeatedDragon: false, hasLeftInitialCottage: true, elfQuestStarted: false, returnedLoversRing: false, receivedWaterShield: false, heardOfDwarf: false }
+};
+
+const fixtureWithZeroCountsSlot2 = {
+  level: 19, hp: 116, maxHp: 116, mp: 27, maxMp: 54, baseAtk: 52, baseDef: 33, spd: 29, exp: 27217, gold: 19131,
+  spells: ["hoimi", "mera", "remira", "kiari", "rariho", "gira", "liremito", "mahoton", "behoimi", "toherosu", "rula", "begirama", "behoma"],
+  inventory: { herb: 0, stick: 0, cloth_armor: 0, antique_key: 0, antidote: 0, iron_sword: 0, iron_armor: 0, torch: 0, magic_water: 0, strong_herb: 0, iron_shield: 0, lantern: 1, pass: 1, steel_sword: 0, steel_armor: 0, steel_shield: 0, sage_water: 4, lovers_ring: 0, forest_guide: 1, water_shield: 1, poison_charm: 1, bronze_key: 0, corrada: 1, fire_charm: 1, cerberus_mane: 0, dragon_armor: 1, special_herb: 0 },
+  equipment: { weapon: "corrada", armor: "dragon_armor", shield: "water_shield" },
+  remiraSteps: 0, torchSteps: 0, holyWaterSteps: 0, isLanternLit: true, isPoisoned: false,
+  returnPoint: { mapId: "dwarf_village", gridX: 12, gridY: 4, direction: "right" },
+  flags: { talkedToSister: true, receivedSisterHerb: true, talkedToScholar: true, reportedMonumentToScholar: true, heardPassRequirement: true, kidnappingEventStarted: true, rescuedGirl: true, hasPass: true, heardOfTizona: true, hasTizona: false, defeatedDragon: false, hasLeftInitialCottage: true, elfQuestStarted: true, returnedLoversRing: true, receivedWaterShield: true, heardOfDwarf: true, blackLizardQuestStarted: true, blackLizardDefeated: true, blackLizardQuestCompleted: true, cerberusQuestStarted: true, receivedDragonArmor: true }
+};
+
+test('32. 実機セーブデータ (数量0アイテム混入) のデシリアライズとサニタイズ整合性', () => {
+  const p = new Player();
+  p.deserialize(fixtureWithZeroCountsSlot1);
+
+  assert.equal(p.level, 10);
+  assert.equal(p.hp, 62);
+  assert.equal(p.maxHp, 62);
+  assert.equal(p.mp, 25);
+  assert.equal(p.maxMp, 25);
+  assert.equal(p.gold, 472);
+  assert.equal(p.exp, 2899);
+
+  // 数量0だったアイテムは0を返し、hasItemはfalse
+  assert.equal(p.inventory.herb, 0);
+  assert.equal(p.inventory.stick, 0);
+  assert.equal(p.inventoryInstance.hasItem('herb'), false);
+  assert.equal('herb' in p.inventory, false);
+
+  // 数量1以上だったアイテムは正常に復元
+  assert.equal(p.inventory.antique_key, 1);
+  assert.equal(p.inventory.magic_water, 7);
+  assert.equal(p.inventory.strong_herb, 2);
+  assert.equal(p.inventory.lantern, 1);
+  assert.equal(p.inventory.pass, 1);
+  assert.equal(p.inventory.steel_sword, 1);
+  assert.equal(p.inventory.steel_armor, 1);
+  assert.equal(p.inventory.steel_shield, 1);
+
+  // 実所持アイテム数は8枠
+  assert.equal(p.getInventoryCount(), 12);
+  assert.equal(p.equipment.weapon, 'steel_sword');
+  assert.equal(p.equipment.armor, 'steel_armor');
+  assert.equal(p.equipment.shield, 'steel_shield');
+
+  // slot_2 の検証
+  const p2 = new Player();
+  p2.deserialize(fixtureWithZeroCountsSlot2);
+
+  assert.equal(p2.level, 19);
+  assert.equal(p2.hp, 116);
+  assert.equal(p2.inventory.herb, 0);
+  assert.equal(p2.inventory.sage_water, 4);
+  assert.equal(p2.inventory.corrada, 1);
+  assert.equal(p2.getInventoryCount(), 9);
+  assert.equal(p2.equipment.weapon, 'corrada');
+  assert.equal(p2.equipment.armor, 'dragon_armor');
+  assert.equal(p2.equipment.shield, 'water_shield');
+});
+
 console.log(`--- All ${testsPassed} Tests Passed Successfully ---`);

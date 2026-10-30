@@ -3,6 +3,7 @@ import { ITEM_DB, SPELL_DB } from './items.js';
 import { logFormatter } from './logFormatter.js';
 import { Actor } from './engine/entities/Actor.js';
 import { Inventory, DEFAULT_MAX_CAPACITY } from './engine/state/Inventory.js';
+import GenericFlags from './engine/state/GenericFlags.js';
 
 /**
  * プロトコル第3項準拠の高解像度例外を生成する決定論的ヘルパー
@@ -19,6 +20,25 @@ export function createProtocolError(type, contextId, propName, val) {
 export const MAX_INVENTORY_CAPACITY = 12;
 
 const VALID_EQUIP_SLOTS = ['weapon', 'armor', 'shield'];
+
+const DEFAULT_PLAYER_FLAGS = {
+  talkedToSister: false,
+  receivedSisterHerb: false,
+  talkedToScholar: false,
+  reportedMonumentToScholar: false,
+  heardPassRequirement: false,
+  kidnappingEventStarted: false,
+  rescuedGirl: false,
+  hasPass: false,
+  heardOfTizona: false,
+  hasTizona: false,
+  defeatedDragon: false,
+  hasLeftInitialCottage: false,
+  elfQuestStarted: false,
+  returnedLoversRing: false,
+  receivedWaterShield: false,
+  heardOfDwarf: false
+};
 
 /**
  * Inventory インスタンスと透過的に同期するインベントリ互換 Proxy の生成
@@ -155,6 +175,57 @@ function createEquipmentProxy(inventoryInstance) {
   });
 }
 
+/**
+ * GenericFlags インスタンスと透過的に同期するフラグ互換 Proxy の生成
+ * @param {GenericFlags} flagsInstance 
+ * @returns {Proxy}
+ */
+function createFlagsProxy(flagsInstance) {
+  return new Proxy({}, {
+    get(target, prop) {
+      if (typeof prop === 'string') {
+        return flagsInstance.get(prop);
+      }
+      return Reflect.get(target, prop);
+    },
+    set(target, prop, value) {
+      if (typeof prop === 'string') {
+        flagsInstance.set(prop, value);
+        return true;
+      }
+      return Reflect.set(target, prop, value);
+    },
+    has(target, prop) {
+      if (typeof prop === 'string') {
+        return flagsInstance.has(prop);
+      }
+      return Reflect.has(target, prop);
+    },
+    deleteProperty(target, prop) {
+      if (typeof prop === 'string') {
+        return flagsInstance.delete(prop);
+      }
+      return Reflect.deleteProperty(target, prop);
+    },
+    ownKeys(target) {
+      return Object.keys(flagsInstance.getAll());
+    },
+    getOwnPropertyDescriptor(target, prop) {
+      if (typeof prop === 'string') {
+        if (flagsInstance.has(prop)) {
+          return {
+            value: flagsInstance.get(prop),
+            writable: true,
+            enumerable: true,
+            configurable: true
+          };
+        }
+      }
+      return undefined;
+    }
+  });
+}
+
 export class Player {
   constructor(gridX = 3, gridY = 4, tileSize = 64, eventBus = null) {
     if (typeof gridX !== 'number') {
@@ -245,24 +316,8 @@ export class Player {
       direction: 'up'
     };
 
-    this.flags = {
-      talkedToSister: false,
-      receivedSisterHerb: false,
-      talkedToScholar: false,
-      reportedMonumentToScholar: false,
-      heardPassRequirement: false,
-      kidnappingEventStarted: false,
-      rescuedGirl: false,
-      hasPass: false,
-      heardOfTizona: false,
-      hasTizona: false,
-      defeatedDragon: false,
-      hasLeftInitialCottage: false,
-      elfQuestStarted: false,
-      returnedLoversRing: false,
-      receivedWaterShield: false,
-      heardOfDwarf: false
-    };
+    this._flagsInstance = new GenericFlags(DEFAULT_PLAYER_FLAGS);
+    this._flagsProxy = createFlagsProxy(this._flagsInstance);
   }
 
   get inventory() {
@@ -281,9 +336,22 @@ export class Player {
     }
 
     const currentEquip = this.inventoryInstance.getEquipment();
+    const sanitizedItems = {};
+    for (const [k, v] of Object.entries(val)) {
+      if (typeof v === 'number') {
+        if (!Number.isNaN(v)) {
+          if (Number.isInteger(v)) {
+            if (v > 0) {
+              sanitizedItems[k] = v;
+            }
+          }
+        }
+      }
+    }
+
     this.inventoryInstance.fromJSON({
       maxCapacity: MAX_INVENTORY_CAPACITY,
-      items: val,
+      items: sanitizedItems,
       equipment: currentEquip
     });
   }
@@ -327,6 +395,23 @@ export class Player {
         shield: shieldVal
       }
     });
+  }
+  
+  get flags() {
+    return this._flagsProxy;
+  }
+  
+  set flags(val) {
+    if (val === null) {
+      return;
+    }
+    if (typeof val !== 'object') {
+      return;
+    }
+    if (Array.isArray(val)) {
+      return;
+    }
+    this._flagsInstance.load(val);
   }
 
   _updateActorStats(overrides = {}) {
@@ -967,7 +1052,7 @@ export class Player {
       isLanternLit: this.isLanternLit,
       isPoisoned: actorData.statusEffects.includes('poison'),
       returnPoint: returnPointCopy,
-      flags: { ...this.flags }
+      flags: this._flagsInstance.getAll()
     };
   }
 
@@ -1026,7 +1111,17 @@ export class Player {
     if (ps.inventory !== null) {
       if (typeof ps.inventory === 'object') {
         if (!Array.isArray(ps.inventory)) {
-          invItems = { ...ps.inventory };
+          for (const [k, v] of Object.entries(ps.inventory)) {
+            if (typeof v === 'number') {
+              if (!Number.isNaN(v)) {
+                if (Number.isInteger(v)) {
+                  if (v > 0) {
+                    invItems[k] = v;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -1064,33 +1159,24 @@ export class Player {
     }
     this.returnPoint = defaultReturnPoint;
 
-    const defaultFlags = {
-      talkedToSister: false,
-      receivedSisterHerb: false,
-      talkedToScholar: false,
-      reportedMonumentToScholar: false,
-      heardPassRequirement: false,
-      kidnappingEventStarted: false,
-      rescuedGirl: false,
-      hasPass: false,
-      heardOfTizona: false,
-      hasTizona: false,
-      defeatedDragon: false,
-      hasLeftInitialCottage: false,
-      elfQuestStarted: false,
-      returnedLoversRing: false,
-      receivedWaterShield: false,
-      heardOfDwarf: false
-    };
-
+    const defaultFlags = { ...DEFAULT_PLAYER_FLAGS };
+    
     if (ps.flags !== null) {
       if (typeof ps.flags === 'object') {
         if (!Array.isArray(ps.flags)) {
-          Object.assign(defaultFlags, ps.flags);
+          const keys = Object.keys(ps.flags);
+          for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            const v = ps.flags[k];
+            if (typeof v === 'boolean') {
+               defaultFlags[k] = v;
+            }
+          }
         }
       }
     }
-    this.flags = defaultFlags;
+    
+    this._flagsInstance.load(defaultFlags);
 
     Object.values(SPELL_DB).forEach(spell => {
       if (typeof spell.learnLevel === 'number') {
