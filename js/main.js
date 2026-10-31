@@ -22,9 +22,14 @@ import { initLogData, logFormatter } from './logFormatter.js';
 import { initItemData } from './items.js';
 import { initMonsterData } from './monsters.js';
 import { EngineEventBus } from './engine/core/EngineEventBus.js';
+import { WebAudioDriver } from './drivers/audio/WebAudioDriver.js';
 
 // Core Event Hub instance
 export const engineEventBus = new EngineEventBus();
+
+// Driver instances
+export const audioDriver = new WebAudioDriver(engineEventBus, sound);
+audioDriver.subscribe();
 
 
 export const TILE_DB = {

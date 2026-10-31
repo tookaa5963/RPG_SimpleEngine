@@ -27,5 +27,6 @@ export const EventTypes = Object.freeze({
     MESSAGE_LOG: 'system:message_log',
     AUDIO_PLAY_SE: 'system:audio_play_se',
     AUDIO_PLAY_BGM: 'system:audio_play_bgm',
+    AUDIO_STOP_BGM: 'system:audio_stop_bgm',
   }),
 });
