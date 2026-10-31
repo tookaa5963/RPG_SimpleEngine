@@ -92,8 +92,7 @@
 - [202610311200] Step 4-1: js/drivers/audio/WebAudioDriver.js の配線（Gate 1, 2, 3 通過）
 - [202610311515] Step 4-2: js/drivers/ui/DomUiDriver.js の配線（Gate 1, 2, 3 通過）
 - [202610311600] Step 4-3 探査: ロジック層残存出力依存の静的特定完了（Core層のヘッドレス健全性を確認、案Aを採用）
-- [ ] Step 4-3: tools/test_headless_run.mjs の新規作成（完全ヘッドレス実証テスト配備 / Gate 1, 2）
-
+- [202610311915] Step 4-3: tools/test_headless_run.mjs の新規作成（完全ヘッドレス実証テスト配備 / Gate 1, 2 通過）
 
 
 ※Phase 5は極めて難易度が上がります。Phase5に入る前に、battle.js の中をさらに「ターン進行キュー」「行動選択UI」「演出アニメーション」といった細かいサブステップへあらかじめ再分解しておく必要あり。
@@ -120,13 +119,14 @@
 
 ## 5. 引き継ぎ部
 
-完了コミット: <dae5726> (feat(ui): implement DomUiDriver and wire actor events in main.js)
+完了コミット: <fb22b4e> (test(headless): add complete headless integration run test)
 直近完了内容:
-- Step 4-3 静的探査の完了: Core層（js/engine/）および player.js, save.js に出力系依存（sound/ui/DOM）が存在しない事実を確定。
-- battleActions.js 等のレガシー依存は Phase 5（BattleEngine 分割）にて包括的に扱う方針（案A）を合意。
+- Step 4-3 完全ヘッドレス実証テスト（tools/test_headless_run.mjs）配備完了:
+  - ブラウザAPI（window/document/AudioContext）が一切存在しない Node.js ランタイム下で、Core層（Actor, Inventory, EffectResolver, DataRepository, GenericFlags, EngineEventBus）が協調動作するゲーム進行シナリオ（47項目）が Exit Code 0 で完走することを実証。
+  - Phase 4 の全工程が完了。Core層の完全ヘッドレス化および疎結合性が担保された。
 
 次タスク:
-- Phase 4: Step 4-3 完全ヘッドレス実証テスト（tools/test_headless_run.mjs）の配備
-  - 目的: DOM（window/document）および AudioDriver を一切ロードしない純粋な Node.js 環境において、Core層モジュール（Actor, Inventory, EffectResolver, DataRepository, GenericFlags）を連携させたゲーム進行シナリオ（生成・戦闘行動・アイテム使用・状態変化）が Exit Code 0 で完走することを機械的に検証する。
-  - 規模: tools/ 配下への新規テストスクリプト配備（本番コード変更なし）
-  - 検証: Gate 1（静的構文チェック）＋ Gate 2（単体テスト実行）
+- Phase 5: 3大中核モジュール物理分割と Bootstrap 化
+  - 次回作業: Step 5-1 探査セッション
+    - menu.js の物理分割（MenuController.js と MenuRenderer.js）に向けた事前静的探査
+    - menu.js 内の純粋ロジック（カーソル移動・インデックス計算・コマンド決定判定）と DOM描画処理（drawListBox / drawMessageBox / sound呼び出し）の境界特定および最小コードブロックの抽出

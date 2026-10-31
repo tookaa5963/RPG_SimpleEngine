@@ -19,3 +19,4 @@
 [202610310230] Step 3-5d: player.js のステータス・インベントリ系シリアライズ統合/e7ca30a0b57887b3fd7093b5e64b7d79854a5002
 [202610311200] Step 4-1: js/drivers/audio/WebAudioDriver.js の配線（Gate 1, 2, 3 通過）/9a09b8197fe9498a53f6dae0f068399f8fadde67
 - [202610311515] Step 4-2: js/drivers/ui/DomUiDriver.js の配線（Gate 1, 2, 3 通過）/dae57268c25cc552d101e9dc20cd559b295d0839
+- [202610311915] Step 4-3: tools/test_headless_run.mjs の新規作成（完全ヘッドレス実証テスト配備 / Gate 1, 2 通過）/fb22b4ebbaee3c2ba3f4d6669065d76a3133ca45
