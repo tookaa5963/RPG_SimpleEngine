@@ -23,6 +23,7 @@ import { initItemData } from './items.js';
 import { initMonsterData } from './monsters.js';
 import { EngineEventBus } from './engine/core/EngineEventBus.js';
 import { WebAudioDriver } from './drivers/audio/WebAudioDriver.js';
+import { DomUiDriver } from './drivers/ui/DomUiDriver.js';
 
 // Core Event Hub instance
 export const engineEventBus = new EngineEventBus();
@@ -30,6 +31,8 @@ export const engineEventBus = new EngineEventBus();
 // Driver instances
 export const audioDriver = new WebAudioDriver(engineEventBus, sound);
 audioDriver.subscribe();
+
+export let domUiDriver = null;
 
 
 export const TILE_DB = {
@@ -645,6 +648,8 @@ function initializeGameEntities() {
   input = new InputManager();
   renderer = new Renderer(TILE_SIZE);
   uiManager = new UIManager();
+  domUiDriver = new DomUiDriver(engineEventBus, uiManager);
+  domUiDriver.subscribe();
   messageWindow = new MessageWindow(() => { currentState = STATE_EXPLORE; });
 
   btnToggleBgm = document.getElementById('btn-toggle-bgm');
