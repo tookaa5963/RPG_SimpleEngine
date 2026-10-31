@@ -89,11 +89,9 @@
 
 目的: ロジック層から sound.js / ui.js の直接インポートを物理削除し、イベント駆動へ完全置換。
 
-- Step 4-1: js/drivers/audio/WebAudioDriver.js の配線  
-  - 規模: 約 80 行（EventBus の音声再生要求イベントを購読して再生）  
-  - 検証: Gate 1 通過 ＋ 実機SE/BGM発火確認  
-- Step 4-2: js/drivers/ui/DomUiDriver.js（または HtmlSidebarDriver.js）の配線  
-  - 規模: 約 100 行（アクター状態変化イベントを購読してDOM更新）  
+- [202610311200] Step 4-1: js/drivers/audio/WebAudioDriver.js の配線（Gate 1, 2, 3 通過）
+- Step 4-2: js/drivers/ui/DomUiDriver.js の配線
+  - 規模: 約 100 行（アクター状態変化イベントを購読してDOM更新）
   - 検証: Gate 1 通過 ＋ 実機サイドバーUI追従確認  
 - Step 4-3: ロジック層からの出力インポート完全撤廃  
   - 規模: player.js, EffectResolver 等から DOM / Audio の参照を削除  
@@ -121,18 +119,18 @@
   - 規模: main.js からロジックを排除し、Core/Driver の配線・初期化のみに圧縮  
   - 検証: Gate 1, 2, 3 全通過（全モジュールの完全独立実証）
 
-## 5\. 引き継ぎ部
+## 5. 引き継ぎ部
 
-完了コミット: eeafb5e (feat(player): delegate scenario flags to GenericFlags and sanitize zero-count items in inventory) 完了内容:
-
-- player.js のシナリオフラグ管理を GenericFlags に完全委譲（Proxy による後方互換性維持）  
-- 旧セーブデータに混入していた数量0の不要アイテムに対するサニタイズ処理を配備し、全スロットの正常復元性を確保  
-- 実機バックアップセーブデータを用いた単体テスト（累計32件）およびブラウザ実機検証（Gate 1, 2, 3）全通過確認  
-- prepare\_staging.mjs における正規表現 lastIndex 競合バグを解消し、依存モジュールの自動ミラーリング機構を安定化
+完了コミット: <取得したコミットハッシュ> (feat(audio): implement WebAudioDriver and wire audio events in main.js)
+完了内容:
+- `EventTypes.SYSTEM` に `AUDIO_STOP_BGM` を追加
+- `js/drivers/audio/WebAudioDriver.js` を新規作成（全17種SEおよびBGM再生/停止イベントの購読・委譲機構）
+- `tools/test_web_audio_driver.mjs` を作成し、単体テスト47件の全通過を確認
+- `js/main.js` に `WebAudioDriver` を配線し、ブラウザ実機（Gate 3）でのイベント駆動発音を確認
+- 既存の全単体テスト（累積275件以上）の通過を確認し、デグレなきことを担保
 
 次タスク:
-
-- Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)  
-  - Step 4-1: js/drivers/audio/WebAudioDriver.js の配線  
-    - 目的: ロジック層からの sound.js 直接呼び出しを廃止し、EngineEventBus 経由の音声再生要求イベントを購読・再生する専用ドライバを配備  
-    - 検証: Gate 1 通過 ＋ 実機SE/BGM発火確認
+- Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)
+  - Step 4-2: js/drivers/ui/DomUiDriver.js の配線
+    - 目的: ロジック層からの DOM 直接操作を排除するため、アクター状態変化イベント（HP/MP変化、状態異常付与/解除等）を購読してサイドバー等のHTML表示を更新する専用ドライバを配備
+    - 検証: Gate 1 通過 ＋ 実機UI追従確認

@@ -17,3 +17,4 @@
 [202610300326] Step 3-5b: player.js のインベントリ・装備系の Inventory 委譲/03a252591fed43c17084133eae6763e04a5cc051
 [202610302053] Step 3-5c: player.js の経験値・成長・ゴールド系の委譲/e465ca1cc7e28e6e42d9c5898a20ae775ff795d3
 [202610310230] Step 3-5d: player.js のステータス・インベントリ系シリアライズ統合/e7ca30a0b57887b3fd7093b5e64b7d79854a5002
+[202610311200] Step 4-1: js/drivers/audio/WebAudioDriver.js の配線（Gate 1, 2, 3 通過）/9a09b8197fe9498a53f6dae0f068399f8fadde67
