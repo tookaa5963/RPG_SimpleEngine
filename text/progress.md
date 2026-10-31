@@ -90,12 +90,17 @@
 目的: ロジック層から sound.js / ui.js の直接インポートを物理削除し、イベント駆動へ完全置換。
 
 - [202610311200] Step 4-1: js/drivers/audio/WebAudioDriver.js の配線（Gate 1, 2, 3 通過）
-- Step 4-2: js/drivers/ui/DomUiDriver.js の配線
-  - 規模: 約 100 行（アクター状態変化イベントを購読してDOM更新）
-  - 検証: Gate 1 通過 ＋ 実機サイドバーUI追従確認  
-- Step 4-3: ロジック層からの出力インポート完全撤廃  
-  - 規模: player.js, EffectResolver 等から DOM / Audio の参照を削除  
-  - 検証: Gate 1（境界違反ゼロ確認）＋ Driver を無効化してもロジックが 100% 走ることを実証
+- [202610311515] Step 4-2: js/drivers/ui/DomUiDriver.js の配線（Gate 1, 2, 3 通過）
+- [探査] Step 4-3 探査: ロジック層における残存出力依存（sound/ui/DOM）の静的特定（コード変更なし）
+- Step 4-3a: Core層（EffectResolver等）からの出力依存撤廃
+  - 規模: Core層における sound / ui 直接参照の排除、EventBus 通知への置換
+  - 検証: Gate 1（Core境界・禁止構文検証）＋ Gate 2（単体テスト）
+- Step 4-3b: レガシーロジック層（player.js等）からの出力依存撤廃
+  - 規模: player.js 内のサウンド再生・DOM操作呼び出しの排除、イベント発行化
+  - 検証: Gate 1 ＋ Gate 2 ＋ Gate 3（実機動作確認）
+- Step 4-3c: 完全ヘッドレス実証テストの配備
+  - 規模: ドライバ非接続状態で全ゲームロジックが完走することを検証するヘッドレスランナーの作成
+  - 検証: Gate 2（新規ヘッドレス統合テストによる Exit Code 0 確認）
 
 ※Phase 5は極めて難易度が上がります。Phase5に入る前に、battle.js の中をさらに「ターン進行キュー」「行動選択UI」「演出アニメーション」といった細かいサブステップへあらかじめ再分解しておく必要あり。
 
@@ -121,16 +126,14 @@
 
 ## 5. 引き継ぎ部
 
-完了コミット: <取得したコミットハッシュ> (feat(audio): implement WebAudioDriver and wire audio events in main.js)
+完了コミット: <dae5726> (feat(ui): implement DomUiDriver and wire actor events in main.js)
 完了内容:
-- `EventTypes.SYSTEM` に `AUDIO_STOP_BGM` を追加
-- `js/drivers/audio/WebAudioDriver.js` を新規作成（全17種SEおよびBGM再生/停止イベントの購読・委譲機構）
-- `tools/test_web_audio_driver.mjs` を作成し、単体テスト47件の全通過を確認
-- `js/main.js` に `WebAudioDriver` を配線し、ブラウザ実機（Gate 3）でのイベント駆動発音を確認
-- 既存の全単体テスト（累積275件以上）の通過を確認し、デグレなきことを担保
+- `js/drivers/ui/DomUiDriver.js` を新規作成（HP/MP変動、状態異常付与/解除、死亡イベントを購読してDOMを更新する出力ドライバ）
+- `tools/test_dom_ui_driver.mjs` を作成し、単体テスト全8項目のパスを確認
+- `js/main.js` に `DomUiDriver` を配線し、実機ブラウザ（Gate 3）でのイベント駆動によるサイドバー追従（コンソールエラー0件）を確認
+- `WebAudioDriver` を含む全47件の既存単体テストの累積パスを確認し、デグレなきことを担保
 
 次タスク:
 - Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)
-  - Step 4-2: js/drivers/ui/DomUiDriver.js の配線
-    - 目的: ロジック層からの DOM 直接操作を排除するため、アクター状態変化イベント（HP/MP変化、状態異常付与/解除等）を購読してサイドバー等のHTML表示を更新する専用ドライバを配備
-    - 検証: Gate 1 通過 ＋ 実機UI追従確認
+  - 【探査セッション】Step 4-3 探査: ロジック層における残存出力依存の静的特定
+    - 目的: プロトコル第6条第4項に基づき、コード変更を行わず `player.js`, `EffectResolver.js` 等に存在する `sound`, `ui`, `document` 等の残存参照行を静的コマンドで網羅的に洗い出し、Step 4-3a / 4-3b の改変境界を確定させる。
