@@ -23,4 +23,5 @@
 - [202610311915]Step5-1直前検討後の書類更新/
 4729a9a48bb97d561045190039d2b5f3a42d0dad
 - [202611011622]Step Pre-1a [受け皿先行]**: `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設。`tools/test_objectives.mjs` を配備/ab2aa554926b8c3c8fc4c9a4818b5d2a6adb645b
-- [202611011655] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。fc0d44cdf369a06f6d5363aa77c4672e4f7c895a
+- [202611011655] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。/fc0d44cdf369a06f6d5363aa77c4672e4f7c895a   
+- [202611011939] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。/badc8613bbd9a8a2847548cbcf4777156a0f699f
