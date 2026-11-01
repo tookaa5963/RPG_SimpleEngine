@@ -22,3 +22,4 @@
 - [202610311915] Step 4-3: tools/test_headless_run.mjs の新規作成（完全ヘッドレス実証テスト配備 / Gate 1, 2 通過）/fb22b4ebbaee3c2ba3f4d6669065d76a3133ca45
 - [202610311915]Step5-1直前検討後の書類更新/
 4729a9a48bb97d561045190039d2b5f3a42d0dad
+- [202611011622]Step Pre-1a [受け皿先行]**: `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設。`tools/test_objectives.mjs` を配備/ab2aa554926b8c3c8fc4c9a4818b5d2a6adb645b
