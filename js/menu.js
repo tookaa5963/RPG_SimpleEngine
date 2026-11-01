@@ -1,6 +1,6 @@
 // FILE_ENTRY: js/menu.js
 import { logFormatter } from './logFormatter.js';
-import { getObjectiveText } from './events.js';
+import { getObjectiveText, resolveCurrentObjectiveKey } from './events.js';
 import { sound } from './sound.js';
 import { maps } from './maps.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
@@ -59,62 +59,11 @@ export class MenuManager {
   }
 
   showCurrentObjective() {
-    const p = this.player;
-    const flags = p.flags || {};
-    let key = '';
-
-    if (!flags.talkedToSister) {
-      key = 'talk_sister';
-    } else if (!flags.talkedToScholar) {
-      key = 'find_scholar';
-    } else if (!flags.reportedMonumentToScholar) {
-      const hasKey = (p.inventory.antique_key || 0) > 0 || (p.inventory.key || 0) > 0;
-      key = hasKey ? 'report_scholar' : 'investigate_monument';
-    } else if (!flags.hasPass) {
-      if (flags.rescuedGirl) {
-        key = 'return_girl';
-      } else if (flags.kidnappingEventStarted) {
-        key = 'rescue_girl';
-      } else if (flags.heardPassRequirement) {
-        key = 'consult_mayor';
-      } else {
-        key = 'cross_checkpoint';
-      }
-    } else if (!flags.heardOfTizona) {
-      key = 'go_library';
-    } else if (!flags.returnedLoversRing) {
-      if (!flags.elfQuestStarted) {
-        key = 'find_temple';
-      } else {
-        const hasRing = (p.inventory.lovers_ring || 0) > 0;
-        key = hasRing ? 'deliver_ring' : 'recover_ring';
-      }
-    } else if (!flags.receivedWaterShield && (p.inventory.water_shield || 0) === 0 && p.equipment.shield !== 'water_shield') {
-      key = 'obtain_water_shield';
-    } else if ((p.inventory.corrada || 0) === 0 && p.equipment.weapon !== 'corrada') {
-      key = 'obtain_corrada';
-    } else if ((p.inventory.dragon_armor || 0) === 0 && p.equipment.armor !== 'dragon_armor') {
-      if (!flags.blackLizardQuestStarted) {
-        key = flags.heardOfDwarf ? 'seek_dwarf_village' : 'seek_armor_clues';
-      } else if (!flags.blackLizardDefeated) {
-        key = 'defeat_black_lizard';
-      } else if (!flags.blackLizardQuestCompleted) {
-        key = 'report_black_lizard';
-      } else if (!flags.cerberusQuestStarted) {
-        key = 'consult_blacksmith';
-      } else if ((p.inventory.cerberus_mane || 0) > 0) {
-        key = 'deliver_mane';
-      } else {
-        key = 'defeat_cerberus';
-      }
-    } else {
-      key = 'defeat_black_dragon';
-    }
-
+    const key = resolveCurrentObjectiveKey(this.player);
     this.msgWin.open([getObjectiveText(key)]);
   }
 
-handleKeyDown(key) {
+  handleKeyDown(key) {
     const rootCommands = this.getRootCommands();
     const actionCommands = this.getActionCommands();
 
@@ -438,7 +387,7 @@ handleKeyDown(key) {
     }
   }
 
-useMagic(spell) {
+  useMagic(spell) {
     const effectDef = spell.effect || (SPELL_DB[spell.id] ? SPELL_DB[spell.id].effect : null);
     if (effectDef && effectDef.type === 'heal_hp') {
       if (this.player.hp >= this.player.maxHp) {
