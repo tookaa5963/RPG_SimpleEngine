@@ -702,6 +702,59 @@ export class Player {
     return this.inventoryInstance.isEquipped(itemId);
   }
 
+  canDropItem(item) {
+    if (typeof item !== 'string' && (typeof item !== 'object' || item === null || Array.isArray(item))) {
+      throw createProtocolError('TypeError', 'player.js:canDropItem', 'item', item);
+    }
+
+    let itemId = '';
+    let itemType = null;
+
+    if (typeof item === 'string') {
+      itemId = item;
+      if (typeof ITEM_DB !== 'undefined' && ITEM_DB !== null && itemId in ITEM_DB) {
+        if (typeof ITEM_DB[itemId] === 'object' && ITEM_DB[itemId] !== null) {
+          itemType = ITEM_DB[itemId].type;
+        }
+      }
+    } else {
+      if (typeof item.id !== 'string') {
+        throw createProtocolError('TypeError', 'player.js:canDropItem', 'item.id', item.id);
+      }
+      itemId = item.id;
+      if ('type' in item && typeof item.type === 'string') {
+        itemType = item.type;
+      } else if (typeof ITEM_DB !== 'undefined' && ITEM_DB !== null && itemId in ITEM_DB) {
+        if (typeof ITEM_DB[itemId] === 'object' && ITEM_DB[itemId] !== null) {
+          itemType = ITEM_DB[itemId].type;
+        }
+      }
+    }
+
+    if (itemId.trim() === '') {
+      throw createProtocolError('EmptyStringError', 'player.js:canDropItem', 'itemId', itemId);
+    }
+
+    if (this.isEquipped(itemId)) {
+      return {
+        canDrop: false,
+        reason: 'equipped'
+      };
+    }
+
+    if (itemType === 'key' || itemType === 'keyItem') {
+      return {
+        canDrop: false,
+        reason: 'key_item'
+      };
+    }
+
+    return {
+      canDrop: true,
+      reason: null
+    };
+  }
+
   getRequiredExpForLevel(level) {
     if (typeof level !== 'number') {
       throw createProtocolError('TypeError', 'player.js:getRequiredExpForLevel', 'level', level);
