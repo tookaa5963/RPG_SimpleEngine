@@ -171,10 +171,10 @@ rpg_simple_engine/
 - [202611012030] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証完了。
 - [202611020110] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1, Gate 2 検証完了。
 
-
-- [] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証。
-
-- [ ] **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
+- [ ] **Step Pre-3bc**
+ **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証。
+ **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
+ ※Step Pre-3bと3cは1セッションで行う。
 
 - [ ] **Step Pre-4a [受け皿先行]**: `data/items/i_forest_guide.json` および `data/spells/s_rula.json`, `s_liremito.json` に effect 定義を付与し、`EffectResolver` にマップ遷移・メッセージ用の解決ストラテジーを配備。Gate 1, Gate 2 検証。
 - [ ] **Step Pre-4b [既存委譲]**: `js/menu.js` の `useItem()` 内にある個別アイテムID分岐（`forest_guide`, `broken_corrada_hilt` 等）を撤廃し、`EffectResolver` 経由へ統一。Gate 1, Gate 2, Gate 3 検証。
@@ -198,35 +198,160 @@ rpg_simple_engine/
 
 ## 5. 引き継ぎ部
 
-### Step Pre-3 における障害発生ログと教訓（対応完了）
+**Step Pre-3bc**を実施する前に下記仕様のテストコードを作成するセッションとします。
 
-1. **障害内容**:
-   - 実機検証（Gate 3）にて、タイトル画面復帰時およびゲーム起動時に以下の例外が発生。
-     - `TypeError: EngineEventBus.emit is not a function` (`js/menu.js`)
-     - `TypeError: EngineEventBus.on is not a function` (`js/main.js`)
-   - これにより、メニューからのゲーム終了（タイトル復帰）が不能となるデグレが発生。
+### tools/test_menu_callbacks.mjs 単体テスト・回帰検証仕様書
 
-2. **根本原因**:
-   - `EngineEventBus` はインスタンス駆動の設計であり、静的メソッド（`static on`, `static emit`）を持たない。
-   - レガシー層（`menu.js`）および起動層（`main.js`）からクラスに対する静的呼び出しを実装したため実行時エラーとなった。また、単体テスト（Gate 2）で当該コードパスが網羅されておらず、実機（Gate 3）まで検知が遅延した。
+1. 文書概要
+1.1 目的
+汎用RPGエンジン移行運用プロトコル ver 1.36 に基づき、MenuManager（js/menu.js）が保持する画面遷移用コールバック（onOpenSlot, onReturnToTitle）を廃止し、EngineEventBus による要求イベント発行へと疎結合化する改修（Step Pre-3bc）において、機能の退行（リグレッション）防止および新仕様の正常動作を機械的・決定論的に検証するためのテスト仕様を定義する。
+1.2 適用範囲
+検証対象モジュール: js/menu.js（MenuManager クラス）
+結合対象実在モジュール: js/player.js（Player クラス）、js/engine/core/EngineEventBus.js、js/engine/core/EventTypes.js
+テストランナー配置: tools/test_menu_callbacks.mjs
+2. アーキテクチャおよび前提制約
+2.1 テスト設計原則
+推測・手製モックの完全排除（第0条第1項準拠）:
+mockPlayer 等の独自スタブオブジェクトの作成を禁止する。アクター状態、所持品、装備判定には必ず Player クラス（js/player.js）の正規インスタンスを使用する。
+ブラックボックス操作の徹底:
+menu.rootIndex や menu.quitConfirmIndex などの内部状態プロパティへの直接代入による状態変更を禁止する。初期状態からの遷移はすべて menu.handleKeyDown(key) によるキー入力シーケンスのみで行う。
+フェイルファストと契約検証:
+イベントバスが未注入、または emit メソッドを持たない不正オブジェクトが渡された状態で操作が行われた場合、直ちに例外を送出して停止することを確認する。
+2.2 ヘッドレス実行環境エミュレーション仕様
+js/menu.js の依存先であるレガシーモジュール（sound.js, maps.js, ui.js）がモジュール評価時に実行するブラウザAPIアクセスを吸収するため、テストスクリプトの最上位で以下のグローバルスタブを注入する。
+対象オブジェクト
+提供メソッド / プロパティ
+戻り値 / 挙動
+目的
+globalThis.localStorage
+getItem, setItem, removeItem, clear
+空関数 / null
+sound.js:loadSettings の初期化エラー抑止
+globalThis.document
+createElement(tag)
+{ appendChild: () => {}, addEventListener: () => {} }
+sound.js:createBgmElement の初期化エラー抑止
+globalThis.document
+getElementById(id), querySelector(sel)
+null
+ui.js 内のDOM参照エラー抑止
+globalThis.fetch
+fetch(url)
+Promise.resolve({ ok: true, json: () => ({ maps: [] }) })
+maps.js:initMapData の相対パス解決エラー抑止
 
-3. **是正処置および確定アーキテクチャ方針**:
-   - **契約テスト配備 (コミット: `a7e8581`)**: `tools/test_headless_run.mjs` の先頭に API 契約テスト（6件）を追加配備（Gate 2 累積アサーション数: 53件）。Core層への静的ファサード配備を物理禁止し、「パターンB（インスタンス専用・DI規約）」を確定。
-   - **Step Pre-3a 完了 (コミット: `efe85b4`)**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（`REQUEST_MAP_CHANGE`, `REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）を先行配備（Gate 1 / Gate 2 通過）。
+2.3 ステージングツール（prepare_staging.mjs）適合仕様
+tools/prepare_staging.mjs の静的依存抽出パーサーは静的 import ... from ... 構文のみを対象とするため、動的インポート（await import(...)）を使用する場合は明示的な依存追跡が行われない。
+したがって、環境スタブ初期化とモジュールロードの順序制御を行うにあたっては、以下のいずれかの整合措置を必須とする。
+方式A: テスト冒頭にダミーの静的インポート文を記述せず、prepare_staging.mjs 実行時に js/player.js および js/menu.js が自動コピーされるよう、トップレベル静的インポート可能な設計への分離。
+方式B: モック初期化専用のブートストラップモジュール（tools/setup_headless_env.mjs）を先行静的インポートし、続けてテスト対象を静的インポートする構造への統一。
+3. テストケース詳細仕様
+3.1 Phase 1: 回帰防止テスト群（現行コールバック方式の検証）
+現行コード（7引数コンストラクタ）に対し、キー入力シーケンスによる画面遷移要求が正確にコールバック関数へ伝達されることを検証する。
+Case 1-1: ルートカーソルの境界巡回（ブラックボックス操作保証）
+前提条件: createMenuHarness() により menu インスタンスを生成し、menu.open() を呼び出す（phase === 'ROOT'、カーソル位置 0）。
+入力シーケンス:
+handleKeyDown('ArrowUp')
+handleKeyDown('Enter')
+検証項目:
+カーソルが最末尾（インデックス 6: 冒険を中断する）へ逆巡回し、menu.phase === 'QUIT_CONFIRM' となること。
+入力シーケンス（キャンセル復帰）: 3. handleKeyDown('Escape')
+検証項目:
+menu.phase === 'ROOT' に復帰すること。
+Case 1-2: ロードダイアログ要求のキーストローク伝達
+前提条件: menu.open() 完了状態。
+入力シーケンス:
+handleKeyDown('ArrowDown')（道具）
+handleKeyDown('ArrowDown')（装備）
+handleKeyDown('ArrowDown')（思い出す）
+handleKeyDown('ArrowDown')（冒険の書を読む: インデックス 4）
+handleKeyDown('Enter')
+検証項目:
+onOpenSlot が厳密に 1 回呼び出されること。
+onOpenSlot に渡された第1引数が文字列 'load' であること。
+Case 1-3: セーブダイアログ要求のキーストローク伝達
+前提条件: menu.open() 完了状態。
+入力シーケンス:
+handleKeyDown('ArrowDown') × 5回（冒険の書を記録する: インデックス 5）
+handleKeyDown('Enter')
+検証項目:
+onOpenSlot が厳密に 1 回呼び出されること。
+onOpenSlot に渡された第1引数が文字列 'save' であること。
+Case 1-4: 中断メニューの「いいえ」選択（キャンセル）
+前提条件: menu.open() 完了状態。
+入力シーケンス:
+handleKeyDown('ArrowDown') × 6回（冒険を中断する）
+handleKeyDown('Enter')（QUIT_CONFIRM 突入、初期カーソルは 1: 「いいえ」）
+handleKeyDown('Enter')
+検証項目:
+menu.phase === 'ROOT' に戻ること。
+onReturnToTitle が呼び出されていないこと（呼び出し回数 0）。
+onEnd が呼び出されていないこと（呼び出し回数 0）。
+Case 1-5: 中断メニューのトグル反転と「はい」確定
+前提条件: menu.open() 完了状態。
+入力シーケンス:
+handleKeyDown('ArrowDown') × 6回
+handleKeyDown('Enter')
+handleKeyDown('ArrowLeft')（トグル反転により 0: 「はい」へ移動）
+handleKeyDown('Enter')
+検証項目:
+onEnd が厳密に 1 回呼び出されること。
+onReturnToTitle が厳密に 1 回呼び出されること。
+3.2 Phase 2: イベント駆動移行後テスト群（Step Pre-3bc 疎通検証）
+js/menu.js のコールバック引数が物理削除され、eventBus が注入された新シグネチャに対する検証。
+JavaScript
+// 新コンストラクタシグネチャ
+new MenuManager(player, messageWindow, onEndCallback, changeMap, getCurrentMap, eventBus)
 
----
+Case 2-1: ロード要求イベントの発行検証
+入力シーケンス: open() → ArrowDown × 4回 → Enter。
+検証項目:
+eventBus.emit 経由で EventTypes.SYSTEM.REQUEST_SLOT_DIALOG が 1 回発行されること。
+ペイロードが { mode: 'load' } であること。
+Case 2-2: セーブ要求イベントの発行検証
+入力シーケンス: open() → ArrowDown × 5回 → Enter。
+検証項目:
+eventBus.emit 経由で EventTypes.SYSTEM.REQUEST_SLOT_DIALOG が 1 回発行されること。
+ペイロードが { mode: 'save' } であること。
+Case 2-3: タイトル復帰要求イベントの発行検証
+入力シーケンス: open() → ArrowDown × 6回 → Enter → ArrowLeft → Enter。
+検証項目:
+eventBus.emit 経由で EventTypes.SYSTEM.REQUEST_RETURN_TITLE が 1 回発行されること。
+ペイロードが {} であること。
+onEnd が 1 回実行されること。
+3.3 Phase 3: 契約違反・フェイルファスト検証群
+Case 3-1: 無効な EventBus に対する防御
+条件: eventBus に null, undefined, または emit メソッドを持たないオブジェクトを渡してインスタンス化し、イベント発行を伴う操作（ロード/セーブ/中断確定）を実行する。
+検証項目:
+処理が黙殺（サイレントフェイル）されず、TypeError またはプロトコル規定の高解像度例外が確実に送出されること。
+Case 3-2: クラス静的呼び出しの不使用保証
+検証項目:
+EngineEventBus.emit（静的メソッド）への呼び出しが一切行われず、必ずコンストラクタ経由で注入されたインスタンスの emit が実行されていること。
+4. セッション別実行ロードマップと合格基準（DoD）
+[Session 1: テスト環境・回帰検証の配備]
+  │
+  ├─ 1. tools/setup_headless_env.mjs の新設（ブラウザAPIモックの共通化）
+  ├─ 2. tools/test_menu_callbacks.mjs の配備（Phase 1 回帰テスト実装）
+  ├─ 3. tools/prepare_staging.mjs による依存解決の正常性確認
+  ├─ 4. Gate 1（構文検査）および Gate 2（Exit Code 0）の通過確認
+  └─ 成果物コミット（未改修の本番コードに対する完全互換性の保証）
 
-### 次回タスク: Step Pre-3b [既存委譲]
+[Session 2: Step Pre-3bc 本体改修およびイベント配線]
+  │
+  ├─ 1. js/menu.js の改修（コールバック引数の削除、EventTypes.SYSTEM の emit 発行）
+  ├─ 2. js/main.js の改修（EventTypes 購読ハンドラ設置、MenuManager への eventBus 注入）
+  ├─ 3. tools/test_menu_callbacks.mjs のアサーションを Phase 2・3 へ更新
+  ├─ 4. Gate 1・Gate 2（Exit Code 0）の通過確認
+  ├─ 5. 本番ツリーへの昇格
+  ├─ 6. Gate 3（実機ブラウザでのセーブ/ロード/タイトル復帰の動作およびエラー0件確認）
+  └─ 成果物コミット
 
-- [ ] **探査フェーズ（事前探査セッション）**:
-  - `js/menu.js` 内の直接コールバック呼び出し箇所（`onOpenSlot`, `onReturnToTitle`）およびコンストラクタ引数の受取状況を静的に特定。
-  - 実装セッションへの入力情報として以下の3点を抽出：
-    1. 該当箇所の最小コードブロック（10〜20行程度）
-    2. 対象ブロックがアクセスしている外部変数・プロパティ一覧（`eventBus` インスタンス保持経路の確認）
-    3. 該当コードの動作解説（3行以内）
+4.1 Session 1 合格判定条件
+tools/test_menu_callbacks.mjs が既存の js/menu.js および js/player.js に対して実行され、全 7 項目以上のアサーションが assert.strictEqual により Exit Code 0 で完走すること。
+テストコード内に mockPlayer や手製データオブジェクトが存在せず、すべて実クラスから生成されていること。
+tools/test_headless_run.mjs を含む既存の累積テストランナーが破壊されていないこと。
+4.2 Session 2 合格判定条件
+js/menu.js 内に旧コールバック（this.onOpenSlot, this.onReturnToTitle）への参照およびフォールバック分岐が 1 行も残存していないこと。
+Phase 2 および Phase 3 の全テストケースが Exit Code 0 で通過すること。
+実機ブラウザ検証（Gate 3）において、メニューからのスロット起動および中断復帰が実行可能であり、コンソールエラーが 0 件であること。
 
-- [ ] **実装フェーズ（Step Pre-3b 実装セッション）**:
-  - `js/menu.js` のコンストラクタで `eventBus` インスタンスを受け取り保持するよう改修。
-  - 直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `this.eventBus.emit(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, ...)` および `this.eventBus.emit(EventTypes.SYSTEM.REQUEST_RETURN_TITLE)` へ置換。
-  - Gate 1、Gate 2、Gate 3 検証の実施。
-  - **必須制約**: クラス静的呼び出し（`EngineEventBus.emit`）を完全禁止とし、必ず注入された `this.eventBus` インスタンス経由で発行すること。
