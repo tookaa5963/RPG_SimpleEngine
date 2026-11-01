@@ -1,4 +1,4 @@
-﻿// FILE_ENTRY: js/events.js
+// FILE_ENTRY: js/events.js
 import { audioService } from './audioService.js';
 import { i18n } from './i18n.js';
 
@@ -494,6 +494,106 @@ export class EventManager {
     this.activeNpc = null;
     this.activeMap = null;
   }
+}
+
+/**
+ * プレイヤーの状態から現在の進行目標キーを決定論的に解決する純粋関数
+ * @param {Object} player
+ * @returns {string} objectives.json に登録されているキー
+ */
+export function resolveCurrentObjectiveKey(player) {
+  if (player === null) {
+    throw createProtocolError('NullReferenceError', 'events.js:resolveCurrentObjectiveKey', 'player', player);
+  }
+  if (typeof player !== 'object') {
+    throw createProtocolError('TypeError', 'events.js:resolveCurrentObjectiveKey', 'player', player);
+  }
+
+  let flags = {};
+  if (player.flags !== null && typeof player.flags === 'object') {
+    flags = player.flags;
+  }
+
+  let inventory = {};
+  if (player.inventory !== null && typeof player.inventory === 'object') {
+    inventory = player.inventory;
+  }
+
+  let equipment = {};
+  if (player.equipment !== null && typeof player.equipment === 'object') {
+    equipment = player.equipment;
+  }
+
+  const getItemCount = (itemId) => {
+    if (typeof inventory[itemId] === 'number') {
+      return inventory[itemId];
+    }
+    return 0;
+  };
+
+  let key = '';
+
+  if (!flags.talkedToSister) {
+    key = 'talk_sister';
+  } else if (!flags.talkedToScholar) {
+    key = 'find_scholar';
+  } else if (!flags.reportedMonumentToScholar) {
+    const hasKey = getItemCount('antique_key') > 0 || getItemCount('key') > 0;
+    if (hasKey) {
+      key = 'report_scholar';
+    } else {
+      key = 'investigate_monument';
+    }
+  } else if (!flags.hasPass) {
+    if (flags.rescuedGirl) {
+      key = 'return_girl';
+    } else if (flags.kidnappingEventStarted) {
+      key = 'rescue_girl';
+    } else if (flags.heardPassRequirement) {
+      key = 'consult_mayor';
+    } else {
+      key = 'cross_checkpoint';
+    }
+  } else if (!flags.heardOfTizona) {
+    key = 'go_library';
+  } else if (!flags.returnedLoversRing) {
+    if (!flags.elfQuestStarted) {
+      key = 'find_temple';
+    } else {
+      const hasRing = getItemCount('lovers_ring') > 0;
+      if (hasRing) {
+        key = 'deliver_ring';
+      } else {
+        key = 'recover_ring';
+      }
+    }
+  } else if (!flags.receivedWaterShield && getItemCount('water_shield') === 0 && equipment.shield !== 'water_shield') {
+    key = 'obtain_water_shield';
+  } else if (getItemCount('corrada') === 0 && equipment.weapon !== 'corrada') {
+    key = 'obtain_corrada';
+  } else if (getItemCount('dragon_armor') === 0 && equipment.armor !== 'dragon_armor') {
+    if (!flags.blackLizardQuestStarted) {
+      if (flags.heardOfDwarf) {
+        key = 'seek_dwarf_village';
+      } else {
+        key = 'seek_armor_clues';
+      }
+    } else if (!flags.blackLizardDefeated) {
+      key = 'defeat_black_lizard';
+    } else if (!flags.blackLizardQuestCompleted) {
+      key = 'report_black_lizard';
+    } else if (!flags.cerberusQuestStarted) {
+      key = 'consult_blacksmith';
+    } else if (getItemCount('cerberus_mane') > 0) {
+      key = 'deliver_mane';
+    } else {
+      key = 'defeat_cerberus';
+    }
+  } else {
+    key = 'defeat_black_dragon';
+  }
+
+  return key;
 }
 
 export function getObjectiveText(key) {

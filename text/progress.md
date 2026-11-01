@@ -171,7 +171,7 @@ rpg_simple_engine/
 ### 2. 詳細実行ステップ（Phase 5-1完了まで）
 
 #### Phase 5-Pre: レガシー依存パージと events.js 先行改修
-- [ ] **Step Pre-1a [受け皿先行]**: `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設。`tools/test_objectives.mjs` を配備し Gate 1, Gate 2 検証。
+- [202611011617] **Step Pre-1a [受け皿先行]**: `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設。`tools/test_objectives.mjs` を配備し Gate 1, Gate 2 検証。
 - [ ] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。Gate 1, Gate 3 検証。
 - [ ] **Step Pre-2a [受け皿先行]**: `data/items.json` および `EffectResolver` に特殊アイテム効果（テキスト表示・歩数バフ）を定義・拡張。Gate 1, Gate 2 検証。
 - [ ] **Step Pre-2b [既存委譲]**: `js/menu.js` の `useItem()` 内にある個別アイテムID分岐を撤廃し `EffectResolver` 経由へ統一。Gate 1, Gate 3 検証。
@@ -197,19 +197,14 @@ rpg_simple_engine/
 
 ## 5. 引き継ぎ部
 
-**完了コミット**: `<fb22b4e>` (test(headless): add complete headless integration run test)  
 **直近完了内容**:
-- **Phase 4 全工程完了**:
-  - `tools/test_headless_run.mjs` による完全ヘッドレス実証テスト配備完了。
-  - ブラウザAPI（`window` / `document` / `AudioContext`）非依存下で、Core層（Actor, Inventory, EffectResolver, DataRepository, GenericFlags, EngineEventBus）が協調動作するゲーム進行シナリオ全47項目が Exit Code 0 でパスすることを確認。
-- **Phase 5 移行計画の再策定（第4版・確定版）**:
-  - 3層アーキテクチャ（Engine Core / Game Content / Platform Driver）の物理境界を確定。
-  - 「受け皿先行原則（Acceptor-First）」および「特定ゲームロジック事前パージ原則」を運用規約へ明文化。
-  - `menu.js` 解体に先立ち、特定ゲーム固有ロジック（ジャーナル判定・特殊アイテム分岐）を Game Content 層（`events.js` / データ層）へ先行移設する工程へ改定。
+- **Step Pre-1a 完了**:
+  - `js/events.js` に `resolveCurrentObjectiveKey(player)` を新設（引数オブジェクト `{ flags, inventory, equipment }` を評価する副作用なしの純粋関数）。
+  - `tools/test_objectives.mjs` を配備し、全22種の目標キー分岐および異常系テスト（全30項目）が Exit Code 0 でパスすることを確認。
+  - 本番昇格後のファイナル検証（Gate 1, Gate 2, 累積テスト47項目）を全件通過。
 
 **次タスク**:
-- **Phase 5-Pre: レガシー依存パージと events.js 先行改修**
-- **次回着手作業**: `Step Pre-1a [受け皿先行]`
-  - `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設（引数オブジェクト `{ flags, inventory, equipment }` を受け取る副作用なしの純粋関数、約40行）。
-  - `tools/test_objectives.mjs` を新規作成し、各章・イベント進行状態（初期状態、姉会話後、黒リザードマン討伐前後、クリア直前等）に対する目的キー返却を単体検証。
-  - 静的検証（Gate 1: `node tools/verify_gate1.mjs`）および単体検証（Gate 2: `node tools/test_objectives.mjs`）の Exit Code 0 パスを確認。
+- **Step Pre-1b [既存委譲]**:
+  - 探査セッションまたは事前確認を経て、`js/menu.js` の `showCurrentObjective()` 内の既存60行に及ぶ `if/else` 分岐を削除。
+  - `const key = resolveCurrentObjectiveKey(this.player);` の呼び出し1行へ委譲・置換。
+  - Gate 1（静的検証）および Gate 3（実機検証: メニュー画面から「思い出す」を開き、目標テキストが正常表示されること、コンソールエラー0件であること）を実施。
