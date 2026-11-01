@@ -108,7 +108,7 @@ rpg_simple_engine/
     ├── test_menu_controller.mjs              # [新規] MenuController 単体テスト
     └── test_headless_run.mjs                 # Gate 2 ヘッドレス総合累積検証
 
-## 4\. フェーズ別チェックリスト
+## 4. フェーズ別チェックリスト
 
 ### Phase 0: 環境準備
 
@@ -116,13 +116,11 @@ rpg_simple_engine/
 - \[202610271800\] .gitignore による ai\_staging/ の隔離完了
 
 ### Phase 1: メッセージング基盤配備 (Core/core)
-
 - \[202610281900\] Step 1-1: js/engine/core/EventTypes.js 新規作成（イベント定数定義 / Gate 1通過）  
 - \[202610281900\] Step 1-2: js/engine/core/EngineEventBus.js 新規作成（Pub/Subハブ / Gate 1, 2通過）  
 - \[202610282045\] Step 1-3: main.js へのグローバル/コンテキスト配線（Gate 3通過）
 
 ### Phase 2: 効果解決系（EffectSystem）垂直スライス抽出 (Core/effects)
-
 - \[202610282231\] Step 2-1: データスキーマ拡張（回復アイテム3件・呪文3件へのeffect定義 / Gate 1通過）  
 - \[202610290130\] Step 2-2: js/engine/effects/EffectResolver.js 新規作成（ディスパッチャ / Gate 1, 2, 3通過）  
 - \[202610290215\] Step 2-3: js/engine/effects/HealHpEffect.js 新規作成（HP回復計算ストラテジー / Gate 1, 2通過）  
@@ -135,9 +133,7 @@ rpg_simple_engine/
 - \[202610291450\] Step 2-6: battleActions.js の戦闘使用委譲切り替え（Gate 1, 3通過）
 
 ### Phase 3: 汎用ステート・アクター・データ層のCore化 (Core/entities, state, data)
-
 目的: アクターモデルの確立、フラグ・変数のヘッドレス管理、DataRepository によるデータ参照の統一。
-
 - \[202610291720\] Step 3-1: js/engine/state/GenericFlags.js, VariableStore.js の新規作成  
 - \[202610291956\] Step 3-2: js/engine/entities/Actor.js の新規作成  
 - \[202610292020\] Step 3-3: js/engine/state/Inventory.js の新規作成  
@@ -149,9 +145,7 @@ rpg_simple_engine/
 - \[202610310425\] Step 3-5e: player.js のシナリオフラグ系の GenericFlags 委譲
 
 ### Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)
-
 目的: ロジック層から sound.js / ui.js の直接インポートを物理削除し、イベント駆動へ完全置換。
-
 - [202610311200] Step 4-1: js/drivers/audio/WebAudioDriver.js の配線（Gate 1, 2, 3 通過）
 - [202610311515] Step 4-2: js/drivers/ui/DomUiDriver.js の配線（Gate 1, 2, 3 通過）
 - [202610311600] Step 4-3 探査: ロジック層残存出力依存の静的特定完了（Core層のヘッドレス健全性を確認、案Aを採用）
@@ -165,14 +159,13 @@ rpg_simple_engine/
 - **Platform Driver (`js/drivers/`)**: Canvas描画、WebAudio再生、入力検知を担当。
 - **受け皿先行原則 (Acceptor-First)**: 既存コード変更前に必ず新関数・新モジュールと単体テストを配備し、Gate 1/Gate 2 通過後に委譲。
 - **ワンステップ・ワンコミット**: 1コミットの差分規模を新規50〜150行、委譲数行〜十数行に制限。
-
 ---
 
 ### 2. 詳細実行ステップ（Phase 5-1完了まで）
 
 #### Phase 5-Pre: レガシー依存パージと events.js 先行改修
 - [202611011617] **Step Pre-1a [受け皿先行]**: `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設。`tools/test_objectives.mjs` を配備し Gate 1, Gate 2 検証。
-- [ ] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。Gate 1, Gate 3 検証。
+- [202611011655] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。Gate 1, Gate 2, Gate 3 検証完了。
 - [ ] **Step Pre-2a [受け皿先行]**: `data/items.json` および `EffectResolver` に特殊アイテム効果（テキスト表示・歩数バフ）を定義・拡張。Gate 1, Gate 2 検証。
 - [ ] **Step Pre-2b [既存委譲]**: `js/menu.js` の `useItem()` 内にある個別アイテムID分岐を撤廃し `EffectResolver` 経由へ統一。Gate 1, Gate 3 検証。
 - [ ] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント（`SYSTEM:REQUEST_MAP_CHANGE`, `SYSTEM:REQUEST_SLOT_DIALOG`, `SYSTEM:REQUEST_RETURN_TITLE`）を追加。Gate 1 検証。
@@ -198,13 +191,12 @@ rpg_simple_engine/
 ## 5. 引き継ぎ部
 
 **直近完了内容**:
-- **Step Pre-1a 完了**:
-  - `js/events.js` に `resolveCurrentObjectiveKey(player)` を新設（引数オブジェクト `{ flags, inventory, equipment }` を評価する副作用なしの純粋関数）。
-  - `tools/test_objectives.mjs` を配備し、全22種の目標キー分岐および異常系テスト（全30項目）が Exit Code 0 でパスすることを確認。
-  - 本番昇格後のファイナル検証（Gate 1, Gate 2, 累積テスト47項目）を全件通過。
+- **Step Pre-1b 完了**:
+  - `js/menu.js` 内の目標判定ロジック（約50行）を削除し、`resolveCurrentObjectiveKey(this.player)` への委譲に集約。
+  - レガシーUI層からシナリオ進行フラグの直接判定をパージ完了。
+  - Gate 1、Gate 2（単体30件・累積47件）、Gate 3（実機動作確認・エラー0件）を全件通過。
 
 **次タスク**:
-- **Step Pre-1b [既存委譲]**:
-  - 探査セッションまたは事前確認を経て、`js/menu.js` の `showCurrentObjective()` 内の既存60行に及ぶ `if/else` 分岐を削除。
-  - `const key = resolveCurrentObjectiveKey(this.player);` の呼び出し1行へ委譲・置換。
-  - Gate 1（静的検証）および Gate 3（実機検証: メニュー画面から「思い出す」を開き、目標テキストが正常表示されること、コンソールエラー0件であること）を実施。
+- **Step Pre-2a [受け皿先行]**:
+  - `data/items.json` および `EffectResolver` に特殊アイテム効果（テキスト表示・歩数バフ・マップ遷移等）を定義・拡張。
+  - Gate 1, Gate 2 検証の実施。
