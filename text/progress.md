@@ -170,8 +170,8 @@ rpg_simple_engine/
 - [202611012010] **Step Pre-2b-1 [受け皿先行]**: `js/player.js` にアイテム破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。`tools/test_player_candrop.mjs` を配備し Gate 1, Gate 2 検証完了。
 - [202611012030] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証完了。
 - [202611012135] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1, Gate 2 検証完了。
+- [202611012150] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証完了。
 
-- [ ] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle` 等）を `EngineEventBus.emit` へ置換。Gate 1 検証。
 - [ ] **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
 
 - [ ] **Step Pre-4a [受け皿先行]**: `data/items/i_forest_guide.json` および `data/spells/s_rula.json`, `s_liremito.json` に effect 定義を付与し、`EffectResolver` にマップ遷移・メッセージ用の解決ストラテジーを配備。Gate 1, Gate 2 検証。
@@ -196,10 +196,11 @@ rpg_simple_engine/
 
 ## 5. 引き継ぎ部
 **直近完了内容**:
-Step Pre-3a 完了:
-- `js/engine/core/EventTypes.js` に `SYSTEM.REQUEST_MAP_CHANGE`, `SYSTEM.REQUEST_SLOT_DIALOG`, `SYSTEM.REQUEST.RETURN_TITLE` を追加。
-- Gate 1（Core層静的検証）、Gate 2（ヘッドレス累積実証テスト全47項目）を通過し本番反映完了（コミット: d93478a）。
+Step Pre-3b 完了:
+- `js/menu.js` 内でセーブ/ロード枠呼び出し（`this.onOpenSlot`）およびタイトル復帰（`this.onReturnToTitle`）の直接実行を排除。
+- `EngineEventBus.emit(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, { mode })` および `EngineEventBus.emit(EventTypes.SYSTEM.REQUEST_RETURN_TITLE, {})` へ置換。
+- Gate 1、Gate 2（ヘッドレス累積実証47項目）をパスし本番反映完了。
 
 **次タスク**:
-- [ ] Step Pre-3b [既存委譲]: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle` 等）を `EngineEventBus.emit` へ置換。Gate 1 検証。
+- [ ] Step Pre-3c [配線・引数削減]: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
 ※注意: 第6条4項に基づき、既存コード修正前には必ず探査セッション（該当箇所の抽出と外部アクセス一覧・平易な解説の特定）を実施すること。

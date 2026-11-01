@@ -28,3 +28,4 @@
 - [202611012010] **Step Pre-2b-1 [受け皿先行]**: `js/player.js` にアイテム破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。`tools/test_player_candrop./1e83f3e1c9ac4c7578514016444d4d9ae16b68aa
 - [202611012030] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約/4e4117241b05f06c687134aeb6724eb1cef91bc9
 - [202611012135] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。/d93478a69aa9bc3032d969fd08268d36713c7f7a
+- [202611012150] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。/51e6b55a60b3d86e0a3307422260f101a1e68322
