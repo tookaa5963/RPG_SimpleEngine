@@ -22,6 +22,7 @@ import { initLogData, logFormatter } from './logFormatter.js';
 import { initItemData } from './items.js';
 import { initMonsterData } from './monsters.js';
 import { EngineEventBus } from './engine/core/EngineEventBus.js';
+import { EventTypes } from './engine/core/EventTypes.js';
 import { WebAudioDriver } from './drivers/audio/WebAudioDriver.js';
 import { DomUiDriver } from './drivers/ui/DomUiDriver.js';
 
@@ -769,15 +770,25 @@ function initializeGameEntities() {
     }
   });
 
-  menuManager = new MenuManager(
-    player,
-    messageWindow,
-    () => { currentState = STATE_EXPLORE; },
-    (mode) => { slotDialog.open(mode, false); },
-    (targetMap, gx, gy, dir, isTeleport) => { fieldManager.changeMap(targetMap, gx, gy, dir, isTeleport); },
-    () => fieldManager.currentMap,
-    returnToTitle
-  );
+engineEventBus.on(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, (payload) => {
+  let mode = 'save';
+  if (payload && payload.mode) {
+    mode = payload.mode;
+  }
+  slotDialog.open(mode, false);
+});
+engineEventBus.on(EventTypes.SYSTEM.REQUEST_RETURN_TITLE, () => {
+  returnToTitle();
+});
+
+menuManager = new MenuManager(
+player,
+messageWindow,
+() => { currentState = STATE_EXPLORE; },
+(targetMap, gx, gy, dir, isTeleport) => { fieldManager.changeMap(targetMap, gx, gy, dir, isTeleport); },
+() => fieldManager.currentMap,
+engineEventBus
+);
   shopManager = new ShopManager(player, () => { currentState = STATE_EXPLORE; });
   innManager = new InnManager(
     player,

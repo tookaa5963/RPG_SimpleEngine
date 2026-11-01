@@ -1,11 +1,13 @@
 // tools/test_menu_callbacks.mjs
-// MenuManager 回帰防止単体テスト（Phase 1: コールバック方式検証）
+// MenuManager 回帰防止単体テスト（Phase 1: イベント駆動方式検証）
 
 import './setup_headless_env.mjs';
 import assert from 'node:assert/strict';
 import { Player } from '../js/player.js';
 import { MenuManager } from '../js/menu.js';
 import { initLocaleData } from '../js/i18n.js';
+import { EngineEventBus } from '../js/engine/core/EngineEventBus.js';
+import { EventTypes } from '../js/engine/core/EventTypes.js';
 
 function createHarness() {
   const player = new Player();
@@ -14,20 +16,17 @@ function createHarness() {
     clear: () => {}
   };
 
+  const eventBus = new EngineEventBus();
+
   const calls = {
     onEnd: 0,
-    onOpenSlot: [],
     changeMap: 0,
     getCurrentMap: 0,
-    onReturnToTitle: 0
+    events: []
   };
 
   const onEndCallback = () => {
     calls.onEnd += 1;
-  };
-
-  const onOpenSlot = (mode) => {
-    calls.onOpenSlot.push(mode);
   };
 
   const changeMap = () => {
@@ -39,21 +38,24 @@ function createHarness() {
     return 'map_test';
   };
 
-  const onReturnToTitle = () => {
-    calls.onReturnToTitle += 1;
-  };
+  eventBus.on(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, (payload) => {
+    calls.events.push({ type: 'slot', payload });
+  });
+
+  eventBus.on(EventTypes.SYSTEM.REQUEST_RETURN_TITLE, () => {
+    calls.events.push({ type: 'return_title' });
+  });
 
   const menu = new MenuManager(
     player,
     msgWin,
     onEndCallback,
-    onOpenSlot,
     changeMap,
     getCurrentMap,
-    onReturnToTitle
+    eventBus
   );
 
-  return { menu, calls };
+  return { menu, calls, eventBus };
 }
 
 async function runTests() {
@@ -97,8 +99,9 @@ async function runTests() {
     assert.strictEqual(menu.rootIndex, 4);
 
     menu.handleKeyDown('Enter');
-    assert.strictEqual(calls.onOpenSlot.length, 1);
-    assert.strictEqual(calls.onOpenSlot[0], 'load');
+    assert.strictEqual(calls.events.length, 1);
+    assert.strictEqual(calls.events[0].type, 'slot');
+    assert.strictEqual(calls.events[0].payload.mode, 'load');
   }
 
   // ---------------------------------------------------------------------------
@@ -117,8 +120,9 @@ async function runTests() {
     assert.strictEqual(menu.rootIndex, 5);
 
     menu.handleKeyDown('Enter');
-    assert.strictEqual(calls.onOpenSlot.length, 1);
-    assert.strictEqual(calls.onOpenSlot[0], 'save');
+    assert.strictEqual(calls.events.length, 1);
+    assert.strictEqual(calls.events[0].type, 'slot');
+    assert.strictEqual(calls.events[0].payload.mode, 'save');
   }
 
   // ---------------------------------------------------------------------------
@@ -145,7 +149,7 @@ async function runTests() {
     menu.handleKeyDown('Enter');
     assert.strictEqual(menu.phase, 'ROOT');
     assert.strictEqual(calls.onEnd, 0);
-    assert.strictEqual(calls.onReturnToTitle, 0);
+    assert.strictEqual(calls.events.length, 0);
   }
 
   // ---------------------------------------------------------------------------
@@ -173,7 +177,8 @@ async function runTests() {
     // Enter (はい 確定)
     menu.handleKeyDown('Enter');
     assert.strictEqual(calls.onEnd, 1);
-    assert.strictEqual(calls.onReturnToTitle, 1);
+    assert.strictEqual(calls.events.length, 1);
+    assert.strictEqual(calls.events[0].type, 'return_title');
   }
 
   console.log('[PASS] tools/test_menu_callbacks.mjs: All Phase 1 callback cases passed successfully.');
