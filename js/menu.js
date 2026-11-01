@@ -258,12 +258,14 @@ export class MenuManager {
   }
 
   equipItem(item) {
-    const isEquipped = (
-      this.player.equipment.weapon === item.id ||
-      this.player.equipment.armor === item.id ||
-      this.player.equipment.shield === item.id
-    );
+    const slotMap = { weapon: 'weapon', armor: 'armor', shield: 'shield' };
+    const slot = slotMap[item.type];
+    if (!slot) {
+      return;
+    }
+
     const itemName = ITEM_DB[item.id].name;
+    const isEquipped = this.player.isEquipped(item.id);
 
     if (isEquipped) {
       if (this.player.isInventoryFull(1)) {
@@ -272,20 +274,14 @@ export class MenuManager {
         this.msgWin.open([i18n.t('menu.inventory_full_unequip')]);
         return;
       }
-      if (item.type === 'weapon') this.player.equipment.weapon = null;
-      else if (item.type === 'armor') this.player.equipment.armor = null;
-      else if (item.type === 'shield') this.player.equipment.shield = null;
-
+      this.player.unequip(slot);
       sound.playChest();
       this.onEnd();
       this.msgWin.open([i18n.t('menu.unequipped', { name: itemName })]);
       return;
     }
 
-    if (item.type === 'weapon') this.player.equipment.weapon = item.id;
-    else if (item.type === 'armor') this.player.equipment.armor = item.id;
-    else if (item.type === 'shield') this.player.equipment.shield = item.id;
-
+    this.player.equip(slot, item.id);
     sound.playChest();
     this.onEnd();
     this.msgWin.open([i18n.t('menu.equipped', { name: itemName })]);

@@ -698,6 +698,10 @@ export class Player {
     return this.inventoryInstance.unequip(slot);
   }
 
+  isEquipped(itemId) {
+    return this.inventoryInstance.isEquipped(itemId);
+  }
+
   getRequiredExpForLevel(level) {
     if (typeof level !== 'number') {
       throw createProtocolError('TypeError', 'player.js:getRequiredExpForLevel', 'level', level);
