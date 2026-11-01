@@ -198,14 +198,14 @@ export class MenuManager {
             this.useItem(this.selectedItem);
           }
         } else if (this.actionIndex === 1) {
-          const isEquipped = (this.player.equipment.weapon === this.selectedItem.id || this.player.equipment.armor === this.selectedItem.id || this.player.equipment.shield === this.selectedItem.id);
-
-          if (isEquipped) {
+          const dropCheck = this.player.canDropItem(this.selectedItem);
+          if (!dropCheck.success) {
             this.onEnd();
-            this.msgWin.open([i18n.t('menu.cannot_drop_equipped')]);
-          } else if (this.selectedItem.type === 'key' || this.selectedItem.type === 'keyItem') {
-            this.onEnd();
-            this.msgWin.open([i18n.t('menu.cannot_drop_key')]);
+            let msgKey = 'menu.cannot_drop_key';
+            if (dropCheck.reason === 'equipped') {
+              msgKey = 'menu.cannot_drop_equipped';
+            }
+            this.msgWin.open([i18n.t(msgKey)]);
           } else {
             this.dropConfirmIndex = 1;
             this.phase = 'DROP_CONFIRM';
