@@ -28,5 +28,8 @@ export const EventTypes = Object.freeze({
     AUDIO_PLAY_SE: 'system:audio_play_se',
     AUDIO_PLAY_BGM: 'system:audio_play_bgm',
     AUDIO_STOP_BGM: 'system:audio_stop_bgm',
+    REQUEST_MAP_CHANGE: 'system:request_map_change',
+    REQUEST_SLOT_DIALOG: 'system:request_slot_dialog',
+    REQUEST_RETURN_TITLE: 'system:request_return_title',
   }),
 });
