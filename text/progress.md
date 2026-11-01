@@ -172,7 +172,7 @@ rpg_simple_engine/
 - [202611020110] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1, Gate 2 検証完了。
 - [202611020303] **Step Pre-3bc検証テスト作成**
 
-- [ ] **Step Pre-3bc**
+- [202611020435] **Step Pre-3bc**
  **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証。
  **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
  ※Step Pre-3bと3cは1セッションで行う。
@@ -199,12 +199,34 @@ rpg_simple_engine/
 
 ## 5. 引き継ぎ部
 
-- **完了作業**:
-  - `tools/setup_headless_env.mjs`, `tools/test_menu_callbacks.mjs` を新規配備。現行コード無修正の状態で回帰検証テストを通過（Gate 1 / Gate 2 完了）。
-- **次回作業**:
-  - **対象ステップ**: **Step Pre-3bc**
-  - **作業内容**:
-    1. `js/menu.js`: コールバック引数（`onOpenSlot`, `onReturnToTitle`）を廃止し、`eventBus.emit(EventTypes.SYSTEM...)` による要求イベント発行へ移行。
-    2. `js/main.js`: 当該システムイベントを購読・配線し、`MenuManager` 生成引数を縮退。
-    3. `tools/test_menu_callbacks.mjs`: キー入力シーケンス（ブラックボックス操作）は一切変更せず、検証対象のみ「コールバック呼び出し」から「`eventBus.emit` の発行およびフェイルファスト検証」へ切り替えて実行。
-    4. Gate 1 / Gate 2 / Gate 3（実機でのセーブ・ロード・中断確認）の通過確認とコミット。
+1. ユーザーの目的:
+   - rpg_simple_engine の完全ヘッドレス・データ駆動型アーキテクチャへの移行。
+   - Phase 5-1（Core層への MenuController 抽出）の前準備として、MenuManager 内の外部具象UI・システムコールバックを EngineEventBus 経由へパージする。
+
+2. 重要情報・規程:
+   - プロトコル: Ver 1.36 準拠（Acceptor-First、1ステップ1コミット、ai_staging 経由の3段ゲート検証：Gate 1 静的/境界、Gate 2 テスト、Gate 3 実機ランタイム）。
+   - EngineEventBus の API 仕様: リスナー登録は on(eventType, callback)（※subscribe は不可）。発行は emit(eventType, payload)。
+   - 確定コミット: 6a23cdee ([Step Pre-3] MenuManagerのダイアログ・シーン遷移コールバックをEngineEventBusへ移行)。
+   - 作業ツリー状態: Clean（ai_staging は完全破棄済み、main ブランチにコミット完了）。
+
+3. 進捗状況:
+   - EventTypes.SYSTEM.REQUEST_SLOT_DIALOG および REQUEST_RETURN_TITLE を定義済み。
+   - js/menu.js: onOpenSlot および onReturnToTitle を廃止し、eventBus 注入および eventBus.emit による要求発行へ改修完了。
+   - js/main.js: engineEventBus.on で上記イベントを購読し、slotDialog および returnToTitle を配線完了。
+   - tools/test_menu_callbacks.mjs: イベント発行の検証へ移行し、Gate 1、Gate 2、累積ヘッドレス実証テスト（全53項目）に合格。
+   - Gate 3: ブラウザ実機にてセーブ/ロード/タイトル復帰の動作およびコンソールエラー0件を確認済み。
+
+4. 現在のコンテキストと残課題:
+   - Step Pre-3 は正式にクローズ済み。
+   - 構造的現状: MenuManager のコンストラクタには依然として 3 つの関数ポインタ（onEndCallback, changeMap, getCurrentMap）が残存しており、コールバックとイベントの混在状態（ハイブリッド状態）にある。
+   - 次回アクション: 残存コールバックをすべてイベント化する「Step Pre-4」を実施するか、そのまま Core 層抽出の「Phase 5-1」へ着手するかを決定し、設計・改修を進める。
+
+現在のステータス詳細
+- 確定リビジョン: 6a23cdee3de65a899bcbf9367e5ad25af8bfedc6
+
+未解決の依存関係:
+- onEndCallback: メニュークローズ時の状態復帰通知
+- changeMap / getCurrentMap: アイテム使用に伴うマップ移動処理
+
+次回:
+- Step Pre-4: 残存コールバック（onEndCallback, changeMap, getCurrentMap）のイベント化による外部依存の完全排除
