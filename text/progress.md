@@ -170,7 +170,7 @@ rpg_simple_engine/
 - [202611012010] **Step Pre-2b-1 [受け皿先行]**: `js/player.js` にアイテム破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。`tools/test_player_candrop.mjs` を配備し Gate 1, Gate 2 検証完了。
 - [202611012030] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証完了。
 
-- [ ] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（`SYSTEM:REQUEST_MAP_CHANGE`, `SYSTEM:REQUEST_SLOT_DIALOG`, `SYSTEM:REQUEST_RETURN_TITLE`）を追加。Gate 1 検証。
+- [ ] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1 検証。
 - [ ] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle` 等）を `EngineEventBus.emit` へ置換。Gate 1 検証。
 - [ ] **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
 
@@ -197,9 +197,9 @@ rpg_simple_engine/
 ## 5. 引き継ぎ部
 **直近完了内容**:
 Step Pre-2b-2 完了:
-- js/menu.js のアイテム破棄可否判定を this.player.canDropItem() 呼び出しへ委譲。
+- `js/menu.js` のアイテム破棄可否判定を `this.player.canDropItem()` 呼び出しへ委譲。
 - 装備中アイテムおよび貴重品の破棄抑止メッセージ分岐を canDropItem の返り値（reason）に基づいて制御。
 - Gate 1（Core層静的検証11件）、Gate 2（ヘッドレス累積実証テスト全47項目）、Gate 3（実機ブラウザ動作検証）を全件通過し本番反映完了。
 
 **次タスク**:
-- [ ] Step Pre-3a [受け皿先行]: js/engine/core/EventTypes.js にシステム要求イベント定数（SYSTEM:REQUEST_MAP_CHANGE, SYSTEM:REQUEST_SLOT_DIALOG, SYSTEM:REQUEST_RETURN_TITLE）を追加。Gate 1 検証。
+- [ ] Step Pre-3a [受け皿先行]: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1 検証。
