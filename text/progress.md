@@ -167,7 +167,7 @@ rpg_simple_engine/
 - [202611011655] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。Gate 1, Gate 2, Gate 3 検証完了。
 
 - [202611011939] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。Gate 1, Gate 2, Gate 3 検証。
-- [ ] **Step Pre-2b-1 [受け皿先行]**: `js/player.js`（または `Inventory.js`）に破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。Gate 1, Gate 2 検証。
+- [202611012010] **Step Pre-2b-1 [受け皿先行]**: `js/player.js` にアイテム破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。`tools/test_player_candrop.mjs` を配備し Gate 1, Gate 2 検証完了。
 - [ ] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証。
 
 - [ ] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（`SYSTEM:REQUEST_MAP_CHANGE`, `SYSTEM:REQUEST_SLOT_DIALOG`, `SYSTEM:REQUEST_RETURN_TITLE`）を追加。Gate 1 検証。
@@ -196,11 +196,10 @@ rpg_simple_engine/
 
 ## 5. 引き継ぎ部
 **直近完了内容**:
-Step Pre-2a 完了:
-
-- js/player.js に isEquipped(itemId) 中継メソッドを配備し、Inventory への責務委譲パスを確立。
-- js/menu.js の equipItem() 内におけるスロット直弄り（this.player.equipment への直接代入・参照）を排除し、isEquipped() / equip() / unequip() 経由へ置換。
-- Gate 1（Core層静的検証11件）、Gate 2（累積実証テスト全47項目）、Gate 3（実機動作確認・エラー0件）を全件通過し、コミット完了（2d58c65）。
+Step Pre-2b-1 完了:
+- js/player.js にアイテム破棄可否判定メソッド canDropItem(item) を実装。
+- 装備中アイテム（Inventory.isEquipped 経由）および貴重品（type: key / keyItem）の破棄抑止をドメインロジックとして集約。
+- tools/test_player_candrop.mjs による単体検証、Gate 1（Core層静的検証11件）、Gate 2（累積実証テスト全47項目）を全件通過し昇格完了。
 
 **次タスク**:
-- [ ] Step Pre-2b-1 [受け皿先行]: js/player.js（または Inventory.js）に破棄可否判定メソッド canDropItem(item)（装備中・貴重品判定）を新設。Gate 1, Gate 2 検証。
+- [ ] Step Pre-2b-2 [既存委譲]: js/menu.js の破棄可否判定を this.player.canDropItem() 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証。
