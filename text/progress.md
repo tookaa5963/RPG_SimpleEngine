@@ -111,26 +111,25 @@ rpg_simple_engine/
 ## 4. フェーズ別チェックリスト
 
 ### Phase 0: 環境準備
-
 - \[202610271800\] Gate 1 静的検証ランナー (tools/verify\_gate1.mjs) の配備・初期検証完了  
 - \[202610271800\] .gitignore による ai\_staging/ の隔離完了
 
 ### Phase 1: メッセージング基盤配備 (Core/core)
-- \[202610281900\] Step 1-1: js/engine/core/EventTypes.js 新規作成（イベント定数定義 / Gate 1通過）  
-- \[202610281900\] Step 1-2: js/engine/core/EngineEventBus.js 新規作成（Pub/Subハブ / Gate 1, 2通過）  
-- \[202610282045\] Step 1-3: main.js へのグローバル/コンテキスト配線（Gate 3通過）
+- \[202610281900\] Step 1-1: js/engine/core/EventTypes.js 新規作成
+- \[202610281900\] Step 1-2: js/engine/core/EngineEventBus.js 新規作成
+- \[202610282045\] Step 1-3: main.js へのグローバル/コンテキスト配線
 
 ### Phase 2: 効果解決系（EffectSystem）垂直スライス抽出 (Core/effects)
-- \[202610282231\] Step 2-1: データスキーマ拡張（回復アイテム3件・呪文3件へのeffect定義 / Gate 1通過）  
-- \[202610290130\] Step 2-2: js/engine/effects/EffectResolver.js 新規作成（ディスパッチャ / Gate 1, 2, 3通過）  
-- \[202610290215\] Step 2-3: js/engine/effects/HealHpEffect.js 新規作成（HP回復計算ストラテジー / Gate 1, 2通過）  
-- \[202610290245\] Step 2-4a: js/engine/effects/HealMpEffect.js 新規作成（MP回復計算ストラテジー / Gate 1, 2通過）  
-- \[202610290333\] Step 2-4b: js/engine/effects/CureStatusEffect.js 新規作成（状態異常解除ストラテジー / Gate 1, 2通過）  
-- \[202610291120\] Step 2-4c: データスキーマ拡張（MP回復アイテム2件 / Gate 1通過）  
-- \[202610291133\] Step 2-4d: データスキーマ拡張（状態異常解除アイテム・呪文各1件 / Gate 1通過）  
-- \[202610291225\] Step 2-4e: EffectResolver への全ストラテジー登録配線（Gate 1, 2通過）  
-- \[202610291410\] Step 2-5: menu.js のフィールド使用委譲切り替え（Gate 1, 3通過）  
-- \[202610291450\] Step 2-6: battleActions.js の戦闘使用委譲切り替え（Gate 1, 3通過）
+- \[202610282231\] Step 2-1: データスキーマ拡張（回復アイテム3件・呪文3件へのeffect定義） 
+- \[202610290130\] Step 2-2: js/engine/effects/EffectResolver.js 新規作成（ディスパッチャ）  
+- \[202610290215\] Step 2-3: js/engine/effects/HealHpEffect.js 新規作成（HP回復計算ストラテジー）  
+- \[202610290245\] Step 2-4a: js/engine/effects/HealMpEffect.js 新規作成（MP回復計算ストラテジー）  
+- \[202610290333\] Step 2-4b: js/engine/effects/CureStatusEffect.js 新規作成（状態異常解除ストラテジー）  
+- \[202610291120\] Step 2-4c: データスキーマ拡張（MP回復アイテム2件）  
+- \[202610291133\] Step 2-4d: データスキーマ拡張（状態異常解除アイテム・呪文各1件）  
+- \[202610291225\] Step 2-4e: EffectResolver への全ストラテジー登録配線
+- \[202610291410\] Step 2-5: menu.js のフィールド使用委譲切り替え
+- \[202610291450\] Step 2-6: battleActions.js の戦闘使用委譲切り替え
 
 ### Phase 3: 汎用ステート・アクター・データ層のCore化 (Core/entities, state, data)
 目的: アクターモデルの確立、フラグ・変数のヘッドレス管理、DataRepository によるデータ参照の統一。
@@ -146,10 +145,10 @@ rpg_simple_engine/
 
 ### Phase 4: 出力ドライバの配線とヘッドレス実証 (Drivers/audio, ui)
 目的: ロジック層から sound.js / ui.js の直接インポートを物理削除し、イベント駆動へ完全置換。
-- [202610311200] Step 4-1: js/drivers/audio/WebAudioDriver.js の配線（Gate 1, 2, 3 通過）
-- [202610311515] Step 4-2: js/drivers/ui/DomUiDriver.js の配線（Gate 1, 2, 3 通過）
-- [202610311600] Step 4-3 探査: ロジック層残存出力依存の静的特定完了（Core層のヘッドレス健全性を確認、案Aを採用）
-- [202610311915] Step 4-3: tools/test_headless_run.mjs の新規作成（完全ヘッドレス実証テスト配備 / Gate 1, 2 通過）
+- [202610311200] Step 4-1: js/drivers/audio/WebAudioDriver.js の配線
+- [202610311515] Step 4-2: js/drivers/ui/DomUiDriver.js の配線
+- [202610311600] Step 4-3 探査: ロジック層残存出力依存の静的特定完了
+- [202610311915] Step 4-3: tools/test_headless_run.mjs の新規作成（完全ヘッドレス実証テスト配備 ）
 
 ## Phase 5: 中核モジュール疎結合化・データ駆動アーキテクチャ移行計画
 
@@ -166,11 +165,18 @@ rpg_simple_engine/
 #### Phase 5-Pre: レガシー依存パージと events.js 先行改修
 - [202611011617] **Step Pre-1a [受け皿先行]**: `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設。`tools/test_objectives.mjs` を配備し Gate 1, Gate 2 検証。
 - [202611011655] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。Gate 1, Gate 2, Gate 3 検証完了。
-- [ ] **Step Pre-2a [受け皿先行]**: `data/items.json` および `EffectResolver` に特殊アイテム効果（テキスト表示・歩数バフ）を定義・拡張。Gate 1, Gate 2 検証。
-- [ ] **Step Pre-2b [既存委譲]**: `js/menu.js` の `useItem()` 内にある個別アイテムID分岐を撤廃し `EffectResolver` 経由へ統一。Gate 1, Gate 3 検証。
-- [ ] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント（`SYSTEM:REQUEST_MAP_CHANGE`, `SYSTEM:REQUEST_SLOT_DIALOG`, `SYSTEM:REQUEST_RETURN_TITLE`）を追加。Gate 1 検証。
-- [ ] **Step Pre-3b [既存委譲]**: `js/menu.js` のコールバック実行箇所を `EngineEventBus.emit` へ置換。Gate 1 検証。
-- [ ] **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` の引数を3つへ縮退。Gate 1, Gate 2, Gate 3 検証。
+
+- [ ] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。Gate 1, Gate 2, Gate 3 検証。
+- [ ] **Step Pre-2b-1 [受け皿先行]**: `js/player.js`（または `Inventory.js`）に破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。Gate 1, Gate 2 検証。
+- [ ] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証。
+
+- [ ] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（`SYSTEM:REQUEST_MAP_CHANGE`, `SYSTEM:REQUEST_SLOT_DIALOG`, `SYSTEM:REQUEST_RETURN_TITLE`）を追加。Gate 1 検証。
+- [ ] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle` 等）を `EngineEventBus.emit` へ置換。Gate 1 検証。
+- [ ] **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
+
+- [ ] **Step Pre-4a [受け皿先行]**: `data/items/i_forest_guide.json` および `data/spells/s_rula.json`, `s_liremito.json` に effect 定義を付与し、`EffectResolver` にマップ遷移・メッセージ用の解決ストラテジーを配備。Gate 1, Gate 2 検証。
+- [ ] **Step Pre-4b [既存委譲]**: `js/menu.js` の `useItem()` 内にある個別アイテムID分岐（`forest_guide`, `broken_corrada_hilt` 等）を撤廃し、`EffectResolver` 経由へ統一。Gate 1, Gate 2, Gate 3 検証。
+- [ ] **Step Pre-4c [既存委譲]**: `js/menu.js` の `useMagic()` 内にある呪文個別分岐（rula, liremito, 回復呪文）を撤廃し、`EffectResolver` 経由へ統一。Gate 1, Gate 2, Gate 3 検証。
 
 #### Phase 5-0: 共通抽象基盤配備
 - [ ] **Step 5-0a [基盤新設]**: `js/engine/core/ActionTypes.js`（抽象入力コマンド定数）を新規配備。Gate 1 検証。
@@ -197,6 +203,4 @@ rpg_simple_engine/
   - Gate 1、Gate 2（単体30件・累積47件）、Gate 3（実機動作確認・エラー0件）を全件通過。
 
 **次タスク**:
-- **Step Pre-2a [受け皿先行]**:
-  - `data/items.json` および `EffectResolver` に特殊アイテム効果（テキスト表示・歩数バフ・マップ遷移等）を定義・拡張。
-  - Gate 1, Gate 2 検証の実施。
+- [ ] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。Gate 1, Gate 2, Gate 3 検証。
