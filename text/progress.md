@@ -221,3 +221,8 @@ rpg_simple_engine/
     - 【案A】`EngineEventBus.js` に `static on()`, `static emit()` 等のファサードを追加し、受け皿単体テスト（Gate 2）を拡充した上で、各モジュールからの静的呼び出しを正規サポートする（推奨：引数バケツリレーの完全排除）。
     - 【案B】`new EngineEventBus()` インスタンスを `GameContext` またはコンストラクタ引数で各マネージャーに明示的に受け渡す（DI構造の維持）。
   - 方針決定後、受け皿先行（Acceptor-First）で `EngineEventBus.js` を改修・Gate 1/2 通過後に、`menu.js` および `main.js` の委譲を再実行する。
+
+- **Core API 契約テストの配備完了 (コミット: a7e8581)**:
+  - `tools/test_headless_run.mjs` の先頭に `EngineEventBus` の API 契約テスト（6件）を追加配備（Gate 2 累積アサーション数: 47 → 53件）。
+  - **確定アーキテクチャ方針**: 「パターンB（インスタンス専用・DI規約）」を採用。Core層への静的ファサード（`static emit` / `static on`）配備を契約レベルで物理的に禁止。
+  - **次期実装（Step Pre-3b）の必須制約**: `js/menu.js` でのイベント発行は、クラス静的呼び出しではなく、必ずインスタンス注入（コンストラクタ引数による `eventBus` の伝播）を用いて実装すること。
