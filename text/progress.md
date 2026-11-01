@@ -169,9 +169,10 @@ rpg_simple_engine/
 - [202611011939] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。Gate 1, Gate 2, Gate 3 検証。
 - [202611012010] **Step Pre-2b-1 [受け皿先行]**: `js/player.js` にアイテム破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。`tools/test_player_candrop.mjs` を配備し Gate 1, Gate 2 検証完了。
 - [202611012030] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証完了。
+- [202611020110] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1, Gate 2 検証完了。
 
-- [] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1, Gate 2 検証完了。
-- [] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証完了。
+
+- [] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証。
 
 - [ ] **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
 
@@ -196,33 +197,36 @@ rpg_simple_engine/
 - **Phase 5-4**: `main.js` 解体（`titleScene.js` 循環参照解消、`KeyboardDriver.js` / `InputRouter.js` 導入、100行規模ブートストラップ化）。
 
 ## 5. 引き継ぎ部
-### Step Pre-3 における障害発生ログと教訓
+
+### Step Pre-3 における障害発生ログと教訓（対応完了）
 
 1. **障害内容**:
    - 実機検証（Gate 3）にて、タイトル画面復帰時およびゲーム起動時に以下の例外が発生。
      - `TypeError: EngineEventBus.emit is not a function` (`js/menu.js`)
      - `TypeError: EngineEventBus.on is not a function` (`js/main.js`)
-   - これにより、メニューからのゲーム終了（タイトル復帰）が不能となる重大なデグレが発生。
+   - これにより、メニューからのゲーム終了（タイトル復帰）が不能となるデグレが発生。
 
 2. **根本原因**:
-   - `js/engine/core/EngineEventBus.js` はクラスであり、`on` や `emit` はインスタンスメソッドとして定義されている（`static` メソッドが存在しない）。
-   - レガシー層（`menu.js`）および起動層（`main.js`）からクラスに対する静的呼び出し（`EngineEventBus.emit(...)`）を実装したため実行時エラーとなった。
-   - 単体テスト（Gate 2）では対象行（メニューからのタイトル遷移パスおよび `main.js` の初期化コード）が直接走査されず、実機（Gate 3）まで検知が遅延した。
+   - `EngineEventBus` はインスタンス駆動の設計であり、静的メソッド（`static on`, `static emit`）を持たない。
+   - レガシー層（`menu.js`）および起動層（`main.js`）からクラスに対する静的呼び出しを実装したため実行時エラーとなった。また、単体テスト（Gate 2）で当該コードパスが網羅されておらず、実機（Gate 3）まで検知が遅延した。
 
-3. **是正方針（受け皿先行の再徹底）**:
-   - 既存コード（`menu.js` / `main.js`）のイベント化を進める前に、イベントバスの呼び出し仕様（静的ファサードの提供か、DIコンテナ経由のインスタンス利用か）を Core 層（受け皿）側で確定・テスト配備しなければならない。
+3. **是正処置および確定アーキテクチャ方針**:
+   - **契約テスト配備 (コミット: `a7e8581`)**: `tools/test_headless_run.mjs` の先頭に API 契約テスト（6件）を追加配備（Gate 2 累積アサーション数: 53件）。Core層への静的ファサード配備を物理禁止し、「パターンB（インスタンス専用・DI規約）」を確定。
+   - **Step Pre-3a 完了 (コミット: `efe85b4`)**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（`REQUEST_MAP_CHANGE`, `REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）を先行配備（Gate 1 / Gate 2 通過）。
 
 ---
 
-### 次回タスク
+### 次回タスク: Step Pre-3b [既存委譲]
 
-- [ ] **Step Pre-3 再設計・先行実装**:
-  - **アプローチの選定**:
-    - 【案A】`EngineEventBus.js` に `static on()`, `static emit()` 等のファサードを追加し、受け皿単体テスト（Gate 2）を拡充した上で、各モジュールからの静的呼び出しを正規サポートする（推奨：引数バケツリレーの完全排除）。
-    - 【案B】`new EngineEventBus()` インスタンスを `GameContext` またはコンストラクタ引数で各マネージャーに明示的に受け渡す（DI構造の維持）。
-  - 方針決定後、受け皿先行（Acceptor-First）で `EngineEventBus.js` を改修・Gate 1/2 通過後に、`menu.js` および `main.js` の委譲を再実行する。
+- [ ] **探査フェーズ（事前探査セッション）**:
+  - `js/menu.js` 内の直接コールバック呼び出し箇所（`onOpenSlot`, `onReturnToTitle`）およびコンストラクタ引数の受取状況を静的に特定。
+  - 実装セッションへの入力情報として以下の3点を抽出：
+    1. 該当箇所の最小コードブロック（10〜20行程度）
+    2. 対象ブロックがアクセスしている外部変数・プロパティ一覧（`eventBus` インスタンス保持経路の確認）
+    3. 該当コードの動作解説（3行以内）
 
-- **Core API 契約テストの配備完了 (コミット: a7e8581)**:
-  - `tools/test_headless_run.mjs` の先頭に `EngineEventBus` の API 契約テスト（6件）を追加配備（Gate 2 累積アサーション数: 47 → 53件）。
-  - **確定アーキテクチャ方針**: 「パターンB（インスタンス専用・DI規約）」を採用。Core層への静的ファサード（`static emit` / `static on`）配備を契約レベルで物理的に禁止。
-  - **次期実装（Step Pre-3b）の必須制約**: `js/menu.js` でのイベント発行は、クラス静的呼び出しではなく、必ずインスタンス注入（コンストラクタ引数による `eventBus` の伝播）を用いて実装すること。
+- [ ] **実装フェーズ（Step Pre-3b 実装セッション）**:
+  - `js/menu.js` のコンストラクタで `eventBus` インスタンスを受け取り保持するよう改修。
+  - 直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `this.eventBus.emit(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, ...)` および `this.eventBus.emit(EventTypes.SYSTEM.REQUEST_RETURN_TITLE)` へ置換。
+  - Gate 1、Gate 2、Gate 3 検証の実施。
+  - **必須制約**: クラス静的呼び出し（`EngineEventBus.emit`）を完全禁止とし、必ず注入された `this.eventBus` インスタンス経由で発行すること。
