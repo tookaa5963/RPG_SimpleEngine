@@ -25,3 +25,4 @@
 - [202611011622]Step Pre-1a [受け皿先行]**: `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設。`tools/test_objectives.mjs` を配備/ab2aa554926b8c3c8fc4c9a4818b5d2a6adb645b
 - [202611011655] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。/fc0d44cdf369a06f6d5363aa77c4672e4f7c895a   
 - [202611011939] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。/badc8613bbd9a8a2847548cbcf4777156a0f699f
+- [202611012010] **Step Pre-2b-1 [受け皿先行]**: `js/player.js` にアイテム破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。`tools/test_player_candrop./1e83f3e1c9ac4c7578514016444d4d9ae16b68aa
