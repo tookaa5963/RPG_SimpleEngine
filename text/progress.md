@@ -166,7 +166,7 @@ rpg_simple_engine/
 - [202611011617] **Step Pre-1a [受け皿先行]**: `js/events.js` にジャーナル判定純粋関数 `resolveCurrentObjectiveKey(player)` を新設。`tools/test_objectives.mjs` を配備し Gate 1, Gate 2 検証。
 - [202611011655] **Step Pre-1b [既存委譲]**: `js/menu.js` の `showCurrentObjective()` を `resolveCurrentObjectiveKey(this.player)` の呼び出し1行へ置換。Gate 1, Gate 2, Gate 3 検証完了。
 
-- [ ] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。Gate 1, Gate 2, Gate 3 検証。
+- [202611011939] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。Gate 1, Gate 2, Gate 3 検証。
 - [ ] **Step Pre-2b-1 [受け皿先行]**: `js/player.js`（または `Inventory.js`）に破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。Gate 1, Gate 2 検証。
 - [ ] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証。
 
@@ -195,12 +195,12 @@ rpg_simple_engine/
 - **Phase 5-4**: `main.js` 解体（`titleScene.js` 循環参照解消、`KeyboardDriver.js` / `InputRouter.js` 導入、100行規模ブートストラップ化）。
 
 ## 5. 引き継ぎ部
-
 **直近完了内容**:
-- **Step Pre-1b 完了**:
-  - `js/menu.js` 内の目標判定ロジック（約50行）を削除し、`resolveCurrentObjectiveKey(this.player)` への委譲に集約。
-  - レガシーUI層からシナリオ進行フラグの直接判定をパージ完了。
-  - Gate 1、Gate 2（単体30件・累積47件）、Gate 3（実機動作確認・エラー0件）を全件通過。
+Step Pre-2a 完了:
+
+- js/player.js に isEquipped(itemId) 中継メソッドを配備し、Inventory への責務委譲パスを確立。
+- js/menu.js の equipItem() 内におけるスロット直弄り（this.player.equipment への直接代入・参照）を排除し、isEquipped() / equip() / unequip() 経由へ置換。
+- Gate 1（Core層静的検証11件）、Gate 2（累積実証テスト全47項目）、Gate 3（実機動作確認・エラー0件）を全件通過し、コミット完了（2d58c65）。
 
 **次タスク**:
-- [ ] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。Gate 1, Gate 2, Gate 3 検証。
+- [ ] Step Pre-2b-1 [受け皿先行]: js/player.js（または Inventory.js）に破棄可否判定メソッド canDropItem(item)（装備中・貴重品判定）を新設。Gate 1, Gate 2 検証。
