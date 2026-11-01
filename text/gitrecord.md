@@ -32,3 +32,4 @@
 - ロールバック→[202611012030] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約/4e4117241b05f06c687134aeb6724eb1cef91bc9
 - [202611012030]**Core API 契約テストの配備完了**/61108a36e7433c729262bfee5baff00e694d9799
 - [202611020110] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。/efe85b4a3335f0e7a61dea475a6f2878323abb42
+- [202611020303]`tools/setup_headless_env.mjs`, `tools/test_menu_callbacks.mjs`を新規配備/c630b3770a056992462bb27cfe76ee80453caa2c
