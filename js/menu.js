@@ -7,6 +7,8 @@ import { ITEM_DB, SPELL_DB } from './items.js';
 import { drawListBox, drawMessageBox } from './ui.js';
 import { i18n } from './i18n.js';
 import { EffectResolver } from './engine/effects/EffectResolver.js';
+import { EngineEventBus } from './engine/core/EngineEventBus.js';
+import { EventTypes } from './engine/core/EventTypes.js';
 
 const effectResolver = new EffectResolver();
 
@@ -106,9 +108,9 @@ export class MenuManager {
           this.onEnd();
           this.showCurrentObjective();
         } else if (this.rootIndex === 4) {
-          if (this.onOpenSlot) this.onOpenSlot('load');
+          EngineEventBus.emit(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, { mode: 'load' });
         } else if (this.rootIndex === 5) {
-          if (this.onOpenSlot) this.onOpenSlot('save');
+          EngineEventBus.emit(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, { mode: 'save' });
         } else if (this.rootIndex === 6) {
           this.quitConfirmIndex = 1;
           this.phase = 'QUIT_CONFIRM';
@@ -129,9 +131,7 @@ export class MenuManager {
         sound.playSubmit();
         if (this.quitConfirmIndex === 0) {
           this.onEnd();
-          if (this.onReturnToTitle) {
-            this.onReturnToTitle();
-          }
+          EngineEventBus.emit(EventTypes.SYSTEM.REQUEST_RETURN_TITLE, {});
         } else {
           this.phase = 'ROOT';
         }
