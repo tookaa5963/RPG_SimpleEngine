@@ -29,6 +29,30 @@ function recordAssertion() {
 }
 
 // -------------------------------------------------------------
+// 0. Core API 契約検証: EngineEventBus（インスタンス専用・DI規約）
+// -------------------------------------------------------------
+// static 呼び出しの禁止保証（大域状態・誤用の遮断）
+assert.strictEqual(typeof EngineEventBus.on, 'undefined', '契約違反: EngineEventBus は static 呼び出しを禁止しています');
+recordAssertion();
+
+assert.strictEqual(typeof EngineEventBus.emit, 'undefined', '契約違反: EngineEventBus は static 呼び出しを禁止しています');
+recordAssertion();
+
+// インスタンスメソッドの存在保証
+const contractBus = new EngineEventBus();
+assert.strictEqual(typeof contractBus.on, 'function', '契約違反: EngineEventBus.prototype.on が存在しません');
+recordAssertion();
+
+assert.strictEqual(typeof contractBus.off, 'function', '契約違反: EngineEventBus.prototype.off が存在しません');
+recordAssertion();
+
+assert.strictEqual(typeof contractBus.emit, 'function', '契約違反: EngineEventBus.prototype.emit が存在しません');
+recordAssertion();
+
+assert.strictEqual(typeof contractBus.clear, 'function', '契約違反: EngineEventBus.prototype.clear が存在しません');
+recordAssertion();
+
+// -------------------------------------------------------------
 // 1. 基盤初期化およびイベント記録リスナーの配線
 // -------------------------------------------------------------
 const eventBus = new EngineEventBus();

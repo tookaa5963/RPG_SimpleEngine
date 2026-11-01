@@ -169,8 +169,9 @@ rpg_simple_engine/
 - [202611011939] **Step Pre-2a [既存委譲]**: `js/menu.js` の `equipItem()` 内にあるスロット直弄り（`VALID_EQUIP_SLOTS` 等）を排除し、`this.player.equip()` / `this.player.unequip()` / `this.player.isEquipped()` 経由へ委譲。Gate 1, Gate 2, Gate 3 検証。
 - [202611012010] **Step Pre-2b-1 [受け皿先行]**: `js/player.js` にアイテム破棄可否判定メソッド `canDropItem(item)`（装備中・貴重品判定）を新設。`tools/test_player_candrop.mjs` を配備し Gate 1, Gate 2 検証完了。
 - [202611012030] **Step Pre-2b-2 [既存委譲]**: `js/menu.js` の破棄可否判定を `this.player.canDropItem()` 呼び出しへ集約。Gate 1, Gate 2, Gate 3 検証完了。
-- [202611012135] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1, Gate 2 検証完了。
-- [202611012150] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証完了。
+
+- [] **Step Pre-3a [受け皿先行]**: `js/engine/core/EventTypes.js` にシステム要求イベント定数（SYSTEM:`REQUEST_MAP_CHANGE`, SYSTEM:`REQUEST_SLOT_DIALOG`, SYSTEM:`REQUEST_RETURN_TITLE`）を追加。Gate 1, Gate 2 検証完了。
+- [] **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証完了。
 
 - [ ] **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
 
@@ -195,12 +196,28 @@ rpg_simple_engine/
 - **Phase 5-4**: `main.js` 解体（`titleScene.js` 循環参照解消、`KeyboardDriver.js` / `InputRouter.js` 導入、100行規模ブートストラップ化）。
 
 ## 5. 引き継ぎ部
-**直近完了内容**:
-Step Pre-3b 完了:
-- `js/menu.js` 内でセーブ/ロード枠呼び出し（`this.onOpenSlot`）およびタイトル復帰（`this.onReturnToTitle`）の直接実行を排除。
-- `EngineEventBus.emit(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, { mode })` および `EngineEventBus.emit(EventTypes.SYSTEM.REQUEST_RETURN_TITLE, {})` へ置換。
-- Gate 1、Gate 2（ヘッドレス累積実証47項目）をパスし本番反映完了。
+### Step Pre-3 における障害発生ログと教訓
 
-**次タスク**:
-- [ ] Step Pre-3c [配線・引数削減]: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
-※注意: 第6条4項に基づき、既存コード修正前には必ず探査セッション（該当箇所の抽出と外部アクセス一覧・平易な解説の特定）を実施すること。
+1. **障害内容**:
+   - 実機検証（Gate 3）にて、タイトル画面復帰時およびゲーム起動時に以下の例外が発生。
+     - `TypeError: EngineEventBus.emit is not a function` (`js/menu.js`)
+     - `TypeError: EngineEventBus.on is not a function` (`js/main.js`)
+   - これにより、メニューからのゲーム終了（タイトル復帰）が不能となる重大なデグレが発生。
+
+2. **根本原因**:
+   - `js/engine/core/EngineEventBus.js` はクラスであり、`on` や `emit` はインスタンスメソッドとして定義されている（`static` メソッドが存在しない）。
+   - レガシー層（`menu.js`）および起動層（`main.js`）からクラスに対する静的呼び出し（`EngineEventBus.emit(...)`）を実装したため実行時エラーとなった。
+   - 単体テスト（Gate 2）では対象行（メニューからのタイトル遷移パスおよび `main.js` の初期化コード）が直接走査されず、実機（Gate 3）まで検知が遅延した。
+
+3. **是正方針（受け皿先行の再徹底）**:
+   - 既存コード（`menu.js` / `main.js`）のイベント化を進める前に、イベントバスの呼び出し仕様（静的ファサードの提供か、DIコンテナ経由のインスタンス利用か）を Core 層（受け皿）側で確定・テスト配備しなければならない。
+
+---
+
+### 次回タスク
+
+- [ ] **Step Pre-3 再設計・先行実装**:
+  - **アプローチの選定**:
+    - 【案A】`EngineEventBus.js` に `static on()`, `static emit()` 等のファサードを追加し、受け皿単体テスト（Gate 2）を拡充した上で、各モジュールからの静的呼び出しを正規サポートする（推奨：引数バケツリレーの完全排除）。
+    - 【案B】`new EngineEventBus()` インスタンスを `GameContext` またはコンストラクタ引数で各マネージャーに明示的に受け渡す（DI構造の維持）。
+  - 方針決定後、受け皿先行（Acceptor-First）で `EngineEventBus.js` を改修・Gate 1/2 通過後に、`menu.js` および `main.js` の委譲を再実行する。
