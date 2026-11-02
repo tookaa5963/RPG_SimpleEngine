@@ -781,6 +781,49 @@ engineEventBus.on(EventTypes.SYSTEM.REQUEST_RETURN_TITLE, () => {
   returnToTitle();
 });
 
+engineEventBus.on(EventTypes.SYSTEM.REQUEST_MAP_CHANGE, (payload) => {
+    if (typeof payload !== 'object' || payload === null) {
+      return;
+    }
+
+    let targetMap = '';
+    if (typeof payload.targetMap === 'string') {
+      targetMap = payload.targetMap;
+    } else if (typeof payload.targetMapId === 'string') {
+      targetMap = payload.targetMapId;
+    }
+
+    let targetX = null;
+    if (typeof payload.targetX === 'number') {
+      targetX = payload.targetX;
+    } else if (typeof payload.targetGridX === 'number') {
+      targetX = payload.targetGridX;
+    }
+
+    let targetY = null;
+    if (typeof payload.targetY === 'number') {
+      targetY = payload.targetY;
+    } else if (typeof payload.targetGridY === 'number') {
+      targetY = payload.targetGridY;
+    }
+
+    let direction = 'down';
+    if (typeof payload.direction === 'string' && payload.direction.length > 0) {
+      direction = payload.direction;
+    } else if (typeof payload.newDirection === 'string' && payload.newDirection.length > 0) {
+      direction = payload.newDirection;
+    }
+
+    let isTeleport = false;
+    if (typeof payload.isTeleport === 'boolean') {
+      isTeleport = payload.isTeleport;
+    }
+
+    if (targetMap.length > 0 && targetX !== null && targetY !== null) {
+      fieldManager.changeMap(targetMap, targetX, targetY, direction, isTeleport);
+    }
+  });
+  
 menuManager = new MenuManager(
 player,
 messageWindow,
