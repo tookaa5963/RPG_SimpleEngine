@@ -1176,5 +1176,6 @@
       "itemId": "steel_shield"
     }
   ],
-  "npcs": []
+  "npcs": [],
+  "mapType": "forest"
 }

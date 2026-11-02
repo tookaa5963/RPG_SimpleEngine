@@ -1229,5 +1229,6 @@
       "itemId": "strong_herb"
     }
   ],
-  "npcs": []
+  "npcs": [],
+  "mapType": "forest"
 }

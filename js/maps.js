@@ -97,6 +97,10 @@ export async function initMapData() {
 
     const loadedMaps = await Promise.all(loadPromises);
     loadedMaps.forEach(({ mapId, rawMapData }) => {
+        rawMapData.id = mapId;
+        if (typeof rawMapData.mapType !== 'string') {
+            rawMapData.mapType = 'normal';
+        }
         maps[mapId] = rawMapData;
     });
 
