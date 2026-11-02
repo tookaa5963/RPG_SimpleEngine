@@ -6,5 +6,15 @@
     "ja": "コラーダの折れた柄",
     "en": "Broken Colada Hilt",
     "es": "Empuñadura rota de Colada"
+  },
+  "effect": {
+    "type": "message",
+    "params": {
+      "messageKeys": [
+        "menu_action.broken_hilt_1",
+        "menu_action.broken_hilt_2"
+      ],
+      "consumeItem": false
+    }
   }
 }

@@ -6,5 +6,19 @@
     "ja": "森の道標",
     "en": "Forest Guide",
     "es": "Guía del bosque"
+  },
+  "effect": {
+    "type": "teleport",
+    "params": {
+      "targetMap": "temple",
+      "targetX": 11,
+      "targetY": 9,
+      "direction": "up",
+      "isTeleport": true,
+      "allowedMapTypes": [
+        "forest"
+      ],
+      "messageKey": "menu_action.forest_guide"
+    }
   }
 }

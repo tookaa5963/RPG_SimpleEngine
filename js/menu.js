@@ -183,14 +183,6 @@ export class MenuManager {
               this.equipItem(this.selectedItem);
             } else if (effectDef) {
               this.useItem(this.selectedItem);
-            } else if (this.selectedItem.id === 'forest_guide') {
-              this.useItem(this.selectedItem);
-            } else if (this.selectedItem.id === 'broken_corrada_hilt') {
-              this.onEnd();
-              this.msgWin.open([
-                logFormatter.format('menu_action.broken_hilt_1'),
-                logFormatter.format('menu_action.broken_hilt_2')
-              ]);
             } else if (this.selectedItem.type === 'charm') {
               this.onEnd();
               this.msgWin.open([logFormatter.format('menu_action.charm_passive')]);
@@ -400,22 +392,6 @@ export class MenuManager {
         this.msgWin.open([logFormatter.format('menu_action.lantern_on')]);
       } else {
         this.msgWin.open([logFormatter.format('menu_action.lantern_off')]);
-      }
-    } else if (item.id === 'forest_guide') {
-      const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
-      const isForest = (currentMap === maps.forest || currentMap === maps.forest2 || currentMap === maps.forest3 || currentMap === maps.deep_forest);
-
-      if (!isForest) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.cannot_use_here')]);
-        return;
-      }
-
-      sound.playMagic();
-      this.onEnd();
-      this.msgWin.open([logFormatter.format('menu_action.forest_guide')]);
-      if (this.changeMap) {
-        this.changeMap('temple', 11, 9, 'up', true);
       }
     }
   }
