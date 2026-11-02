@@ -3,6 +3,7 @@ class SoundSystem {
   constructor() {
     this.ctx = null;
     this.isUnlocked = false;
+    this.pendingBgmKey = null;
 
     this.bgmEnabled = true;
     this.seEnabled = true;
@@ -23,7 +24,7 @@ class SoundSystem {
       dragons_cave: this.createBgmElement('bgm_dragons_cave', true)
     };
 
-    this.currentBgmKey = null;
+    this.setupAutoplayUnlock();
   }
 
   loadSettings() {
@@ -84,24 +85,54 @@ class SoundSystem {
 
     return audio;
   }
-
-  unlock() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioCtx();
+  setupAutoplayUnlock() {
+    if (typeof window === 'undefined') {
+      return;
     }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
+    const unlockHandler = () => {
+      this.unlock();
+      window.removeEventListener('pointerdown', unlockHandler);
+      window.removeEventListener('keydown', unlockHandler);
+    };
+    window.addEventListener('pointerdown', unlockHandler);
+    window.addEventListener('keydown', unlockHandler);
+  }
+unlock() {
+    if (typeof window !== 'undefined') {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          this.ctx = new AudioCtx();
+        }
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
     }
     this.isUnlocked = true;
+
+    if (this.pendingBgmKey) {
+      const resumeKey = this.pendingBgmKey;
+      this.pendingBgmKey = null;
+      this.playBgm(resumeKey);
+    }
   }
 
   playBgm(key) {
     if (!this.bgmEnabled) {
       this.currentBgmKey = key;
+      this.pendingBgmKey = null;
       return;
     }
-    if (!this.isUnlocked || !this.bgms[key]) return;
+
+    if (!this.bgms[key]) {
+      return;
+    }
+
+    if (!this.isUnlocked) {
+      this.pendingBgmKey = key;
+      return;
+    }
 
     if (this.currentBgmKey === key && !this.bgms[key].paused) {
       return;
@@ -115,12 +146,16 @@ class SoundSystem {
     targetAudio.load();
     targetAudio.currentTime = 0;
 
-    targetAudio.play().catch(e => {
+    targetAudio.play().then(() => {
+      this.pendingBgmKey = null;
+    }).catch(e => {
       console.warn(`BGM [${key}] 再生待機中:`, e);
+      this.pendingBgmKey = key;
     });
   }
 
   stopBgm() {
+    this.pendingBgmKey = null;
     if (this.currentBgmKey && this.bgms[this.currentBgmKey]) {
       const current = this.bgms[this.currentBgmKey];
       current.pause();
