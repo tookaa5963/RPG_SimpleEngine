@@ -259,7 +259,9 @@ export class TitleScene {
       }
       return;
     }
-
+    if (input.upJustPressed || input.downJustPressed || input.actionJustPressed || input.cancelJustPressed || input.isAnyKeyPressed) {
+      sound.unlock();
+    }
     if (this.phase === 'MENU' && !isSlotDialogOpen) {
       if (input.upJustPressed) {
         sound.playCursor();

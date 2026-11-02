@@ -85,19 +85,23 @@ class SoundSystem {
 
     return audio;
   }
-  setupAutoplayUnlock() {
+setupAutoplayUnlock() {
     if (typeof window === 'undefined') {
       return;
     }
-    const unlockHandler = () => {
+    const unlockHandler = (e) => {
+      console.log(`[SoundSystem] 初回ユーザー操作検知 (${e.type}) - 音声アンロック試行`);
       this.unlock();
-      window.removeEventListener('pointerdown', unlockHandler);
-      window.removeEventListener('keydown', unlockHandler);
+      ['pointerdown', 'keydown', 'click', 'touchstart'].forEach((type) => {
+        window.removeEventListener(type, unlockHandler, true);
+      });
     };
-    window.addEventListener('pointerdown', unlockHandler);
-    window.addEventListener('keydown', unlockHandler);
+    ['pointerdown', 'keydown', 'click', 'touchstart'].forEach((type) => {
+      window.addEventListener(type, unlockHandler, { capture: true, once: false });
+    });
   }
-unlock() {
+
+  unlock() {
     if (typeof window !== 'undefined') {
       if (!this.ctx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -106,13 +110,14 @@ unlock() {
         }
       }
       if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume();
+        this.ctx.resume().catch(() => {});
       }
     }
     this.isUnlocked = true;
 
     if (this.pendingBgmKey) {
       const resumeKey = this.pendingBgmKey;
+      console.log(`[SoundSystem] 保留中BGM [${resumeKey}] の自動復帰を実行`);
       this.pendingBgmKey = null;
       this.playBgm(resumeKey);
     }
@@ -120,16 +125,19 @@ unlock() {
 
   playBgm(key) {
     if (!this.bgmEnabled) {
+      console.log(`[SoundSystem] playBgm [${key}] 中止: bgmEnabled が false です`);
       this.currentBgmKey = key;
       this.pendingBgmKey = null;
       return;
     }
 
     if (!this.bgms[key]) {
+      console.warn(`[SoundSystem] playBgm [${key}] 中止: 音源キーが存在しません`);
       return;
     }
 
     if (!this.isUnlocked) {
+      console.log(`[SoundSystem] playBgm [${key}] 保留: ユーザー操作によるアンロック待機中`);
       this.pendingBgmKey = key;
       return;
     }
@@ -143,10 +151,14 @@ unlock() {
     this.currentBgmKey = key;
     const targetAudio = this.bgms[key];
 
-    targetAudio.load();
+    // メディアバッファ破棄を防ぐため、未ロード状態（HAVE_NOTHING）の場合のみ load() を呼び出す
+    if (targetAudio.readyState === 0) {
+      targetAudio.load();
+    }
     targetAudio.currentTime = 0;
 
     targetAudio.play().then(() => {
+      console.log(`[SoundSystem] BGM [${key}] 再生開始`);
       this.pendingBgmKey = null;
     }).catch(e => {
       console.warn(`BGM [${key}] 再生待機中:`, e);
@@ -164,7 +176,10 @@ unlock() {
     }
   }
 
-  playTone(freq, duration, type = 'square', gainVal = 0.1) {
+playTone(freq, duration, type = 'square', gainVal = 0.1) {
+    if (this.pendingBgmKey) {
+      this.unlock();
+    }
     if (!this.seEnabled || !this.isUnlocked || !this.ctx) return;
 
     const finalGain = gainVal * this.seVolume;
@@ -185,6 +200,9 @@ unlock() {
   }
 
   playNoise(duration, gainVal = 0.05) {
+    if (this.pendingBgmKey) {
+      this.unlock();
+    }
     if (!this.seEnabled || !this.isUnlocked || !this.ctx) return;
 
     const finalGain = gainVal * this.seVolume;
@@ -207,6 +225,7 @@ unlock() {
     gain.connect(this.ctx.destination);
 
     noise.start();
+    noise.stop(this.ctx.currentTime + duration);
   }
 
   playFootstep() {
@@ -455,3 +474,6 @@ unlock() {
 }
 
 export const sound = new SoundSystem();
+if (typeof window !== 'undefined') {
+  window.sound = sound;
+}
