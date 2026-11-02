@@ -175,11 +175,14 @@ rpg_simple_engine/
 - [202611020435] **Step Pre-3bc**
  **Step Pre-3b [既存委譲]**: `js/menu.js` 内の直接コールバック呼び出し（`onOpenSlot`, `onReturnToTitle`）を `EngineEventBus.emit`（`REQUEST_SLOT_DIALOG`, `REQUEST_RETURN_TITLE`）へ置換。Gate 1, Gate 2 検証。
  **Step Pre-3c [配線・引数削減]**: `js/main.js` で各要求イベントを購読・配線し、`MenuManager` コンストラクタ引数から外部コールバックを削除して縮退。Gate 1, Gate 2, Gate 3 検証。
- ※Step Pre-3bと3cは1セッションで行う。
 
-- [ ] **Step Pre-4a [受け皿先行]**: `data/items/i_forest_guide.json` および `data/spells/s_rula.json`, `s_liremito.json` に effect 定義を付与し、`EffectResolver` にマップ遷移・メッセージ用の解決ストラテジーを配備。Gate 1, Gate 2 検証。
-- [ ] **Step Pre-4b [既存委譲]**: `js/menu.js` の `useItem()` 内にある個別アイテムID分岐（`forest_guide`, `broken_corrada_hilt` 等）を撤廃し、`EffectResolver` 経由へ統一。Gate 1, Gate 2, Gate 3 検証。
-- [ ] **Step Pre-4c [既存委譲]**: `js/menu.js` の `useMagic()` 内にある呪文個別分岐（rula, liremito, 回復呪文）を撤廃し、`EffectResolver` 経由へ統一。Gate 1, Gate 2, Gate 3 検証。
+- [202611021626] **Step Pre-4a [受け皿先行]**: `TeleportEffect` / `MessageEffect` 配備およびデータスキーマ初期拡張（コミット: ab0764a）。
+- [202611021715] **Step Pre-4a-1 [受け皿是正]**: `MessageEffect` の複数行キー対応と `i_broken_corrada_hilt.json` のキー定義修正。Gate 1, Gate 2 検証完了（コミット: 765aba0）。
+- [ ] **Step Pre-4a-2 [データ整合]**: 森マップJSONへの `mapType: "forest"` 追加および `maps.js` のロード時ID補完。Gate 1, Gate 2 検証。
+- [ ] **Step Pre-4a-3 [配線]**: `js/main.js` での `REQUEST_MAP_CHANGE` 購読配線。Gate 1, Gate 2, Gate 3 検証。
+- [ ] **Step Pre-4b [既存委譲]**: `js/menu.js` の `useItem()` 内にある個別アイテムID分岐（`forest_guide`, `broken_corrada_hilt` 等）を撤廃し、貴重品ガードおよび `EffectResolver` 経由へ統一。Gate 1, Gate 2, Gate 3 検証。
+- [ ] **Step Pre-4c [既存委譲]**: `js/menu.js` の `useMagic()` 内にある呪文個別分岐（`rula`, `liremito` 等）を撤廃し、`EffectResolver` 経由へ統一。Gate 1, Gate 2, Gate 3 検証。
+
 
 #### Phase 5-0: 共通抽象基盤配備
 - [ ] **Step 5-0a [基盤新設]**: `js/engine/core/ActionTypes.js`（抽象入力コマンド定数）を新規配備。Gate 1 検証。
@@ -199,34 +202,28 @@ rpg_simple_engine/
 
 ## 5. 引き継ぎ部
 
-1. ユーザーの目的:
-   - rpg_simple_engine の完全ヘッドレス・データ駆動型アーキテクチャへの移行。
-   - Phase 5-1（Core層への MenuController 抽出）の前準備として、MenuManager 内の外部具象UI・システムコールバックを EngineEventBus 経由へパージする。
+# 引継ぎカプセル: Step Pre-4a-2 着手準備
 
-2. 重要情報・規程:
-   - プロトコル: Ver 1.36 準拠（Acceptor-First、1ステップ1コミット、ai_staging 経由の3段ゲート検証：Gate 1 静的/境界、Gate 2 テスト、Gate 3 実機ランタイム）。
-   - EngineEventBus の API 仕様: リスナー登録は on(eventType, callback)（※subscribe は不可）。発行は emit(eventType, payload)。
-   - 確定コミット: 6a23cdee ([Step Pre-3] MenuManagerのダイアログ・シーン遷移コールバックをEngineEventBusへ移行)。
-   - 作業ツリー状態: Clean（ai_staging は完全破棄済み、main ブランチにコミット完了）。
+1. 現在のGit状態:
+   - 作業ブランチ: step/pre-4a
+   - 最新コミット: 765aba0 (fix(core): support multiple messageKeys in MessageEffect and update hilt item schema)
+   - 作業ツリー: Clean（対象外一時ファイルは排除済み）
 
-3. 進捗状況:
-   - EventTypes.SYSTEM.REQUEST_SLOT_DIALOG および REQUEST_RETURN_TITLE を定義済み。
-   - js/menu.js: onOpenSlot および onReturnToTitle を廃止し、eventBus 注入および eventBus.emit による要求発行へ改修完了。
-   - js/main.js: engineEventBus.on で上記イベントを購読し、slotDialog および returnToTitle を配線完了。
-   - tools/test_menu_callbacks.mjs: イベント発行の検証へ移行し、Gate 1、Gate 2、累積ヘッドレス実証テスト（全53項目）に合格。
-   - Gate 3: ブラウザ実機にてセーブ/ロード/タイトル復帰の動作およびコンソールエラー0件を確認済み。
+2. 次回着手タスク:
+   - タスクID: Step Pre-4a-2 [データ整合]
+   - 目的:
+     - `TeleportEffect` において `forest_guide`（森のしおり）が使用可能となるよう、森マップデータに `mapType: "forest"` を明示付与する。
+     - `js/maps.js` のロード処理で各マップオブジェクトに `id`（マップ識別子）が確実に保持されるよう補完する。
+   - 変更対象:
+     - 森マップJSONファイル（`data/maps/` 配下の該当ファイル）
+     - `js/maps.js`（マップデータロード・正規化部）
+   - 検証要件:
+     - Gate 1: node tools/verify_gate1.mjs
+     - Gate 2: node tools/test_headless_run.mjs（マップロードおよび mapType 判定の検証テスト含む）
 
-4. 現在のコンテキストと残課題:
-   - Step Pre-3 は正式にクローズ済み。
-   - 構造的現状: MenuManager のコンストラクタには依然として 3 つの関数ポインタ（onEndCallback, changeMap, getCurrentMap）が残存しており、コールバックとイベントの混在状態（ハイブリッド状態）にある。
-   - 次回アクション: 残存コールバックをすべてイベント化する「Step Pre-4」を実施するか、そのまま Core 層抽出の「Phase 5-1」へ着手するかを決定し、設計・改修を進める。
+3. 前提確定事項:
+   - `TeleportEffect` の `allowedMapTypes: ['forest']` 条件に合致させるため、森マップ側に `mapType` プロパティが必要。
+   - 新規セッション開始直後に `data/maps/` の物理構造と `js/maps.js` のロード実装を静的確認（セッション1：探査）から着手する。
 
-現在のステータス詳細
-- 確定リビジョン: 6a23cdee3de65a899bcbf9367e5ad25af8bfedc6
-
-未解決の依存関係:
-- onEndCallback: メニュークローズ時の状態復帰通知
-- changeMap / getCurrentMap: アイテム使用に伴うマップ移動処理
-
-次回:
-- Step Pre-4: 残存コールバック（onEndCallback, changeMap, getCurrentMap）のイベント化による外部依存の完全排除
+Gitの状態確認をしてから
+実装セッションを開始してください。
