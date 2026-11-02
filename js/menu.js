@@ -177,27 +177,30 @@ export class MenuManager {
         sound.playSubmit();
       } else if (key === ' ' || key === 'Enter') {
         sound.playSubmit();
-        if (this.actionIndex === 0) {
-          if (this.selectedItem.type === 'weapon' || this.selectedItem.type === 'armor' || this.selectedItem.type === 'shield') {
-            this.equipItem(this.selectedItem);
-          } else if (this.selectedItem.id === 'forest_guide') {
-            this.useItem(this.selectedItem);
-          } else if (this.selectedItem.id === 'broken_corrada_hilt') {
-            this.onEnd();
-            this.msgWin.open([
-              logFormatter.format('menu_action.broken_hilt_1'),
-              logFormatter.format('menu_action.broken_hilt_2')
-            ]);
-          } else if (this.selectedItem.type === 'charm') {
-            this.onEnd();
-            this.msgWin.open([logFormatter.format('menu_action.charm_passive')]);
-          } else if (this.selectedItem.type === 'key' || this.selectedItem.type === 'keyItem') {
-            this.onEnd();
-            this.msgWin.open([i18n.t('menu.cannot_use_here')]);
-          } else {
-            this.useItem(this.selectedItem);
-          }
-        } else if (this.actionIndex === 1) {
+          if (this.actionIndex === 0) {
+            const effectDef = this.selectedItem.effect || (ITEM_DB[this.selectedItem.id] ? ITEM_DB[this.selectedItem.id].effect : null);
+            if (this.selectedItem.type === 'weapon' || this.selectedItem.type === 'armor' || this.selectedItem.type === 'shield') {
+              this.equipItem(this.selectedItem);
+            } else if (effectDef) {
+              this.useItem(this.selectedItem);
+            } else if (this.selectedItem.id === 'forest_guide') {
+              this.useItem(this.selectedItem);
+            } else if (this.selectedItem.id === 'broken_corrada_hilt') {
+              this.onEnd();
+              this.msgWin.open([
+                logFormatter.format('menu_action.broken_hilt_1'),
+                logFormatter.format('menu_action.broken_hilt_2')
+              ]);
+            } else if (this.selectedItem.type === 'charm') {
+              this.onEnd();
+              this.msgWin.open([logFormatter.format('menu_action.charm_passive')]);
+            } else if (this.selectedItem.type === 'key' || this.selectedItem.type === 'keyItem') {
+              this.onEnd();
+              this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+            } else {
+              this.useItem(this.selectedItem);
+            }
+          } else if (this.actionIndex === 1) {
           const dropCheck = this.player.canDropItem(this.selectedItem);
           if (!dropCheck.success) {
             this.onEnd();
@@ -305,8 +308,24 @@ export class MenuManager {
         }
       }
 
-      const result = effectResolver.resolve(effectDef, this.player, this.player);
-      this.player.removeItem(item.id, 1);
+      const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
+      const result = effectResolver.resolve(effectDef, this.player, this.player, { currentMap });
+
+      if (result.success === false) {
+        this.onEnd();
+        this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+        return;
+      }
+
+      const isKey = (item.type === 'key' || item.type === 'keyItem');
+      let shouldConsume = !isKey;
+      if (typeof result.consumeItem === 'boolean') {
+        shouldConsume = result.consumeItem;
+      }
+      if (shouldConsume) {
+        this.player.removeItem(item.id, 1);
+      }
+
       this.onEnd();
 
       if (result.strategy === 'heal_hp') {
@@ -339,6 +358,24 @@ export class MenuManager {
         } else {
           this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_not_poisoned')]);
         }
+      } else if (result.strategy === 'teleport') {
+        sound.playMagic();
+        const msgKey = (effectDef.params && effectDef.params.messageKey) ? effectDef.params.messageKey : 'menu_action.forest_guide';
+        this.msgWin.open([logFormatter.format(msgKey)]);
+        if (this.eventBus) {
+          this.eventBus.emit(EventTypes.SYSTEM.REQUEST_MAP_CHANGE, {
+            targetMap: result.targetMap,
+            targetX: result.targetX,
+            targetY: result.targetY,
+            direction: result.direction,
+            isTeleport: result.isTeleport
+          });
+        } else if (this.changeMap) {
+          this.changeMap(result.targetMap, result.targetX, result.targetY, result.direction, result.isTeleport);
+        }
+      } else if (result.strategy === 'message') {
+        const msgs = result.messageKeys.map((k) => logFormatter.format(k));
+        this.msgWin.open(msgs);
       }
       return;
     }
