@@ -1,6 +1,8 @@
 import { HealHpEffect } from './HealHpEffect.js';
 import { HealMpEffect } from './HealMpEffect.js';
 import { CureStatusEffect } from './CureStatusEffect.js';
+import { TeleportEffect } from './TeleportEffect.js';
+import { MessageEffect } from './MessageEffect.js';
 
 /**
  * 効果解決ディスパッチャ
@@ -19,11 +21,13 @@ export class EffectResolver {
         this.registerStrategy('heal_hp', new HealHpEffect());
         this.registerStrategy('heal_mp', new HealMpEffect());
         this.registerStrategy('cure_status', new CureStatusEffect());
+        this.registerStrategy('teleport', new TeleportEffect());
+        this.registerStrategy('message', new MessageEffect());
     }
 
     /**
      * 効果計算ストラテジーを登録する
-     * @param {string} type - 効果識別子（例: 'heal_hp', 'heal_mp', 'cure_status'）
+     * @param {string} type - 効果識別子（例: 'heal_hp', 'heal_mp', 'cure_status', 'teleport', 'message'）
      * @param {Object} strategy - calculate メソッドを実装したストラテジーインスタンス
      */
     registerStrategy(type, strategy) {

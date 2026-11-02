@@ -285,6 +285,70 @@ recordAssertion();
 assert.strictEqual(statusRemoveEvents[0].payload.statusId, 'poison');
 recordAssertion();
 
+// -------------------------------------------------------------
+// 10. 新規効果計算ストラテジー検証（teleport, message）
+// -------------------------------------------------------------
+// 10-1. TeleportEffect のディスパッチ検証（正常系: 条件一致）
+const teleportDef = {
+  type: 'teleport',
+  params: {
+    targetMap: 'temple',
+    targetX: 11,
+    targetY: 9,
+    direction: 'up',
+    isTeleport: true,
+    allowedMapTypes: ['forest']
+  }
+};
+const teleportSuccessResult = effectResolver.resolve(teleportDef, player, player, {
+  currentMap: { id: 'forest', mapType: 'forest' }
+});
+assert.strictEqual(teleportSuccessResult.success, true);
+recordAssertion();
+assert.strictEqual(teleportSuccessResult.strategy, 'teleport');
+recordAssertion();
+assert.strictEqual(teleportSuccessResult.targetMap, 'temple');
+recordAssertion();
+assert.strictEqual(teleportSuccessResult.targetX, 11);
+recordAssertion();
+assert.strictEqual(teleportSuccessResult.targetY, 9);
+recordAssertion();
+assert.strictEqual(teleportSuccessResult.direction, 'up');
+recordAssertion();
+assert.strictEqual(teleportSuccessResult.isTeleport, true);
+recordAssertion();
+
+// 10-2. TeleportEffect のディスパッチ検証（異常系: 条件不一致）
+const teleportFailResult = effectResolver.resolve(teleportDef, player, player, {
+  currentMap: { id: 'first_town', mapType: 'town' }
+});
+assert.strictEqual(teleportFailResult.success, false);
+recordAssertion();
+assert.strictEqual(teleportFailResult.strategy, 'teleport');
+recordAssertion();
+assert.strictEqual(teleportFailResult.reason, 'INVALID_LOCATION');
+recordAssertion();
+
+// 10-3. MessageEffect のディスパッチ検証
+const messageDef = {
+  type: 'message',
+  params: {
+    messageKeys: ['menu_action.broken_hilt_1', 'menu_action.broken_hilt_2'],
+    consumeItem: false
+  }
+};
+const messageResult = effectResolver.resolve(messageDef, player, player);
+assert.strictEqual(messageResult.success, true);
+recordAssertion();
+assert.strictEqual(messageResult.strategy, 'message');
+recordAssertion();
+assert.deepStrictEqual(messageResult.messageKeys, ['menu_action.broken_hilt_1', 'menu_action.broken_hilt_2']);
+recordAssertion();
+assert.strictEqual(messageResult.consumeItem, false);
+recordAssertion();
+assert.strictEqual(messageResult.reason, null);
+recordAssertion();
+
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
 console.log('=== [完全ヘッドレス実行実証テスト正常終了] ===');
 process.exit(0);
