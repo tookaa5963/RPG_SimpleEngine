@@ -9,5 +9,11 @@
     "ja": "リレミト",
     "en": "Evac",
     "es": "Evacua"
+  },
+  "effect": {
+    "type": "teleport",
+    "params": {
+      "targetType": "escape_target"
+    }
   }
 }

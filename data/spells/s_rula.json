@@ -9,5 +9,15 @@
     "ja": "ルーラ",
     "en": "Zoom",
     "es": "Teletransporte"
+  },
+  "effect": {
+    "type": "teleport",
+    "params": {
+      "targetType": "return_point",
+      "blockedMapProperties": [
+        "isDark",
+        "escapeTarget"
+      ]
+    }
   }
 }
