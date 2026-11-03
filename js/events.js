@@ -637,3 +637,57 @@ export function getEndingText(key) {
   }
   return text;
 }
+/**
+ * フィールド呪文のシナリオ詠唱可否を判定する純粋関数
+ * @param {string} spellId - 呪文ID
+ * @param {Object} player - プレイヤーオブジェクト
+ * @returns {{ allowed: boolean, reason: string|null }}
+ */
+export function canCastFieldSpell(spellId, player) {
+  if (typeof spellId !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:canCastFieldSpell', 'spellId', spellId);
+  }
+  if (spellId.length === 0) {
+    throw createProtocolError('EmptyStringError', 'events.js:canCastFieldSpell', 'spellId', spellId);
+  }
+  if (typeof player !== 'object') {
+    throw createProtocolError('TypeError', 'events.js:canCastFieldSpell', 'player', player);
+  }
+  if (player === null) {
+    throw createProtocolError('TypeError', 'events.js:canCastFieldSpell', 'player', player);
+  }
+
+  if (spellId === 'rula' || spellId === 'liremito') {
+    let hasFlags = false;
+    let rescuedGirl = false;
+    let hasPass = false;
+
+    if (typeof player.flags === 'object') {
+      if (player.flags !== null) {
+        hasFlags = true;
+        if (player.flags.rescuedGirl === true) {
+          rescuedGirl = true;
+        }
+        if (player.flags.hasPass === true) {
+          hasPass = true;
+        }
+      }
+    }
+
+    if (hasFlags) {
+      if (rescuedGirl === true) {
+        if (hasPass === false) {
+          return {
+            allowed: false,
+            reason: 'girl_priority'
+          };
+        }
+      }
+    }
+  }
+
+  return {
+    allowed: true,
+    reason: null
+  };
+}
