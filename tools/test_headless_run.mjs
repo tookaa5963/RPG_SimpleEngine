@@ -349,6 +349,90 @@ recordAssertion();
 assert.strictEqual(messageResult.reason, null);
 recordAssertion();
 
+// 10-4. TeleportEffect のディスパッチ検証（動的解決: escape_target 成功）
+const teleportEscapeDef = {
+  type: 'teleport',
+  params: {
+    targetType: 'escape_target'
+  }
+};
+const teleportEscapeResult = effectResolver.resolve(teleportEscapeDef, player, player, {
+  currentMap: {
+    id: 'cave_b1',
+    escapeTarget: {
+      targetMap: 'first_island',
+      targetX: 6,
+      targetY: 10,
+      direction: 'down'
+    }
+  }
+});
+assert.strictEqual(teleportEscapeResult.success, true);
+recordAssertion();
+assert.strictEqual(teleportEscapeResult.strategy, 'teleport');
+recordAssertion();
+assert.strictEqual(teleportEscapeResult.targetMap, 'first_island');
+recordAssertion();
+assert.strictEqual(teleportEscapeResult.targetX, 6);
+recordAssertion();
+assert.strictEqual(teleportEscapeResult.targetY, 10);
+recordAssertion();
+assert.strictEqual(teleportEscapeResult.direction, 'down');
+recordAssertion();
+assert.strictEqual(teleportEscapeResult.isTeleport, true);
+recordAssertion();
+
+// 10-5. TeleportEffect のディスパッチ検証（動的解決: return_point 成功）
+const teleportReturnDef = {
+  type: 'teleport',
+  params: {
+    targetType: 'return_point',
+    blockedMapProperties: ['isDark', 'escapeTarget']
+  }
+};
+const returnPlayer = {
+  returnPoint: {
+    mapId: 'cottage',
+    gridX: 3,
+    gridY: 4,
+    direction: 'up'
+  }
+};
+const teleportReturnResult = effectResolver.resolve(teleportReturnDef, returnPlayer, returnPlayer, {
+  currentMap: {
+    id: 'field',
+    isDark: false
+  }
+});
+assert.strictEqual(teleportReturnResult.success, true);
+recordAssertion();
+assert.strictEqual(teleportReturnResult.strategy, 'teleport');
+recordAssertion();
+assert.strictEqual(teleportReturnResult.targetMap, 'cottage');
+recordAssertion();
+assert.strictEqual(teleportReturnResult.targetX, 3);
+recordAssertion();
+assert.strictEqual(teleportReturnResult.targetY, 4);
+recordAssertion();
+assert.strictEqual(teleportReturnResult.direction, 'up');
+recordAssertion();
+assert.strictEqual(teleportReturnResult.isTeleport, true);
+recordAssertion();
+
+// 10-6. TeleportEffect のディスパッチ検証（動的解決: blockedMapProperties 使用禁止）
+const teleportBlockedResult = effectResolver.resolve(teleportReturnDef, returnPlayer, returnPlayer, {
+  currentMap: {
+    id: 'dark_cave',
+    isDark: true
+  }
+});
+assert.strictEqual(teleportBlockedResult.success, false);
+recordAssertion();
+assert.strictEqual(teleportBlockedResult.strategy, 'teleport');
+recordAssertion();
+assert.strictEqual(teleportBlockedResult.reason, 'BLOCKED_LOCATION');
+recordAssertion();
+
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
 console.log('=== [完全ヘッドレス実行実証テスト正常終了] ===');
 process.exit(0);
