@@ -23,6 +23,7 @@ import { initItemData } from './items.js';
 import { initMonsterData } from './monsters.js';
 import { EngineEventBus } from './engine/core/EngineEventBus.js';
 import { EventTypes } from './engine/core/EventTypes.js';
+import { ActionTypes } from './engine/core/ActionTypes.js';
 import { WebAudioDriver } from './drivers/audio/WebAudioDriver.js';
 import { DomUiDriver } from './drivers/ui/DomUiDriver.js';
 
@@ -770,18 +771,18 @@ function initializeGameEntities() {
     }
   });
 
-engineEventBus.on(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, (payload) => {
+engineEventBus.on(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, (payload) => {
   let mode = 'save';
   if (payload && payload.mode) {
     mode = payload.mode;
   }
   slotDialog.open(mode, false);
 });
-engineEventBus.on(EventTypes.SYSTEM.REQUEST_RETURN_TITLE, () => {
+engineEventBus.on(ActionTypes.SYSTEM.RETURN_TO_TITLE, () => {
   returnToTitle();
 });
 
-engineEventBus.on(EventTypes.SYSTEM.REQUEST_MAP_CHANGE, (payload) => {
+engineEventBus.on(ActionTypes.SYSTEM.CHANGE_MAP, (payload) => {
     if (typeof payload !== 'object' || payload === null) {
       return;
     }

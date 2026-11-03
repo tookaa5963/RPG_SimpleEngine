@@ -8,6 +8,7 @@ import { drawListBox, drawMessageBox } from './ui.js';
 import { i18n } from './i18n.js';
 import { EffectResolver } from './engine/effects/EffectResolver.js';
 import { EventTypes } from './engine/core/EventTypes.js';
+import { ActionTypes } from './engine/core/ActionTypes.js';
 
 const effectResolver = new EffectResolver();
 
@@ -106,9 +107,9 @@ export class MenuManager {
           this.onEnd();
           this.showCurrentObjective();
         } else if (this.rootIndex === 4) {
-          if (this.eventBus) this.eventBus.emit(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, { mode: 'load' });
+          if (this.eventBus) this.eventBus.emit(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, { mode: 'load' });
         } else if (this.rootIndex === 5) {
-          if (this.eventBus) this.eventBus.emit(EventTypes.SYSTEM.REQUEST_SLOT_DIALOG, { mode: 'save' });
+          if (this.eventBus) this.eventBus.emit(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, { mode: 'save' });
         } else if (this.rootIndex === 6) {
           this.quitConfirmIndex = 1;
           this.phase = 'QUIT_CONFIRM';
@@ -130,7 +131,7 @@ export class MenuManager {
         if (this.quitConfirmIndex === 0) {
           this.onEnd();
           if (this.eventBus) {
-            this.eventBus.emit(EventTypes.SYSTEM.REQUEST_RETURN_TITLE);
+            this.eventBus.emit(ActionTypes.SYSTEM.RETURN_TO_TITLE);
           }
         } else {
           this.phase = 'ROOT';
@@ -355,7 +356,7 @@ export class MenuManager {
         const msgKey = (effectDef.params && effectDef.params.messageKey) ? effectDef.params.messageKey : 'menu_action.forest_guide';
         this.msgWin.open([logFormatter.format(msgKey)]);
         if (this.eventBus) {
-          this.eventBus.emit(EventTypes.SYSTEM.REQUEST_MAP_CHANGE, {
+          this.eventBus.emit(ActionTypes.SYSTEM.CHANGE_MAP, {
             targetMap: result.targetMap,
             targetX: result.targetX,
             targetY: result.targetY,
@@ -476,7 +477,7 @@ export class MenuManager {
       this.onEnd();
       this.msgWin.open([castMsg]);
       if (this.eventBus) {
-        this.eventBus.emit(EventTypes.SYSTEM.REQUEST_MAP_CHANGE, {
+        this.eventBus.emit(ActionTypes.SYSTEM.CHANGE_MAP, {
           targetMap: result.targetMap,
           targetX: result.targetX,
           targetY: result.targetY,
