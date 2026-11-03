@@ -1,6 +1,6 @@
 // FILE_ENTRY: js/menu.js
 import { logFormatter } from './logFormatter.js';
-import { getObjectiveText, resolveCurrentObjectiveKey } from './events.js';
+import { getObjectiveText, resolveCurrentObjectiveKey, canCastFieldSpell } from './events.js';
 import { sound } from './sound.js';
 import { maps } from './maps.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
@@ -177,22 +177,22 @@ export class MenuManager {
         sound.playSubmit();
       } else if (key === ' ' || key === 'Enter') {
         sound.playSubmit();
-          if (this.actionIndex === 0) {
-            const effectDef = this.selectedItem.effect || (ITEM_DB[this.selectedItem.id] ? ITEM_DB[this.selectedItem.id].effect : null);
-            if (this.selectedItem.type === 'weapon' || this.selectedItem.type === 'armor' || this.selectedItem.type === 'shield') {
-              this.equipItem(this.selectedItem);
-            } else if (effectDef) {
-              this.useItem(this.selectedItem);
-            } else if (this.selectedItem.type === 'charm') {
-              this.onEnd();
-              this.msgWin.open([logFormatter.format('menu_action.charm_passive')]);
-            } else if (this.selectedItem.type === 'key' || this.selectedItem.type === 'keyItem') {
-              this.onEnd();
-              this.msgWin.open([i18n.t('menu.cannot_use_here')]);
-            } else {
-              this.useItem(this.selectedItem);
-            }
-          } else if (this.actionIndex === 1) {
+        if (this.actionIndex === 0) {
+          const effectDef = this.selectedItem.effect || (ITEM_DB[this.selectedItem.id] ? ITEM_DB[this.selectedItem.id].effect : null);
+          if (this.selectedItem.type === 'weapon' || this.selectedItem.type === 'armor' || this.selectedItem.type === 'shield') {
+            this.equipItem(this.selectedItem);
+          } else if (effectDef) {
+            this.useItem(this.selectedItem);
+          } else if (this.selectedItem.type === 'charm') {
+            this.onEnd();
+            this.msgWin.open([logFormatter.format('menu_action.charm_passive')]);
+          } else if (this.selectedItem.type === 'key' || this.selectedItem.type === 'keyItem') {
+            this.onEnd();
+            this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+          } else {
+            this.useItem(this.selectedItem);
+          }
+        } else if (this.actionIndex === 1) {
           const dropCheck = this.player.canDropItem(this.selectedItem);
           if (!dropCheck.success) {
             this.onEnd();
@@ -406,33 +406,29 @@ export class MenuManager {
       }
     }
 
-    if (spell.id === 'liremito') {
-      const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
-      if (!currentMap || !currentMap.escapeTarget) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.cannot_use_here')]);
-        return;
-      }
-    }
-
-    if (spell.id === 'rula') {
-      const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
-      if (currentMap && (currentMap.isDark || currentMap.escapeTarget)) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.cannot_use_here')]);
-        return;
-      }
-      if (!this.player.returnPoint || !this.player.returnPoint.mapId) {
-        this.onEnd();
-        this.msgWin.open([i18n.t('menu.no_return_point')]);
-        return;
-      }
-    }
-
-    if ((spell.id === 'liremito' || spell.id === 'rula') && this.player.flags.rescuedGirl && !this.player.flags.hasPass) {
+    const spellCheck = canCastFieldSpell(spell.id, this.player);
+    if (!spellCheck.allowed) {
       this.onEnd();
-      this.msgWin.open([i18n.t('menu.girl_priority')]);
+      if (spellCheck.reason === 'girl_priority') {
+        this.msgWin.open([i18n.t('menu.girl_priority')]);
+      } else {
+        this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+      }
       return;
+    }
+
+    if (effectDef && effectDef.type === 'teleport') {
+      const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
+      const preCheck = effectResolver.resolve(effectDef, this.player, this.player, { currentMap });
+      if (!preCheck.success) {
+        this.onEnd();
+        if (preCheck.reason === 'NO_RETURN_POINT') {
+          this.msgWin.open([i18n.t('menu.no_return_point')]);
+        } else {
+          this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+        }
+        return;
+      }
     }
 
     if (!this.player.consumeMp(spell.cost)) {
@@ -474,6 +470,25 @@ export class MenuManager {
       return;
     }
 
+    if (effectDef && effectDef.type === 'teleport') {
+      const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
+      const result = effectResolver.resolve(effectDef, this.player, this.player, { currentMap });
+      this.onEnd();
+      this.msgWin.open([castMsg]);
+      if (this.eventBus) {
+        this.eventBus.emit(EventTypes.SYSTEM.REQUEST_MAP_CHANGE, {
+          targetMap: result.targetMap,
+          targetX: result.targetX,
+          targetY: result.targetY,
+          direction: result.direction,
+          isTeleport: result.isTeleport
+        });
+      } else if (this.changeMap) {
+        this.changeMap(result.targetMap, result.targetX, result.targetY, result.direction, result.isTeleport);
+      }
+      return;
+    }
+
     if (spell.id === 'remira') {
       this.player.remiraSteps = 120;
       this.onEnd();
@@ -482,20 +497,6 @@ export class MenuManager {
       this.player.holyWaterSteps = 128;
       this.onEnd();
       this.msgWin.open([castMsg, logFormatter.format('menu_action.holy_water_2')]);
-    } else if (spell.id === 'liremito') {
-      const escape = this.getCurrentMap().escapeTarget;
-      this.onEnd();
-      this.msgWin.open([castMsg]);
-      if (this.changeMap) {
-        this.changeMap(escape.targetMap, escape.targetX, escape.targetY, escape.direction, true);
-      }
-    } else if (spell.id === 'rula') {
-      const returnPt = this.player.returnPoint;
-      this.onEnd();
-      this.msgWin.open([castMsg]);
-      if (this.changeMap) {
-        this.changeMap(returnPt.mapId, returnPt.gridX, returnPt.gridY, returnPt.direction || 'down', true);
-      }
     }
   }
 
