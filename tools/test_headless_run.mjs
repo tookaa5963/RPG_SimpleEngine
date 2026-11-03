@@ -4,8 +4,8 @@
  * 
  * 目的:
  * ブラウザ環境（window, document, DOM要素, AudioContext 等）が存在しない純粋な Node.js ランタイムにおいて、
- * Core層モジュール（EngineEventBus, DataRepository, Actor, Inventory, EffectResolver, GenericFlags）が
- * 協調してゲーム進行サイクル（アクター生成、戦闘ダメージ計算、アイテム消費、効果解決、状態変更、フラグ管理、イベント通知）を
+ * Core層モジュール（EngineEventBus, DataRepository, Actor, Inventory, EffectResolver, GenericFlags, ActionTypes, EventTypes）が
+ * 協調してゲーム進行サイクル（アクター生成、戦闘ダメージ計算、アイテム消費、効果解決、状態変更、フラグ管理、イベント通知、契約検証）を
  * 正常に完走できることを機械的に実証する。
  */
 
@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { EngineEventBus } from '../js/engine/core/EngineEventBus.js';
+import { ActionTypes } from '../js/engine/core/ActionTypes.js';
 import { EventTypes } from '../js/engine/core/EventTypes.js';
 import { DataRepository } from '../js/engine/data/DataRepository.js';
 import { Actor } from '../js/engine/entities/Actor.js';
@@ -431,6 +432,23 @@ recordAssertion();
 assert.strictEqual(teleportBlockedResult.strategy, 'teleport');
 recordAssertion();
 assert.strictEqual(teleportBlockedResult.reason, 'BLOCKED_LOCATION');
+recordAssertion();
+
+// -------------------------------------------------------------
+// 11. 通信プロトコル契約検証（ActionTypes / EventTypes）
+// -------------------------------------------------------------
+assert.strictEqual(
+  Object.isFrozen(ActionTypes) &&
+  Object.isFrozen(ActionTypes.PLAYER) &&
+  Object.isFrozen(ActionTypes.MENU) &&
+  Object.isFrozen(ActionTypes.BATTLE) &&
+  Object.isFrozen(ActionTypes.SYSTEM) &&
+  typeof EventTypes.SYSTEM.REQUEST_MAP_CHANGE === 'undefined' &&
+  typeof EventTypes.SYSTEM.REQUEST_SLOT_DIALOG === 'undefined' &&
+  typeof EventTypes.SYSTEM.REQUEST_RETURN_TITLE === 'undefined',
+  true,
+  '契約違反: 通信プロトコル（ActionTypes / EventTypes）の凍結またはクレンジング要件を満たしていません'
+);
 recordAssertion();
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
