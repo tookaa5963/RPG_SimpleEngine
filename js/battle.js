@@ -22,6 +22,7 @@ import {
   checkEscape
 } from './engine/battle/BattleCalculator.js';
 import { RewardCalculator } from './engine/battle/RewardCalculator.js';
+import { BattleStateMachine, BattleState } from './engine/battle/BattleStateMachine.js';
 
 export { MONSTER_DEFINITIONS } from './monsters.js';
 
@@ -55,6 +56,8 @@ export class BattleManager {
 
     this.cw = 768;
     this.ch = 768;
+
+    this.stateMachine = new BattleStateMachine();
   }
 
   getCommands() {
@@ -88,6 +91,8 @@ export class BattleManager {
       throw new Error(`[BattleManager] Invalid monsterId "${monsterId}". Entity not found in MONSTER_DEFINITIONS.`);
     }
 
+    this.stateMachine.init({ isAmbush: Boolean(isAmbush) });
+
     this.enemy = { ...base };
     this.enemy.sleepTurns = 0;
     this.enemy.spellSealed = false;
@@ -113,6 +118,8 @@ export class BattleManager {
         logFormatter.format('battle_log.appeared', { name: this.enemy.name }),
         logFormatter.format('battle_log.enemy_ambush', { name: this.enemy.name })
       ], () => {
+        this.stateMachine.proceedToTurnCheck();
+        this.stateMachine.resolveTurnCheck({ canAct: false });
         this.runEnemyTurn();
       });
     } else {
@@ -123,6 +130,10 @@ export class BattleManager {
   }
 
   checkPlayerTurn(isFirstTurn = false) {
+    if (this.stateMachine.state !== BattleState.TURN_CHECK) {
+      this.stateMachine.proceedToTurnCheck();
+    }
+
     if (!isFirstTurn && this.player.isPoisoned && this.player.hp > 0) {
       const hasCharm = (this.player.inventory.poison_charm || 0) > 0;
       const rate = hasCharm ? 0.025 : 0.05;
@@ -138,6 +149,7 @@ export class BattleManager {
 
       this.queueMessages([poisonMsg], () => {
         if (this.player.hp <= 0) {
+          this.stateMachine.resolveDefeat();
           this.defeat();
         } else {
           this.proceedPlayerTurn();
@@ -154,16 +166,19 @@ export class BattleManager {
       if (this.playerSleepTurns <= 0) {
         this.playerSleepTurns = 0;
         this.queueMessages([logFormatter.format('battle_log.player_awake')], () => {
+          this.stateMachine.resolveTurnCheck({ canAct: true });
           this.commandIndex = 0;
           this.phase = 'COMMAND_SELECT';
         });
       } else {
         this.queueMessages([logFormatter.format('battle_log.player_sleep')], () => {
+          this.stateMachine.resolveTurnCheck({ canAct: false });
           this.runEnemyTurn();
         });
       }
       return;
     }
+    this.stateMachine.resolveTurnCheck({ canAct: true });
     this.commandIndex = 0;
     this.phase = 'COMMAND_SELECT';
   }
@@ -200,10 +215,17 @@ export class BattleManager {
   }
 
   executeCommand() {
-    if (this.commandIndex === 0) this.runTurn('ATTACK');
-    else if (this.commandIndex === 1) this.openMagicMenu();
-    else if (this.commandIndex === 2) this.openItemMenu();
-    else if (this.commandIndex === 3) this.runEscape();
+    if (this.commandIndex === 0) {
+      this.stateMachine.submitCommand('ATTACK');
+      this.runTurn('ATTACK');
+    } else if (this.commandIndex === 1) {
+      this.openMagicMenu();
+    } else if (this.commandIndex === 2) {
+      this.openItemMenu();
+    } else if (this.commandIndex === 3) {
+      this.stateMachine.submitCommand('ESCAPE');
+      this.runEscape();
+    }
   }
 
   openMagicMenu() {
@@ -257,6 +279,11 @@ export class BattleManager {
   }
 
   executeSelection(selected) {
+    if (selected.type === 'magic') {
+      this.stateMachine.submitCommand('SPELL');
+    } else if (selected.type === 'item') {
+      this.stateMachine.submitCommand('ITEM');
+    }
     executeBattleAction(this, selected);
   }
 
@@ -537,9 +564,13 @@ export class BattleManager {
   runEscape() {
     const isNoEscape = Boolean(this.enemy.dropItem || this.enemy.noEscape);
     const success = checkEscape(isNoEscape);
+    this.stateMachine.resolveEscape(success);
     if (success) {
       sound.playEscape();
-      this.queueMessages([logFormatter.format('battle_log.hero_escape')], () => { this.onEnd({ result: 'ESCAPE' }); });
+      this.queueMessages([logFormatter.format('battle_log.hero_escape')], () => {
+        this.stateMachine.endBattle();
+        this.onEnd({ result: 'ESCAPE' });
+      });
     } else {
       this.queueMessages([logFormatter.format('battle_log.hero_escape'), logFormatter.format('battle_log.escape_failed')], () => {
         this.runEnemyTurn();
@@ -547,10 +578,12 @@ export class BattleManager {
     }
   }
 
-victory() {
+  victory() {
     sound.stopBgm();
+    this.stateMachine.startVictoryPending();
 
     if (this.enemy.id === 'black_dragon') {
+      this.stateMachine.resolveVictory({ needsDiscard: false });
       this.onEnd({ result: 'DRAGON_VICTORY' });
       return;
     }
@@ -583,11 +616,13 @@ victory() {
       }
 
       if (reward.status === 'DROP_OBTAINED') {
+        this.stateMachine.resolveVictory({ needsDiscard: false });
         this.player.addItem(reward.dropItemId, 1);
         const itemName = ITEM_DB[reward.dropItemId]?.name || '';
         afterMessages.push(logFormatter.format('battle_log.treasure_drop', { name: this.enemy.name, item: itemName }));
         this.proceedAfterMessages(afterMessages);
       } else if (reward.status === 'DISCARD_REQUIRED') {
+        this.stateMachine.resolveVictory({ needsDiscard: true });
         this.pendingDropItem = reward.dropItemId;
         afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
         this.queueMessages(afterMessages, () => {
@@ -596,12 +631,14 @@ victory() {
           this.phase = 'DISCARD_SELECT';
         });
       } else if (reward.status === 'DROP_ABANDONED') {
+        this.stateMachine.resolveVictory({ needsDiscard: false });
         const itemName = ITEM_DB[reward.dropItemId]?.name || '';
         afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
         afterMessages.push(logFormatter.format('battle_log.gave_up_item', { item: itemName }));
         this.proceedAfterMessages(afterMessages);
       } else {
         // NO_DROP
+        this.stateMachine.resolveVictory({ needsDiscard: false });
         this.proceedAfterMessages(afterMessages);
       }
     });
@@ -618,7 +655,11 @@ victory() {
   }
 
   defeat() {
+    if (this.stateMachine.state !== BattleState.DEFEAT && this.stateMachine.state !== BattleState.BATTLE_END) {
+      this.stateMachine.resolveDefeat();
+    }
     this.queueMessages([logFormatter.format('battle_log.hero_defeated')], () => {
+      this.stateMachine.endBattle();
       this.onEnd({ result: 'DEFEAT' });
     });
   }
@@ -671,6 +712,7 @@ victory() {
         this.player.addItem(this.pendingDropItem, 1);
         const droppedName = ITEM_DB[this.pendingDropItem]?.name || '';
         sound.playChest();
+        this.stateMachine.resolveDiscard();
         this.queueMessages([
           logFormatter.format('battle_log.hero_discarded_item', { discarded: discarded.name, dropped: droppedName })
         ], () => {
