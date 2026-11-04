@@ -4,6 +4,12 @@ import { audioService } from './audioService.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
 import { i18n } from './i18n.js';
 import { EffectResolver } from './engine/effects/EffectResolver.js';
+import {
+    calcSpellDamage,
+    applyDamageRate,
+    checkChance,
+    calcStatusTurns
+} from './engine/battle/BattleCalculator.js';
 
 const effectResolver = new EffectResolver();
 
@@ -210,10 +216,10 @@ function executeMagicAction(bm, spell) {
     }
 
     if (spell.id === 'mera') {
-        let magicDmg = Math.floor(Math.random() * 5) + 10;
+        let magicDmg = calcSpellDamage(10, 14);
         if (enemy) {
             if (enemy.id === 'black_dragon') {
-                magicDmg = Math.max(1, Math.floor(magicDmg * 0.2));
+                magicDmg = applyDamageRate(magicDmg, 0.2);
             }
         }
         bm.effects.createSparks(bm.enemyCenter.x, bm.enemyCenter.y, '#ff3838', 14);
@@ -230,10 +236,10 @@ function executeMagicAction(bm, spell) {
         return;
     }
     if (spell.id === 'merami') {
-        let magicDmg = Math.floor(Math.random() * 21) + 70;
+        let magicDmg = calcSpellDamage(70, 90);
         if (enemy) {
             if (enemy.id === 'black_dragon') {
-                magicDmg = Math.max(1, Math.floor(magicDmg * 0.2));
+                magicDmg = applyDamageRate(magicDmg, 0.2);
             }
         }
         bm.effects.createSparks(bm.enemyCenter.x, bm.enemyCenter.y, '#ff1744', 24);
@@ -251,10 +257,10 @@ function executeMagicAction(bm, spell) {
         return;
     }
     if (spell.id === 'gira') {
-        let magicDmg = Math.floor(Math.random() * 9) + 20;
+        let magicDmg = calcSpellDamage(20, 28);
         if (enemy) {
             if (enemy.id === 'black_dragon') {
-                magicDmg = Math.max(1, Math.floor(magicDmg * 0.2));
+                magicDmg = applyDamageRate(magicDmg, 0.2);
             }
         }
         bm.effects.createSparks(bm.enemyCenter.x, bm.enemyCenter.y, '#00d2d3', 16);
@@ -271,10 +277,10 @@ function executeMagicAction(bm, spell) {
         return;
     }
     if (spell.id === 'begirama') {
-        let magicDmg = Math.floor(Math.random() * 16) + 50;
+        let magicDmg = calcSpellDamage(50, 65);
         if (enemy) {
             if (enemy.id === 'black_dragon') {
-                magicDmg = Math.max(1, Math.floor(magicDmg * 0.2));
+                magicDmg = applyDamageRate(magicDmg, 0.2);
             }
         }
         bm.effects.createSparks(bm.enemyCenter.x, bm.enemyCenter.y, '#54a0ff', 24);
@@ -300,8 +306,8 @@ function executeMagicAction(bm, spell) {
             if (enemy.sleepResist !== undefined) {
                 successChance = 1 - enemy.sleepResist;
             }
-            if (Math.random() < successChance) {
-                enemy.sleepTurns = Math.floor(Math.random() * 3) + 2;
+            if (checkChance(successChance)) {
+                enemy.sleepTurns = calcStatusTurns(2, 4);
                 bm.effects.addPopup('SLEEP', bm.enemyPopupPos.x, bm.enemyPopupPos.y, '#a29bfe', '#6c5ce7', false, 'bounce');
                 messages.push(i18n.t('battle_action.enemy_asleep', { name: enemy.name }));
             } else {
@@ -322,7 +328,7 @@ function executeMagicAction(bm, spell) {
             if (enemy.sealResist !== undefined) {
                 successChance = 1 - enemy.sealResist;
             }
-            if (Math.random() < successChance) {
+            if (checkChance(successChance)) {
                 enemy.spellSealed = true;
                 bm.effects.addPopup('SEAL', bm.enemyPopupPos.x, bm.enemyPopupPos.y, '#00d2d3', '#0984e3', false, 'bounce');
                 messages.push(i18n.t('battle_action.enemy_spell_sealed', { name: enemy.name }));
