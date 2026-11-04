@@ -159,7 +159,7 @@ export class RewardCalculator {
 
   /**
    * インベントリ満杯時における破棄候補アイテムの抽出
-   * （装備中アイテムの余剰分抽出および重要アイテム type: key の除外）
+   * （装備中アイテムの余剰分抽出および重要アイテム type: key / keyItem の除外）
    * 
    * @param {Object} items - 所持アイテム一覧（キー: itemId, 値: 個数）
    * @param {Object} equipment - 装備中アイテム（スロット別 itemId）
@@ -224,20 +224,22 @@ export class RewardCalculator {
           if (typeof itemDef === 'object') {
             if (itemDef !== null) {
               if (itemDef.type !== 'key') {
-                let equippedQty = 0;
-                if (typeof equippedCount[itemId] === 'number') {
-                  equippedQty = equippedCount[itemId];
-                }
-
-                if (count > equippedQty) {
-                  let itemName = itemId;
-                  if (typeof itemDef.name === 'string') {
-                    itemName = itemDef.name;
+                if (itemDef.type !== 'keyItem') {
+                  let equippedQty = 0;
+                  if (typeof equippedCount[itemId] === 'number') {
+                    equippedQty = equippedCount[itemId];
                   }
-                  candidates.push({
-                    id: itemId,
-                    name: itemName
-                  });
+
+                  if (count > equippedQty) {
+                    let itemName = itemId;
+                    if (typeof itemDef.name === 'string') {
+                      itemName = itemDef.name;
+                    }
+                    candidates.push({
+                      id: itemId,
+                      name: itemName
+                    });
+                  }
                 }
               }
             }

@@ -21,6 +21,7 @@ import {
   determineFirstAttacker,
   checkEscape
 } from './engine/battle/BattleCalculator.js';
+import { RewardCalculator } from './engine/battle/RewardCalculator.js';
 
 export { MONSTER_DEFINITIONS } from './monsters.js';
 
@@ -546,7 +547,7 @@ export class BattleManager {
     }
   }
 
-  victory() {
+victory() {
     sound.stopBgm();
 
     if (this.enemy.id === 'black_dragon') {
@@ -556,23 +557,23 @@ export class BattleManager {
 
     sound.playVictory();
 
-    let earnedExp = this.enemy.exp;
-    const isBoss = Boolean(this.enemy.isBoss);
-    if (!isBoss) {
-      const monsterLevel = this.enemy.level || 1;
-      if (this.player.level - monsterLevel >= 3) {
-        earnedExp = Math.max(1, Math.floor(earnedExp * 0.25));
-      }
-    }
+    const reward = RewardCalculator.calculateRewardSummary({
+      playerLevel: this.player.level,
+      enemy: this.enemy,
+      items: this.player.inventory,
+      equipment: this.player.equipment,
+      itemDb: ITEM_DB,
+      isInventoryFull: this.player.isInventoryFull(1)
+    });
 
     const initialMessages = [
       logFormatter.format('battle_log.enemy_defeated', { name: this.enemy.name }),
-      logFormatter.format('battle_log.exp_gold_gain', { exp: String(earnedExp), gold: String(this.enemy.gold) })
+      logFormatter.format('battle_log.exp_gold_gain', { exp: String(reward.exp), gold: String(reward.gold) })
     ];
 
     this.queueMessages(initialMessages, () => {
-      this.player.addGold(this.enemy.gold);
-      const levelUpMessages = this.player.addExp(earnedExp);
+      this.player.addGold(reward.gold);
+      const levelUpMessages = this.player.addExp(reward.exp);
 
       const afterMessages = [];
 
@@ -581,46 +582,28 @@ export class BattleManager {
         afterMessages.push(...levelUpMessages);
       }
 
-      if (this.enemy.dropItem) {
-        const dropId = this.enemy.dropItem;
-        const itemName = ITEM_DB[dropId]?.name || '';
-
-        if (this.player.isInventoryFull(1)) {
-          const candidates = [];
-          for (const [id, count] of Object.entries(this.player.inventory)) {
-            if (count > 0 && ITEM_DB[id]) {
-              if (ITEM_DB[id].type === 'key' || ITEM_DB[id].type === 'keyItem') continue;
-              let avail = count;
-              if (this.player.equipment.weapon === id) avail--;
-              if (this.player.equipment.armor === id) avail--;
-              if (this.player.equipment.shield === id) avail--;
-              if (avail > 0) {
-                candidates.push({ id: id, name: ITEM_DB[id].name });
-              }
-            }
-          }
-
-          if (candidates.length === 0) {
-            afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
-            afterMessages.push(logFormatter.format('battle_log.gave_up_item', { item: itemName }));
-            this.proceedAfterMessages(afterMessages);
-          } else {
-            this.pendingDropItem = dropId;
-            afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
-            this.queueMessages(afterMessages, () => {
-              this.discardList = candidates;
-              this.discardIndex = 0;
-              this.phase = 'DISCARD_SELECT';
-            });
-          }
-          return;
-        } else {
-          this.player.addItem(dropId, 1);
-          afterMessages.push(logFormatter.format('battle_log.treasure_drop', { name: this.enemy.name, item: itemName }));
-        }
+      if (reward.status === 'DROP_OBTAINED') {
+        this.player.addItem(reward.dropItemId, 1);
+        const itemName = ITEM_DB[reward.dropItemId]?.name || '';
+        afterMessages.push(logFormatter.format('battle_log.treasure_drop', { name: this.enemy.name, item: itemName }));
+        this.proceedAfterMessages(afterMessages);
+      } else if (reward.status === 'DISCARD_REQUIRED') {
+        this.pendingDropItem = reward.dropItemId;
+        afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
+        this.queueMessages(afterMessages, () => {
+          this.discardList = reward.discardCandidates;
+          this.discardIndex = 0;
+          this.phase = 'DISCARD_SELECT';
+        });
+      } else if (reward.status === 'DROP_ABANDONED') {
+        const itemName = ITEM_DB[reward.dropItemId]?.name || '';
+        afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
+        afterMessages.push(logFormatter.format('battle_log.gave_up_item', { item: itemName }));
+        this.proceedAfterMessages(afterMessages);
+      } else {
+        // NO_DROP
+        this.proceedAfterMessages(afterMessages);
       }
-
-      this.proceedAfterMessages(afterMessages);
     });
   }
 
