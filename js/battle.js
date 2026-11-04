@@ -85,12 +85,13 @@ export class BattleManager {
     return { x: this.cw * 0.5, y: this.ch * 0.50 };
   }
 
-  startBattle(monsterId, isAmbush = false) {
+startBattle(monsterId, isAmbush = false) {
     const base = MONSTER_DEFINITIONS[monsterId];
     if (!base) {
       throw new Error(`[BattleManager] Invalid monsterId "${monsterId}". Entity not found in MONSTER_DEFINITIONS.`);
     }
 
+    this.stateMachine = new BattleStateMachine();
     this.stateMachine.init({ isAmbush: Boolean(isAmbush) });
 
     this.enemy = { ...base };
