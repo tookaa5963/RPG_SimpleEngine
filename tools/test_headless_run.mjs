@@ -24,6 +24,7 @@ import { EffectResolver } from '../js/engine/effects/EffectResolver.js';
 import { Inventory } from '../js/engine/state/Inventory.js';
 import GenericFlags from '../js/engine/state/GenericFlags.js';
 import { runRewardCalculatorTests } from './test_reward_calculator.mjs';
+import { runBattleStateMachineTests } from './test_battle_state_machine.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -481,6 +482,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_reward_calculator.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 15. 戦闘ステートマシン純粋モジュール単体検証（BattleStateMachine）
+// -------------------------------------------------------------
+try {
+  runBattleStateMachineTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_battle_state_machine.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
