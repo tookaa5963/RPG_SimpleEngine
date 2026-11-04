@@ -23,6 +23,7 @@ import { Actor } from '../js/engine/entities/Actor.js';
 import { EffectResolver } from '../js/engine/effects/EffectResolver.js';
 import { Inventory } from '../js/engine/state/Inventory.js';
 import GenericFlags from '../js/engine/state/GenericFlags.js';
+import { runRewardCalculatorTests } from './test_reward_calculator.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -471,6 +472,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_battle_calculator.mjs の検証に失敗しました');
+}
+// -------------------------------------------------------------
+// 14. 報酬計算純粋モジュール単体検証（RewardCalculator）
+// -------------------------------------------------------------
+try {
+  runRewardCalculatorTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_reward_calculator.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
