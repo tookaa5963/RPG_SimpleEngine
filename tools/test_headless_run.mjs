@@ -1,10 +1,11 @@
+// FILE_ENTRY: tools/test_headless_run.mjs
 /**
  * tools/test_headless_run.mjs
  * 完全ヘッドレス実証テスト（Core層統合実行シナリオ）
  * 
  * 目的:
  * ブラウザ環境（window, document, DOM要素, AudioContext 等）が存在しない純粋な Node.js ランタイムにおいて、
- * Core層モジュール（EngineEventBus, DataRepository, Actor, Inventory, EffectResolver, GenericFlags, ActionTypes, EventTypes）が
+ * Core層モジュール（EngineEventBus, DataRepository, Actor, Inventory, EffectResolver, GenericFlags, ActionTypes, EventTypes, BattleCalculator）が
  * 協調してゲーム進行サイクル（アクター生成、戦闘ダメージ計算、アイテム消費、効果解決、状態変更、フラグ管理、イベント通知、契約検証）を
  * 正常に完走できることを機械的に実証する。
  */
@@ -460,6 +461,16 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_monster_boss_flags.mjs の検証に失敗しました');
+}
+
+// -------------------------------------------------------------
+// 13. 戦闘数値計算純粋モジュール単体検証（BattleCalculator）
+// -------------------------------------------------------------
+try {
+  execSync('node tools/test_battle_calculator.mjs', { stdio: 'inherit' });
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_battle_calculator.mjs の検証に失敗しました');
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
