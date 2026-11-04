@@ -26,5 +26,6 @@
     "ja": "ガーゴイル",
     "en": "Gargoyle",
     "es": "Gárgola"
-  }
+  },
+  "isBoss": true
 }

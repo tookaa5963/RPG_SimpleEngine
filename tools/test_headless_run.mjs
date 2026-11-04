@@ -12,6 +12,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 
 import { EngineEventBus } from '../js/engine/core/EngineEventBus.js';
 import { ActionTypes } from '../js/engine/core/ActionTypes.js';
@@ -450,6 +451,16 @@ assert.strictEqual(
   '契約違反: 通信プロトコル（ActionTypes / EventTypes）の凍結またはクレンジング要件を満たしていません'
 );
 recordAssertion();
+
+// -------------------------------------------------------------
+// 12. モンスターデータ整合性および経験値計算境界値検証
+// -------------------------------------------------------------
+try {
+  execSync('node tools/test_monster_boss_flags.mjs', { stdio: 'inherit' });
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_monster_boss_flags.mjs の検証に失敗しました');
+}
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
 console.log('=== [完全ヘッドレス実行実証テスト正常終了] ===');

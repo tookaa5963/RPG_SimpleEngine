@@ -32,5 +32,6 @@
     "ja": "ケルベロス",
     "en": "Cerberus",
     "es": "Cerbero"
-  }
+  },
+  "isBoss": true
 }

@@ -26,5 +26,6 @@
     "ja": "ブラックリザードマン",
     "en": "Black Lizardman",
     "es": "Hombre lagarto negro"
-  }
+  },
+  "isBoss": true
 }

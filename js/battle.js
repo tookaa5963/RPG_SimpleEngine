@@ -566,7 +566,7 @@ export class BattleManager {
     sound.playVictory();
 
     let earnedExp = this.enemy.exp;
-    const isBoss = ['gargoyle', 'troll', 'grave_thief', 'dungeon_boss', 'talos', 'cerberus', 'black_dragon', 'black_lizardman'].includes(this.enemy.id);
+    const isBoss = Boolean(this.enemy.isBoss);
     if (!isBoss) {
       const monsterLevel = this.enemy.level || 1;
       if (this.player.level - monsterLevel >= 3) {

@@ -42,5 +42,6 @@
     "ja": "黒竜",
     "en": "Black Dragon",
     "es": "Dragón negro"
-  }
+  },
+  "isBoss": true
 }

@@ -28,5 +28,6 @@
     "ja": "スカルコレクター",
     "en": "Skull Collector",
     "es": "Coleccionista de calaveras"
-  }
+  },
+  "isBoss": true
 }
