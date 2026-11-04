@@ -7,6 +7,20 @@ import { executeBattleAction } from './battleActions.js';
 import { drawListBox, drawMessageBox } from './ui.js';
 import { i18n } from './i18n.js';
 import { logFormatter } from './logFormatter.js';
+import {
+  calcDamage,
+  calcCriticalDamage,
+  calcEnemyCriticalDamage,
+  calcSpellDamage,
+  calcBreathDamage,
+  calcSpecialPhysicalDamage,
+  applyDamageRate,
+  applyDamageReduction,
+  checkChance,
+  calcStatusTurns,
+  determineFirstAttacker,
+  checkEscape
+} from './engine/battle/BattleCalculator.js';
 
 export { MONSTER_DEFINITIONS } from './monsters.js';
 
@@ -132,6 +146,7 @@ export class BattleManager {
     }
     this.proceedPlayerTurn();
   }
+
   proceedPlayerTurn() {
     if (this.playerSleepTurns > 0) {
       this.playerSleepTurns--;
@@ -176,17 +191,11 @@ export class BattleManager {
   }
 
   calcDamage(atk, def) {
-    const base = Math.max(1, Math.floor(atk / 2 - def / 4));
-    const variation = Math.floor(Math.random() * (base * 0.25 + 1));
-    const sign = Math.random() < 0.5 ? -1 : 1;
-    return Math.max(1, base + sign * variation);
+    return calcDamage(atk, def);
   }
 
   calcCriticalDamage(atk) {
-    const base = Math.max(1, atk);
-    const variation = Math.floor(Math.random() * (base * 0.15 + 1));
-    const sign = Math.random() < 0.5 ? -1 : 1;
-    return Math.max(1, base + sign * variation);
+    return calcCriticalDamage(atk);
   }
 
   executeCommand() {
@@ -251,7 +260,7 @@ export class BattleManager {
   }
 
   runTurn(actionType) {
-    const playerFirst = this.player.spd >= this.enemy.spd || Math.random() < 0.6;
+    const playerFirst = determineFirstAttacker(this.player.spd, this.enemy.spd);
     if (playerFirst) {
       if (actionType === 'ATTACK') {
         this.playerAttack(() => {
@@ -286,15 +295,15 @@ export class BattleManager {
   }
 
   playerAttack(onFinish) {
-    const isCrit = Math.random() < 0.0625;
+    const isCrit = checkChance(0.0625);
     let dmg = isCrit ? this.calcCriticalDamage(this.player.atk) : this.calcDamage(this.player.atk, this.enemy.def);
 
     if (this.enemy.physicalDamageRate !== undefined) {
-      dmg = Math.max(1, Math.floor(dmg * this.enemy.physicalDamageRate));
+      dmg = applyDamageRate(dmg, this.enemy.physicalDamageRate);
     }
 
     if (this.enemy && this.enemy.id === 'black_dragon' && this.player.equipment.weapon !== 'corrada') {
-      dmg = Math.max(1, Math.floor(dmg * 0.2));
+      dmg = applyDamageRate(dmg, 0.2);
     }
 
     sound.playAttack();
@@ -346,7 +355,7 @@ export class BattleManager {
     let castSpell = null;
     if (this.enemy.spells && this.enemy.spells.length > 0) {
       for (const sp of this.enemy.spells) {
-        if (Math.random() < sp.chance) {
+        if (checkChance(sp.chance)) {
           castSpell = sp;
           break;
         }
@@ -370,10 +379,7 @@ export class BattleManager {
         }
 
         const rawBase = Number.isFinite(castSpell.baseDmg) ? castSpell.baseDmg : 160;
-        const variationRange = Math.max(1, Math.floor(rawBase * 0.05));
-        const variation = Math.floor(Math.random() * (variationRange * 2 + 1)) - variationRange;
-        const finalBase = Math.max(1, rawBase + variation);
-        const dmg = Math.max(1, Math.round(finalBase * mult));
+        const dmg = calcBreathDamage(rawBase, mult);
 
         this.effects.shake(26);
         this.effects.createPlayerDamageEffect(this.playerCenter.x, this.playerCenter.y, true);
@@ -404,12 +410,8 @@ export class BattleManager {
 
         const hasDragonArmor = this.player.equipment.armor === 'dragon_armor';
         const rawBase = Number.isFinite(castSpell.baseDmg) ? castSpell.baseDmg : 240;
-        const variationRange = Math.max(1, Math.floor(rawBase * 0.06));
-        const variation = Math.floor(Math.random() * (variationRange * 2 + 1)) - variationRange;
-        const finalBase = Math.max(1, rawBase + variation);
-
         const mult = hasDragonArmor ? 0.22 : 1.0;
-        const dmg = Math.max(1, Math.round(finalBase * mult));
+        const dmg = calcSpecialPhysicalDamage(rawBase, mult);
 
         this.effects.shake(30);
         this.effects.createPlayerDamageEffect(this.playerCenter.x, this.playerCenter.y, true);
@@ -445,8 +447,8 @@ export class BattleManager {
         if (this.playerSleepTurns > 0) {
           messages.push(logFormatter.format('battle_log.already_asleep'));
         } else {
-          if (Math.random() < 0.7) {
-            this.playerSleepTurns = Math.floor(Math.random() * 3) + 2;
+          if (checkChance(0.7)) {
+            this.playerSleepTurns = calcStatusTurns(2, 4);
             this.effects.addPopup('SLEEP', this.playerPopupPos.x, this.playerPopupPos.y, '#a29bfe', '#6c5ce7', false, 'bounce');
             messages.push(logFormatter.format('battle_log.hero_fell_asleep'));
           } else {
@@ -461,7 +463,7 @@ export class BattleManager {
         if (this.playerSpellSealed) {
           messages.push(logFormatter.format('battle_log.already_sealed'));
         } else {
-          if (Math.random() < 0.7) {
+          if (checkChance(0.7)) {
             this.playerSpellSealed = true;
             this.effects.addPopup('SEAL', this.playerPopupPos.x, this.playerPopupPos.y, '#00d2d3', '#0984e3', false, 'bounce');
             messages.push(logFormatter.format('battle_log.hero_spell_sealed'));
@@ -475,10 +477,10 @@ export class BattleManager {
 
       const minD = Number.isFinite(castSpell.minDmg) ? castSpell.minDmg : (Number.isFinite(castSpell.baseDmg) ? Math.floor(castSpell.baseDmg * 0.8) : 10);
       const maxD = Number.isFinite(castSpell.maxDmg) ? castSpell.maxDmg : (Number.isFinite(castSpell.baseDmg) ? Math.ceil(castSpell.baseDmg * 1.2) : 20);
-      let dmg = Math.floor(Math.random() * (Math.max(minD, maxD) - minD + 1)) + minD;
+      let dmg = calcSpellDamage(Math.min(minD, maxD), Math.max(minD, maxD));
 
       if ((this.player.inventory.fire_charm || 0) > 0 && ['mera', 'merami', 'gira', 'begirama'].includes(castSpell.id)) {
-        dmg = Math.max(1, dmg - 5);
+        dmg = applyDamageReduction(dmg, 5);
       }
 
       this.effects.shake(18);
@@ -492,15 +494,10 @@ export class BattleManager {
     }
 
     const critRate = this.enemy.criticalChance !== undefined ? this.enemy.criticalChance : 0.05;
-    const isCrit = Math.random() < critRate;
+    const isCrit = checkChance(critRate);
 
-    let dmg;
-    if (isCrit) {
-      const normalDmg = this.calcDamage(this.enemy.atk, this.player.def);
-      dmg = Math.max(1, Math.floor(normalDmg * 2.0));
-    } else {
-      dmg = this.calcDamage(this.enemy.atk, this.player.def);
-    }
+    const normalDmg = this.calcDamage(this.enemy.atk, this.player.def);
+    const dmg = isCrit ? calcEnemyCriticalDamage(normalDmg) : normalDmg;
 
     sound.playAttack();
 
@@ -523,8 +520,8 @@ export class BattleManager {
 
     if (this.enemy.poisonChance && !this.player.isPoisoned && this.player.hp > 0) {
       const hasCharm = (this.player.inventory.poison_charm || 0) > 0;
-      if (Math.random() < this.enemy.poisonChance) {
-        if (hasCharm && Math.random() < 0.8) {
+      if (checkChance(this.enemy.poisonChance)) {
+        if (hasCharm && checkChance(0.8)) {
           messages.push(logFormatter.format('battle_log.poison_defended'));
         } else {
           this.player.isPoisoned = true;
@@ -537,14 +534,8 @@ export class BattleManager {
   }
 
   runEscape() {
-    if (this.enemy.dropItem || this.enemy.noEscape) {
-      this.queueMessages([logFormatter.format('battle_log.hero_escape'), logFormatter.format('battle_log.escape_failed')], () => {
-        this.runEnemyTurn();
-      });
-      return;
-    }
-
-    const success = Math.random() < 0.65;
+    const isNoEscape = Boolean(this.enemy.dropItem || this.enemy.noEscape);
+    const success = checkEscape(isNoEscape);
     if (success) {
       sound.playEscape();
       this.queueMessages([logFormatter.format('battle_log.hero_escape')], () => { this.onEnd({ result: 'ESCAPE' }); });
@@ -610,7 +601,6 @@ export class BattleManager {
           }
 
           if (candidates.length === 0) {
-            // ★修正: 捨てられるものがない場合は諦める
             afterMessages.push(logFormatter.format('battle_log.bag_full_drop', { name: this.enemy.name }));
             afterMessages.push(logFormatter.format('battle_log.gave_up_item', { item: itemName }));
             this.proceedAfterMessages(afterMessages);
@@ -633,7 +623,6 @@ export class BattleManager {
       this.proceedAfterMessages(afterMessages);
     });
   }
-
 
   proceedAfterMessages(afterMessages) {
     if (afterMessages.length > 0) {
@@ -803,8 +792,6 @@ export class BattleManager {
     if (this.isImageLoaded) {
       ctx.drawImage(this.enemyImage, drawX, drawY, drawSize, drawSize);
     } else {
-      // ⚡【最低限の変更】戦闘開始時、メッセージ送り（this.charIndex）が5文字進むまでは、
-      // フォールバックの四角形を描画するのを遅らせて、画像の到着をジッと待ちます
       if (this.charIndex < 50) return;
 
       const half = drawSize * 0.25;
