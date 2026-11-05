@@ -4,7 +4,7 @@ import { SPELL_DB, ITEM_DB } from './items.js';
 import { MONSTER_DEFINITIONS } from './monsters.js';
 import { BattleEffects } from './battleEffects.js';
 import { executeBattleAction } from './battleActions.js';
-import { drawListBox, drawMessageBox } from './ui.js';
+import { BattleRenderer } from './drivers/battle/BattleRenderer.js';
 import { i18n } from './i18n.js';
 import { logFormatter } from './logFormatter.js';
 import {
@@ -43,8 +43,7 @@ export class BattleManager {
     this.textSpeed = 2;
     this.isTextComplete = false;
     this.enemyFlashTimer = 0;
-    this.enemyImage = new Image();
-    this.isImageLoaded = false;
+    this.renderer = new BattleRenderer();
     this.effects = new BattleEffects();
 
     this.playerSleepTurns = 0;
@@ -67,6 +66,14 @@ export class BattleManager {
       i18n.t('battle.item'),
       i18n.t('battle.escape')
     ];
+  }
+
+  get enemyImage() {
+    return this.renderer.enemyImage;
+  }
+
+  get isImageLoaded() {
+    return this.renderer.isImageLoaded;
   }
 
   get enemyCenter() {
@@ -103,14 +110,13 @@ startBattle(monsterId, isAmbush = false) {
     this.commandIndex = 0;
     this.itemIndex = 0;
     this.enemyFlashTimer = 0;
-    this.isImageLoaded = false;
     this.pendingDropItem = null;
     this.discardList = [];
     this.discardIndex = 0;
     this.effects.reset();
-    this.enemyImage.src = this.enemy.imageSrc;
-    this.enemyImage.onload = () => { this.isImageLoaded = true; };
-    this.enemyImage.onerror = () => { console.warn(`画像読込失敗: ${this.enemy.imageSrc}`); };
+    if (this.enemy && this.enemy.imageSrc) {
+      this.renderer.loadEnemyImage(this.enemy.imageSrc);
+    }
 
     sound.playBgm('battle');
 
@@ -760,73 +766,26 @@ startBattle(monsterId, isAmbush = false) {
     this.cw = canvas.width;
     this.ch = canvas.height;
 
-    ctx.save();
-    this.effects.applyScreenShake(ctx);
+    const renderState = {
+      enemy: this.enemy,
+      enemyFlashTimer: this.enemyFlashTimer,
+      isImageLoaded: this.renderer.isImageLoaded,
+      enemyImage: this.renderer.enemyImage,
+      charIndex: this.charIndex,
+      phase: this.phase,
+      commands: this.getCommands(),
+      commandIndex: this.commandIndex,
+      itemList: this.itemList,
+      itemIndex: this.itemIndex,
+      discardList: this.discardList,
+      discardIndex: this.discardIndex,
+      displayedText: this.displayedText,
+      isTextComplete: this.isTextComplete,
+      discardSelectMsg: logFormatter.format('battle_log.discard_select_msg'),
+      effects: this.effects,
+      isWestern: Boolean(i18n.currentLang !== 'ja')
+    };
 
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    if (this.enemy && this.enemy.hp > 0) {
-      if (this.enemyFlashTimer === 0 || Math.floor(this.enemyFlashTimer / 3) % 2 === 0) {
-        this.drawEnemyImage(ctx, this.enemyCenter.x, this.enemyCenter.y);
-      }
-    }
-
-    const margin = Math.floor(this.cw * 0.04);
-    const msgW = this.cw - (margin * 2);
-    const msgH = Math.floor(this.ch * 0.32);
-    const msgY = this.ch - msgH - margin;
-
-    const isWestern = i18n.currentLang !== 'ja';
-    const cmdW = isWestern ? 180 : 160;
-    const cmdX = this.cw - margin - cmdW;
-    const cmdY = msgY - 170;
-
-    if (this.phase === 'COMMAND_SELECT' || this.phase === 'ITEM_SELECT') {
-      drawListBox(ctx, cmdX, cmdY, this.getCommands(), this.commandIndex, 4);
-    }
-    if (this.phase === 'ITEM_SELECT') {
-      const itemNames = this.itemList.map(i => i.name);
-      const itemX = cmdX - (isWestern ? 250 : 220);
-      drawListBox(ctx, itemX, cmdY, itemNames, this.itemIndex, 5);
-    }
-
-    if (this.phase === 'DISCARD_SELECT') {
-      drawMessageBox(ctx, margin, msgY, msgW, msgH, logFormatter.format('battle_log.discard_select_msg'));
-      const discardNames = this.discardList.map(i => i.name);
-      drawListBox(ctx, Math.floor(this.cw * 0.35), msgY - 200, discardNames, this.discardIndex, 6);
-    } else {
-      const showIndicator = this.isTextComplete && this.phase === 'MESSAGE';
-      drawMessageBox(ctx, margin, msgY, msgW, msgH, this.displayedText, showIndicator);
-    }
-
-    this.effects.draw(ctx);
-    ctx.restore();
-  }
-
-  drawEnemyImage(ctx, cx, cy) {
-    let drawSize = Math.floor(this.cw * 0.42);
-    let drawX = cx - (drawSize / 2);
-    let drawY = cy - (drawSize / 2);
-
-    if (this.enemy && this.enemy.id === 'black_dragon') {
-      drawSize = Math.max(this.cw, this.ch);
-      drawX = (this.cw - drawSize) / 2;
-      drawY = (this.ch - drawSize) / 2;
-    }
-
-    if (this.isImageLoaded) {
-      ctx.drawImage(this.enemyImage, drawX, drawY, drawSize, drawSize);
-    } else {
-      if (this.charIndex < 50) return;
-
-      const half = drawSize * 0.25;
-      ctx.fillStyle = this.enemy.color;
-      ctx.fillRect(cx - half, cy - half, half * 2, half * 2);
-      ctx.fillStyle = '#fff';
-      ctx.font = '20px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(this.enemy.name, cx, cy);
-    }
+    this.renderer.render(ctx, canvas, renderState);
   }
 }

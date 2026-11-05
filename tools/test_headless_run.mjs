@@ -25,6 +25,7 @@ import { Inventory } from '../js/engine/state/Inventory.js';
 import GenericFlags from '../js/engine/state/GenericFlags.js';
 import { runRewardCalculatorTests } from './test_reward_calculator.mjs';
 import { runBattleStateMachineTests } from './test_battle_state_machine.mjs';
+import { runBattleRendererTests } from './test_battle_renderer.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -491,6 +492,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_battle_state_machine.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 16. 戦闘描画ドライバ単体検証（BattleRenderer）
+// -------------------------------------------------------------
+try {
+  runBattleRendererTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_battle_renderer.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
