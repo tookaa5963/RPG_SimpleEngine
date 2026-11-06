@@ -354,6 +354,142 @@ export function runBattleStateMachineTests() {
     assert.throws(() => sm.submitCommand('ATTACK'), /Invalid state transition/, 'TC-ERR-08: 終了後のコマンドは例外');
     assert.throws(() => sm.resolveDefeat(), /Invalid state transition/, 'TC-ERR-08: 終了後の敗北は例外');
   }
+  // =========================================================================
+  // 8. コマンドキャンセル・差し戻し遷移の検証（cancelCommand）
+  // =========================================================================
+
+  // TC-BSM-CANCEL-01: ACTION_RESOLVING からのコマンド差し戻し
+  {
+    const sm = new BattleStateMachine();
+    sm.init({ isAmbush: false });
+    sm.proceedToTurnCheck();
+    sm.resolveTurnCheck({ canAct: true });
+    sm.submitCommand('SPELL');
+    assert.strictEqual(sm.state, BattleState.ACTION_RESOLVING);
+
+    const payload = sm.cancelCommand();
+    assert.strictEqual(sm.state, BattleState.COMMAND_WAIT, 'TC-BSM-CANCEL-01: COMMAND_WAIT へ復帰する必要があります');
+    assert.deepStrictEqual(
+      payload,
+      {
+        fromState: BattleState.ACTION_RESOLVING,
+        toState: BattleState.COMMAND_WAIT,
+        context: {}
+      },
+      'TC-BSM-CANCEL-01: 遷移 Payload が完全一致する必要があります'
+    );
+
+    const resubmitPayload = sm.submitCommand('ATTACK');
+    assert.strictEqual(sm.state, BattleState.ACTION_RESOLVING, 'TC-BSM-CANCEL-01: 差し戻し後の再コマンド送信が正常遷移する必要があります');
+    assert.strictEqual(resubmitPayload.toState, BattleState.ACTION_RESOLVING);
+  }
+
+  // TC-BSM-CANCEL-02: ACTION_RESOLVING 以外からの差し戻し拒絶
+  {
+    // 1. UNINITIALIZED
+    const smUninitialized = new BattleStateMachine();
+    assert.throws(
+      () => smUninitialized.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: UNINITIALIZED からの cancelCommand は例外'
+    );
+
+    // 2. INITIALIZING
+    const smInitializing = new BattleStateMachine();
+    smInitializing.init({ isAmbush: false });
+    assert.throws(
+      () => smInitializing.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: INITIALIZING からの cancelCommand は例外'
+    );
+
+    // 3. TURN_CHECK
+    const smTurnCheck = new BattleStateMachine();
+    smTurnCheck.init({ isAmbush: false });
+    smTurnCheck.proceedToTurnCheck();
+    assert.throws(
+      () => smTurnCheck.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: TURN_CHECK からの cancelCommand は例外'
+    );
+
+    // 4. COMMAND_WAIT
+    const smCommandWait = new BattleStateMachine();
+    smCommandWait.init({ isAmbush: false });
+    smCommandWait.proceedToTurnCheck();
+    smCommandWait.resolveTurnCheck({ canAct: true });
+    assert.throws(
+      () => smCommandWait.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: COMMAND_WAIT からの cancelCommand は例外'
+    );
+
+    // 5. VICTORY_PENDING
+    const smVictory = new BattleStateMachine();
+    smVictory.init({ isAmbush: false });
+    smVictory.proceedToTurnCheck();
+    smVictory.resolveTurnCheck({ canAct: true });
+    smVictory.submitCommand('ATTACK');
+    smVictory.resolveVictory({ hasDrop: false });
+    assert.throws(
+      () => smVictory.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: VICTORY_PENDING からの cancelCommand は例外'
+    );
+
+    // 6. DISCARD_WAIT
+    const smDiscard = new BattleStateMachine();
+    smDiscard.init({ isAmbush: false });
+    smDiscard.proceedToTurnCheck();
+    smDiscard.resolveTurnCheck({ canAct: true });
+    smDiscard.submitCommand('ATTACK');
+    smDiscard.resolveVictory({ hasDrop: true, isInventoryFull: true });
+    assert.throws(
+      () => smDiscard.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: DISCARD_WAIT からの cancelCommand は例外'
+    );
+
+    // 7. ESCAPE_SUCCESS
+    const smEscape = new BattleStateMachine();
+    smEscape.init({ isAmbush: false });
+    smEscape.proceedToTurnCheck();
+    smEscape.resolveTurnCheck({ canAct: true });
+    smEscape.submitCommand('ESCAPE');
+    smEscape.resolveEscape(true);
+    assert.throws(
+      () => smEscape.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: ESCAPE_SUCCESS からの cancelCommand は例外'
+    );
+
+    // 8. DEFEAT
+    const smDefeat = new BattleStateMachine();
+    smDefeat.init({ isAmbush: false });
+    smDefeat.proceedToTurnCheck();
+    smDefeat.resolveTurnCheck({ canAct: true });
+    smDefeat.submitCommand('ATTACK');
+    smDefeat.resolveDefeat();
+    assert.throws(
+      () => smDefeat.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: DEFEAT からの cancelCommand は例外'
+    );
+
+    // 9. BATTLE_END
+    const smEnd = new BattleStateMachine();
+    smEnd.init({ isAmbush: false });
+    smEnd.proceedToTurnCheck();
+    smEnd.resolveTurnCheck({ canAct: true });
+    smEnd.submitCommand('ESCAPE');
+    smEnd.resolveEscape(true);
+    smEnd.endBattle();
+    assert.throws(
+      () => smEnd.cancelCommand(),
+      /Invalid state transition/,
+      'TC-BSM-CANCEL-02: BATTLE_END からの cancelCommand は例外'
+    );
+  }
 }
 
 // 直接実行時のエントリポイント

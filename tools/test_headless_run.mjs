@@ -27,6 +27,7 @@ import { runRewardCalculatorTests } from './test_reward_calculator.mjs';
 import { runBattleStateMachineTests } from './test_battle_state_machine.mjs';
 import { runBattleRendererTests } from './test_battle_renderer.mjs';
 import { runNpcActiveStateTests } from './test_npc_active_state.mjs';
+import { runBattleDoubleSubmitTests } from './test_battle_double_submit.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -511,6 +512,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_npc_active_state.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 18. 戦闘中コマンド二重送信抑止・ステート同期検証（BattleManager / BattleStateMachine）
+// -------------------------------------------------------------
+try {
+  runBattleDoubleSubmitTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_battle_double_submit.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
