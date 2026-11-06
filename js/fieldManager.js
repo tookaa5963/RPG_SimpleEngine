@@ -5,7 +5,7 @@ import { MONSTER_DEFINITIONS } from './monsters.js';
 import { ITEM_DB } from './items.js';
 import { i18n } from './i18n.js';
 import { logFormatter } from './logFormatter.js';
-import { evaluateNpcActiveState } from './events.js';
+import { evaluateNpcActiveState, resolveNpcPlacementAndMovement } from './events.js';
 
 export class FieldManager {
   constructor({
@@ -62,45 +62,7 @@ export class FieldManager {
     if (!this.currentMap || !this.currentMap.initialNpcs) return;
     this.currentMap.npcs = this.currentMap.initialNpcs
       .filter(npc => this.isNpcActive(npc, this.currentMapId))
-      .map(npc => ({ ...npc }));
-
-    if (this.currentMapId === 'first_island' && this.player.flags.hasPass) {
-      const guard = this.currentMap.npcs.find(n => n.id === 'guard_port');
-      if (guard) {
-        guard.gridX = 29;
-        guard.gridY = 14;
-      }
-    }
-
-    // エルフの位置制御
-    if (this.currentMapId === 'temple') {
-      const elf = this.currentMap.npcs.find(n => n.id === 'elf');
-      if (elf) {
-        if (!this.player.flags.heardOfTizona) {
-          // 学者から話を聞く前は (19, 2) に固定配置（移動不可）
-          elf.gridX = 19;
-          elf.gridY = 2;
-          elf.moveArea = { minX: 19, maxX: 19, minY: 2, maxY: 2 };
-          elf.walkTimer = 999999;
-          elf.direction = 'down';
-        } else {
-          // 話を聞いた後は移動範囲を解放
-          elf.gridX = 11;
-          elf.gridY = 5;
-          elf.moveArea = { minX: 9, maxX: 12, minY: 4, maxY: 6 };
-          elf.walkTimer = 60;
-        }
-      }
-    }
-
-    this.currentMap.npcs.forEach(npc => {
-      npc.pixelX = npc.gridX * this.tileSize;
-      npc.pixelY = npc.gridY * this.tileSize;
-      npc.targetPixelX = npc.pixelX;
-      npc.targetPixelY = npc.pixelY;
-      npc.isMoving = false;
-    });
-
+      .map(npc => resolveNpcPlacementAndMovement(npc, this.currentMapId, this.player));
 
     this.currentMap.npcs.forEach(npc => {
       npc.pixelX = npc.gridX * this.tileSize;
