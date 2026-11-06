@@ -6,6 +6,7 @@ import { ITEM_DB } from './items.js';
 import { i18n } from './i18n.js';
 import { logFormatter } from './logFormatter.js';
 import { evaluateNpcActiveState, resolveNpcPlacementAndMovement } from './events.js';
+import { canPlayerMoveTo, canNpcMoveTo } from './engine/field/CollisionSystem.js';
 
 export class FieldManager {
   constructor({
@@ -174,53 +175,25 @@ export class FieldManager {
   }
 
   canPlayerMoveTo(gx, gy) {
-    const mapData = this.currentMap.data;
-    if (gy < 0 || gy >= mapData.length || gx < 0 || gx >= mapData[0].length) return false;
-
-    const tile = mapData[gy][gx];
-    const tileDef = this.tileDb[tile];
-    if (!tileDef || !tileDef.pass) return false;
-
-    if (this.currentMap.interactables.some(obj => obj.gridX === gx && obj.gridY === gy)) return false;
-
-    const blockingNpc = this.currentMap.npcs.find(npc => {
-      const destGx = Math.round(npc.targetPixelX / this.tileSize);
-      const destGy = Math.round(npc.targetPixelY / this.tileSize);
-      return (npc.gridX === gx && npc.gridY === gy) || (destGx === gx && destGy === gy);
+    return canPlayerMoveTo({
+      map: this.currentMap,
+      tileDb: this.tileDb,
+      gx,
+      gy,
+      tileSize: this.tileSize
     });
-    if (blockingNpc && blockingNpc.type !== 'monster') return false;
-    return true;
   }
 
   canNpcMoveTo(npc, gx, gy) {
-    if (npc.moveArea) {
-      if (gx < npc.moveArea.minX || gx > npc.moveArea.maxX ||
-        gy < npc.moveArea.minY || gy > npc.moveArea.maxY) {
-        return false;
-      }
-    }
-
-    const mapData = this.currentMap.data;
-    if (gy < 0 || gy >= mapData.length || gx < 0 || gx >= mapData[0].length) return false;
-    const tile = mapData[gy][gx];
-    const tileDef = this.tileDb[tile];
-    if (!tileDef || !tileDef.pass) return false;
-    if (this.currentMap.interactables.some(obj => obj.gridX === gx && obj.gridY === gy)) return false;
-
-    const playerDestGx = Math.round(this.player.targetPixelX / this.tileSize);
-    const playerDestGy = Math.round(this.player.targetPixelY / this.tileSize);
-    if ((this.player.gridX === gx && this.player.gridY === gy) || (playerDestGx === gx && playerDestGy === gy)) {
-      if (npc.type !== 'monster') return false;
-    }
-
-    const otherNpcOccupied = this.currentMap.npcs.some(other => {
-      if (other === npc) return false;
-      const otherDestGx = Math.round(other.targetPixelX / this.tileSize);
-      const otherDestGy = Math.round(other.targetPixelY / this.tileSize);
-      return (other.gridX === gx && other.gridY === gy) || (otherDestGx === gx && otherDestGy === gy);
+    return canNpcMoveTo({
+      npc,
+      map: this.currentMap,
+      tileDb: this.tileDb,
+      player: this.player,
+      gx,
+      gy,
+      tileSize: this.tileSize
     });
-    if (otherNpcOccupied) return false;
-    return true;
   }
 
   triggerSymbolEncounter(monsterNpc) {
