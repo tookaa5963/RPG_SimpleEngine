@@ -354,6 +354,7 @@ export function runBattleStateMachineTests() {
     assert.throws(() => sm.submitCommand('ATTACK'), /Invalid state transition/, 'TC-ERR-08: 終了後のコマンドは例外');
     assert.throws(() => sm.resolveDefeat(), /Invalid state transition/, 'TC-ERR-08: 終了後の敗北は例外');
   }
+
   // =========================================================================
   // 8. コマンドキャンセル・差し戻し遷移の検証（cancelCommand）
   // =========================================================================
@@ -430,7 +431,7 @@ export function runBattleStateMachineTests() {
     smVictory.proceedToTurnCheck();
     smVictory.resolveTurnCheck({ canAct: true });
     smVictory.submitCommand('ATTACK');
-    smVictory.resolveVictory({ hasDrop: false });
+    smVictory.startVictoryPending();
     assert.throws(
       () => smVictory.cancelCommand(),
       /Invalid state transition/,
@@ -443,7 +444,8 @@ export function runBattleStateMachineTests() {
     smDiscard.proceedToTurnCheck();
     smDiscard.resolveTurnCheck({ canAct: true });
     smDiscard.submitCommand('ATTACK');
-    smDiscard.resolveVictory({ hasDrop: true, isInventoryFull: true });
+    smDiscard.startVictoryPending();
+    smDiscard.resolveVictory({ needsDiscard: true });
     assert.throws(
       () => smDiscard.cancelCommand(),
       /Invalid state transition/,
