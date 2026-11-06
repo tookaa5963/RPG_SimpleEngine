@@ -30,6 +30,7 @@ import { runNpcActiveStateTests } from './test_npc_active_state.mjs';
 import { runBattleDoubleSubmitTests } from './test_battle_double_submit.mjs';
 import { runNpcMovementControlTests } from './test_npc_movement_control.mjs';
 import { runCollisionSystemTests } from './test_collision_system.mjs';
+import { runEncounterCalculatorTests } from './test_encounter_calculator.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -541,6 +542,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_collision_system.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 21. 歩数・エンカウント計算純粋モジュール単体検証（EncounterCalculator）
+// -------------------------------------------------------------
+try {
+  runEncounterCalculatorTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_encounter_calculator.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);

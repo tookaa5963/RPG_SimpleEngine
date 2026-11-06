@@ -7,6 +7,7 @@ import { i18n } from './i18n.js';
 import { logFormatter } from './logFormatter.js';
 import { evaluateNpcActiveState, resolveNpcPlacementAndMovement } from './events.js';
 import { canPlayerMoveTo, canNpcMoveTo } from './engine/field/CollisionSystem.js';
+import { shouldRepelMonster, evaluateRandomEncounter } from './engine/field/EncounterCalculator.js';
 
 export class FieldManager {
   constructor({
@@ -203,59 +204,46 @@ export class FieldManager {
     sound.playEncounter();
     if (this.onEncounter) this.onEncounter(monsterNpc.monsterId, this.pendingMonsterIndex);
   }
-
-  shouldRepelMonster(monsterId) {
-    if (this.player.holyWaterSteps <= 0) return false;
-    const monsterDef = MONSTER_DEFINITIONS[monsterId];
-    if (!monsterDef) return false;
-
-    if (['gargoyle', 'troll', 'grave_thief', 'dungeon_boss', 'talos', 'cerberus', 'black_dragon', 'black_lizardman'].includes(monsterId)) {
-      return false;
-    }
-
-    const monsterLevel = monsterDef.level || 1;
-
-    if (this.player.level - monsterLevel >= 3) {
-      return Math.random() >= 0.15;
-    }
-
-    return false;
+shouldRepelMonster(monsterId) {
+    const holyWaterSteps =
+      typeof this.player.holyWaterSteps === 'number' ? this.player.holyWaterSteps : 0;
+    return shouldRepelMonster({
+      holyWaterSteps,
+      playerLevel: this.player.level,
+      monsterDef: MONSTER_DEFINITIONS[monsterId],
+      repelRoll: Math.random()
+    });
   }
 
   checkRandomEncounter() {
-    this.stepsSinceLastBattle++;
-    if (this.stepsSinceLastBattle <= this.minSafeSteps) return;
+    const holyWaterSteps =
+      typeof this.player.holyWaterSteps === 'number' ? this.player.holyWaterSteps : 0;
+    const result = evaluateRandomEncounter({
+      stepsSinceLastBattle: this.stepsSinceLastBattle,
+      minSafeSteps: this.minSafeSteps,
+      map: this.currentMap,
+      playerX: this.player.gridX,
+      playerY: this.player.gridY,
+      encounterRoll: Math.random(),
+      poolRoll: Math.random(),
+      holyWaterSteps,
+      playerLevel: this.player.level,
+      repelRoll: Math.random(),
+      monsterDefinitions: MONSTER_DEFINITIONS
+    });
 
-    let activeRate = this.currentMap.encounterRate || 0;
-    let activePool = this.currentMap.monsters || ['slime'];
+    this.stepsSinceLastBattle = result.nextStepsSinceLastBattle;
 
-    if (this.currentMap.encounterZones && this.currentMap.encounterZones.length > 0) {
-      const zone = this.currentMap.encounterZones.find(z =>
-        this.player.gridX >= z.x1 && this.player.gridX <= z.x2 &&
-        this.player.gridY >= z.y1 && this.player.gridY <= z.y2
-      );
-
-      if (zone) {
-        activeRate = zone.rate !== undefined ? zone.rate : activeRate;
-        activePool = zone.monsters || activePool;
-      } else {
-        return;
-      }
-    }
-
-    if (Math.random() < activeRate) {
-      const monsterId = activePool[Math.floor(Math.random() * activePool.length)];
-      if (this.shouldRepelMonster(monsterId)) {
-        return;
-      }
-
-      this.pendingMonsterId = monsterId;
+    if (result.encountered && result.monsterId) {
+      this.pendingMonsterId = result.monsterId;
       this.pendingMonsterIndex = null;
       sound.stopBgm();
       sound.playEncounter();
-      if (this.onEncounter) this.onEncounter(monsterId, null);
+      if (this.onEncounter) this.onEncounter(result.monsterId, null);
     }
   }
+
+
 
   interactFacingObject() {
     let targetX = this.player.gridX;
