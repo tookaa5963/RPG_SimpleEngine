@@ -28,6 +28,7 @@ import { runBattleStateMachineTests } from './test_battle_state_machine.mjs';
 import { runBattleRendererTests } from './test_battle_renderer.mjs';
 import { runNpcActiveStateTests } from './test_npc_active_state.mjs';
 import { runBattleDoubleSubmitTests } from './test_battle_double_submit.mjs';
+import { runNpcMovementControlTests } from './test_npc_movement_control.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -521,6 +522,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_battle_double_submit.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 19. NPC移動例外制御純粋関数単体検証（resolveNpcPlacementAndMovement）
+// -------------------------------------------------------------
+try {
+  runNpcMovementControlTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_npc_movement_control.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);

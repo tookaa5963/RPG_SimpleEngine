@@ -808,3 +808,82 @@ export function evaluateNpcActiveState(npc, mapId, player, defeatedBosses) {
 
   return true;
 }
+
+/**
+ * シナリオ進行状態に基づきNPCの初期配置および移動例外制御を解決する純粋関数
+ * @param {Object} npc - 対象NPCデータオブジェクト
+ * @param {string} mapId - 現在のマップID
+ * @param {Object} player - プレイヤー状態オブジェクト
+ * @returns {Object} 配置・移動制約が反映された新しいNPCオブジェクト
+ */
+export function resolveNpcPlacementAndMovement(npc, mapId, player) {
+  if (npc === null) {
+    throw createProtocolError('NullReferenceError', 'events.js:resolveNpcPlacementAndMovement', 'npc', npc);
+  }
+  if (typeof npc !== 'object' || Array.isArray(npc)) {
+    throw createProtocolError('TypeError', 'events.js:resolveNpcPlacementAndMovement', 'npc', npc);
+  }
+  if (typeof npc.id !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:resolveNpcPlacementAndMovement', 'npc.id', npc.id);
+  }
+  if (npc.id.length === 0) {
+    throw createProtocolError('EmptyStringError', 'events.js:resolveNpcPlacementAndMovement', 'npc.id', npc.id);
+  }
+  if (typeof npc.gridX !== 'number' || !Number.isFinite(npc.gridX)) {
+    throw createProtocolError('TypeError', 'events.js:resolveNpcPlacementAndMovement', 'npc.gridX', npc.gridX);
+  }
+  if (typeof npc.gridY !== 'number' || !Number.isFinite(npc.gridY)) {
+    throw createProtocolError('TypeError', 'events.js:resolveNpcPlacementAndMovement', 'npc.gridY', npc.gridY);
+  }
+  if (typeof mapId !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:resolveNpcPlacementAndMovement', 'mapId', mapId);
+  }
+  if (mapId.length === 0) {
+    throw createProtocolError('EmptyStringError', 'events.js:resolveNpcPlacementAndMovement', 'mapId', mapId);
+  }
+  if (player === null) {
+    throw createProtocolError('NullReferenceError', 'events.js:resolveNpcPlacementAndMovement', 'player', player);
+  }
+  if (typeof player !== 'object' || Array.isArray(player)) {
+    throw createProtocolError('TypeError', 'events.js:resolveNpcPlacementAndMovement', 'player', player);
+  }
+
+  let flags = {};
+  if (player.flags !== undefined && player.flags !== null && typeof player.flags === 'object' && !Array.isArray(player.flags)) {
+    flags = player.flags;
+  }
+
+  const resolvedNpc = { ...npc };
+  if (npc.moveArea !== undefined && npc.moveArea !== null && typeof npc.moveArea === 'object' && !Array.isArray(npc.moveArea)) {
+    resolvedNpc.moveArea = { ...npc.moveArea };
+  }
+
+  if (mapId === 'first_island' && resolvedNpc.id === 'guard_port') {
+    if (Boolean(flags.hasPass)) {
+      resolvedNpc.gridX = 29;
+      resolvedNpc.gridY = 14;
+      resolvedNpc.walkTimer = 999999;
+      resolvedNpc.direction = 'down';
+    }
+    return resolvedNpc;
+  }
+
+  if (mapId === 'temple' && resolvedNpc.id === 'elf') {
+    if (!flags.heardOfTizona) {
+      resolvedNpc.gridX = 19;
+      resolvedNpc.gridY = 2;
+      resolvedNpc.moveArea = { minX: 19, maxX: 19, minY: 2, maxY: 2 };
+      resolvedNpc.walkTimer = 999999;
+      resolvedNpc.direction = 'down';
+    } else {
+      resolvedNpc.gridX = 11;
+      resolvedNpc.gridY = 5;
+      resolvedNpc.moveArea = { minX: 9, maxX: 12, minY: 4, maxY: 6 };
+      resolvedNpc.walkTimer = 60;
+      resolvedNpc.direction = 'down';
+    }
+    return resolvedNpc;
+  }
+
+  return resolvedNpc;
+}
