@@ -180,6 +180,24 @@ export class BattleStateMachine {
   }
 
   /**
+   * コマンド受理の差し戻し（キャンセル）
+   */
+  cancelCommand() {
+    if (this.#state !== BattleState.ACTION_RESOLVING) {
+      throw new Error('Invalid state transition: cannot cancel command from ' + this.#state);
+    }
+
+    const fromState = this.#state;
+    this.#state = BattleState.COMMAND_WAIT;
+
+    return {
+      fromState: fromState,
+      toState: this.#state,
+      context: {}
+    };
+  }
+
+  /**
    * 逃走判定の解決
    * @param {boolean} success 
    */

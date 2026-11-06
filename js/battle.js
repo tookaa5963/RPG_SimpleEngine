@@ -222,6 +222,9 @@ startBattle(monsterId, isAmbush = false) {
   }
 
   executeCommand() {
+    if (this.stateMachine.state !== BattleState.COMMAND_WAIT) {
+      return;
+    }
     if (this.commandIndex === 0) {
       this.stateMachine.submitCommand('ATTACK');
       this.runTurn('ATTACK');
@@ -286,6 +289,9 @@ startBattle(monsterId, isAmbush = false) {
   }
 
   executeSelection(selected) {
+    if (this.stateMachine.state !== BattleState.COMMAND_WAIT) {
+      return;
+    }
     if (selected.type === 'magic') {
       this.stateMachine.submitCommand('SPELL');
     } else if (selected.type === 'item') {

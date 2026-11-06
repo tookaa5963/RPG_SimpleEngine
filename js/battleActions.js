@@ -142,6 +142,9 @@ function executeMagicAction(bm, spell) {
     const enemy = bm.enemy;
 
     if (!player.consumeMp(spell.cost)) {
+        if (bm.stateMachine && typeof bm.stateMachine.cancelCommand === 'function') {
+            bm.stateMachine.cancelCommand();
+        }
         bm.queueMessages([i18n.t('menu.mp_shortage')], () => {
             bm.commandIndex = 0;
             bm.phase = 'COMMAND_SELECT';
