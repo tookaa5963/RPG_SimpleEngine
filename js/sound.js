@@ -28,6 +28,9 @@ class SoundSystem {
   }
 
   loadSettings() {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
     try {
       const savedBgm = localStorage.getItem('camino_de_leyenda_setting_bgm');
       if (savedBgm !== null) this.bgmEnabled = savedBgm === 'true';
@@ -40,6 +43,9 @@ class SoundSystem {
   }
 
   saveSettings() {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
     try {
       localStorage.setItem('camino_de_leyenda_setting_bgm', String(this.bgmEnabled));
       localStorage.setItem('camino_de_leyenda_setting_se', String(this.seEnabled));
@@ -68,6 +74,9 @@ class SoundSystem {
 
   // 拡張子なしのベース名からMP3/WAV両対応のAudio要素を生成
   createBgmElement(baseFileName, loop = true) {
+    if (typeof document === 'undefined') {
+      return null;
+    }
     const audio = document.createElement('audio');
     audio.loop = loop;
     audio.volume = this.bgmVolume;

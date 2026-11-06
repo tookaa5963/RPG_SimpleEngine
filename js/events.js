@@ -691,3 +691,120 @@ export function canCastFieldSpell(spellId, player) {
     reason: null
   };
 }
+
+/**
+ * シナリオ進行状態に基づきNPCのアクティブ（出現）状態を判定する純粋関数
+ * @param {Object} npc - NPC定義オブジェクト
+ * @param {string} mapId - 現在のマップID
+ * @param {Object} player - プレイヤーオブジェクト
+ * @param {Array<string>} defeatedBosses - 撃破済みボスID一覧
+ * @returns {boolean}
+ */
+export function evaluateNpcActiveState(npc, mapId, player, defeatedBosses) {
+  if (npc === null) {
+    throw createProtocolError('NullReferenceError', 'events.js:evaluateNpcActiveState', 'npc', npc);
+  }
+  if (typeof npc !== 'object' || Array.isArray(npc)) {
+    throw createProtocolError('TypeError', 'events.js:evaluateNpcActiveState', 'npc', npc);
+  }
+  if (typeof npc.id !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:evaluateNpcActiveState', 'npc.id', npc.id);
+  }
+  if (npc.id.length === 0) {
+    throw createProtocolError('EmptyStringError', 'events.js:evaluateNpcActiveState', 'npc.id', npc.id);
+  }
+  if (typeof mapId !== 'string') {
+    throw createProtocolError('TypeError', 'events.js:evaluateNpcActiveState', 'mapId', mapId);
+  }
+  if (mapId.length === 0) {
+    throw createProtocolError('EmptyStringError', 'events.js:evaluateNpcActiveState', 'mapId', mapId);
+  }
+  if (player === null) {
+    throw createProtocolError('NullReferenceError', 'events.js:evaluateNpcActiveState', 'player', player);
+  }
+  if (typeof player !== 'object' || Array.isArray(player)) {
+    throw createProtocolError('TypeError', 'events.js:evaluateNpcActiveState', 'player', player);
+  }
+  if (!Array.isArray(defeatedBosses)) {
+    throw createProtocolError('TypeError', 'events.js:evaluateNpcActiveState', 'defeatedBosses', defeatedBosses);
+  }
+
+  let flags = {};
+  if (player.flags !== null && typeof player.flags === 'object') {
+    flags = player.flags;
+  }
+
+  let inventory = {};
+  if (player.inventory !== null && typeof player.inventory === 'object') {
+    inventory = player.inventory;
+  }
+
+  if (defeatedBosses.includes(npc.id)) {
+    return false;
+  }
+
+  if (npc.id === 'talos') {
+    return !defeatedBosses.includes('talos');
+  }
+
+  if (npc.id === 'gargoyle') {
+    if (!flags.talkedToScholar) {
+      return false;
+    }
+  }
+
+  if (npc.id === 'troll') {
+    if (!flags.kidnappingEventStarted) {
+      return false;
+    }
+  }
+
+  if (npc.id === 'grave_thief') {
+    if (!flags.elfQuestStarted) {
+      return false;
+    }
+
+    let loversRingCount = 0;
+    if (typeof inventory.lovers_ring === 'number') {
+      loversRingCount = inventory.lovers_ring;
+    }
+
+    if (
+      defeatedBosses.includes('grave_thief') ||
+      Boolean(flags.returnedLoversRing) ||
+      loversRingCount > 0
+    ) {
+      return false;
+    }
+  }
+
+  if (npc.id === 'undine') {
+    return Boolean(flags.returnedLoversRing);
+  }
+
+  if (npc.id === 'girl') {
+    if (mapId === 'first_town') {
+      if (Boolean(flags.kidnappingEventStarted) && !flags.hasPass) {
+        return false;
+      }
+      return true;
+    }
+    if (mapId === 'first_dungeon2') {
+      if (Boolean(flags.kidnappingEventStarted) && !flags.rescuedGirl) {
+        return true;
+      }
+      return false;
+    }
+  }
+
+  if (npc.id === 'old_man') {
+    if (mapId === 'cave') {
+      return !flags.reportedMonumentToScholar;
+    }
+    if (mapId === 'port_town') {
+      return Boolean(flags.reportedMonumentToScholar);
+    }
+  }
+
+  return true;
+}

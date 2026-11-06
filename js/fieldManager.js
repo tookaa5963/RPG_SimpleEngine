@@ -5,6 +5,7 @@ import { MONSTER_DEFINITIONS } from './monsters.js';
 import { ITEM_DB } from './items.js';
 import { i18n } from './i18n.js';
 import { logFormatter } from './logFormatter.js';
+import { evaluateNpcActiveState } from './events.js';
 
 export class FieldManager {
   constructor({
@@ -54,62 +55,7 @@ export class FieldManager {
   }
 
   isNpcActive(npc, mapId = this.currentMapId) {
-    if (this.defeatedBosses.includes(npc.id)) return false;
-
-    if (npc.id === 'talos') {
-      return !this.defeatedBosses.includes('talos');
-    }
-
-    if (npc.id === 'gargoyle') {
-      // 学者と話す前（依頼前）は出現しない
-      if (!this.player.flags.talkedToScholar) return false;
-    }
-    if (npc.id === 'troll') {
-      // 町長から依頼を受ける前（誘拐事件発生前）は出現しない
-      if (!this.player.flags.kidnappingEventStarted) return false;
-    }
-    if (npc.id === 'grave_thief') {
-      // エルフから依頼される前は出現しない
-      if (!this.player.flags.elfQuestStarted) return false;
-
-      if (
-        this.defeatedBosses.includes('grave_thief') ||
-        this.player.flags.returnedLoversRing ||
-        (this.player.inventory.lovers_ring || 0) > 0
-      ) {
-        return false;
-      }
-    }
-
-    if (npc.id === 'undine') {
-      return !!this.player.flags.returnedLoversRing;
-    }
-
-    if (npc.id === 'girl') {
-      if (mapId === 'first_town') {
-        if (this.player.flags.kidnappingEventStarted && !this.player.flags.hasPass) {
-          return false;
-        }
-        return true;
-      }
-      if (mapId === 'first_dungeon2') {
-        if (this.player.flags.kidnappingEventStarted && !this.player.flags.rescuedGirl) {
-          return true;
-        }
-        return false;
-      }
-    }
-
-    if (npc.id === 'old_man') {
-      if (mapId === 'cave') {
-        return !this.player.flags.reportedMonumentToScholar;
-      }
-      if (mapId === 'port_town') {
-        return !!this.player.flags.reportedMonumentToScholar;
-      }
-    }
-
-    return true;
+    return evaluateNpcActiveState(npc, mapId, this.player, this.defeatedBosses);
   }
 
   refreshCurrentMapNpcs() {
