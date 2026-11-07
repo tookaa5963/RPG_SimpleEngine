@@ -8,6 +8,7 @@ import { evaluateNpcActiveState, resolveNpcPlacementAndMovement } from './events
 import { canPlayerMoveTo, canNpcMoveTo } from './engine/field/CollisionSystem.js';
 import { shouldRepelMonster, evaluateRandomEncounter } from './engine/field/EncounterCalculator.js';
 import { EventTypes } from './engine/core/EventTypes.js';
+import { FieldRenderer } from './drivers/field/FieldRenderer.js';
 
 export class FieldManager {
   constructor({
@@ -519,6 +520,8 @@ export class FieldManager {
   }
 
   updatePlayer(input) {
+    const normalizedInput = FieldRenderer.normalizeFieldInput(input);
+
     if (this.player.bumpCoolDown > 0) this.player.bumpCoolDown--;
     if (this.player.poisonFlashTimer > 0) this.player.poisonFlashTimer--;
     if (this.player.poisonShakeTimer > 0) this.player.poisonShakeTimer--;
@@ -640,10 +643,10 @@ export class FieldManager {
       let inputDir = null;
       let nextGridX = this.player.gridX;
       let nextGridY = this.player.gridY;
-      if (input.up) { inputDir = 'up'; nextGridY--; }
-      else if (input.down) { inputDir = 'down'; nextGridY++; }
-      else if (input.left) { inputDir = 'left'; nextGridX--; }
-      else if (input.right) { inputDir = 'right'; nextGridX++; }
+      if (normalizedInput.up) { inputDir = 'up'; nextGridY--; }
+      else if (normalizedInput.down) { inputDir = 'down'; nextGridY++; }
+      else if (normalizedInput.left) { inputDir = 'left'; nextGridX--; }
+      else if (normalizedInput.right) { inputDir = 'right'; nextGridX++; }
 
       if (inputDir) {
         if (this.player.direction !== inputDir) {

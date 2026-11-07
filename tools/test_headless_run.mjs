@@ -32,6 +32,7 @@ import { runNpcMovementControlTests } from './test_npc_movement_control.mjs';
 import { runCollisionSystemTests } from './test_collision_system.mjs';
 import { runEncounterCalculatorTests } from './test_encounter_calculator.mjs';
 import { runMapTransitionEventTests } from './test_map_transition_event.mjs';
+import { runFieldRendererTests } from './test_field_renderer.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -561,6 +562,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_map_transition_event.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 23. フィールド描画・入力正規化 Platform Driver 単体検証（FieldRenderer）
+// -------------------------------------------------------------
+try {
+  runFieldRendererTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_field_renderer.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);

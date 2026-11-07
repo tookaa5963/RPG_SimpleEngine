@@ -10,7 +10,7 @@ import { InnManager, initInnData } from './inn.js';
 import { ChurchManager, initChurchData } from './church.js';
 import { InputManager } from './input.js';
 import { SaveManager } from './save.js';
-import { Renderer } from './renderer.js';
+import { FieldRenderer } from './drivers/field/FieldRenderer.js';
 import { UIManager } from './ui.js';
 import { Player } from './player.js';
 import { EventManager, initEventData, getEndingText } from './events.js'; // ★ initEventDataを追加
@@ -627,10 +627,11 @@ function update() {
 
   fieldManager.updateNpcs(currentState);
 
-  if (input.cancelJustPressed && !player.isMoving) { sound.playSubmit(); menuManager.open(); currentState = STATE_MENU; return; }
-  if (input.actionJustPressed && !player.isMoving) { fieldManager.interactFacingObject(); return; }
+  const normalizedFieldInput = FieldRenderer.normalizeFieldInput(input);
+  if (normalizedFieldInput.cancelJustPressed && !player.isMoving) { sound.playSubmit(); menuManager.open(); currentState = STATE_MENU; return; }
+  if (normalizedFieldInput.actionJustPressed && !player.isMoving) { fieldManager.interactFacingObject(); return; }
 
-  fieldManager.updatePlayer(input);
+  fieldManager.updatePlayer(normalizedFieldInput);
 }
 
 function draw() {
@@ -690,7 +691,7 @@ function initializeGameEntities() {
   teleportFadeState = null;
 
   input = new InputManager();
-  renderer = new Renderer(TILE_SIZE);
+  renderer = new FieldRenderer(TILE_SIZE);
   uiManager = new UIManager();
   domUiDriver = new DomUiDriver(engineEventBus, uiManager);
   domUiDriver.subscribe();
