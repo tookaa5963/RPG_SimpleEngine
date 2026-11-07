@@ -1,4 +1,3 @@
-// FILE_ENTRY: js/fieldManager.js
 import { maps } from './maps.js';
 import { sound } from './sound.js';
 import { MONSTER_DEFINITIONS } from './monsters.js';
@@ -8,6 +7,7 @@ import { logFormatter } from './logFormatter.js';
 import { evaluateNpcActiveState, resolveNpcPlacementAndMovement } from './events.js';
 import { canPlayerMoveTo, canNpcMoveTo } from './engine/field/CollisionSystem.js';
 import { shouldRepelMonster, evaluateRandomEncounter } from './engine/field/EncounterCalculator.js';
+import { EventTypes } from './engine/core/EventTypes.js';
 
 export class FieldManager {
   constructor({
@@ -21,7 +21,8 @@ export class FieldManager {
     onStateChange,
     onPlayerDeath,
     onEnterDragonsCave2 = null,
-    startMapId = 'lighthousekeeper_cottage'
+    startMapId = 'lighthousekeeper_cottage',
+    eventBus = null
   }) {
     this.player = player;
     this.tileDb = tileDb;
@@ -33,6 +34,7 @@ export class FieldManager {
     this.onStateChange = onStateChange;
     this.onPlayerDeath = onPlayerDeath;
     this.onEnterDragonsCave2 = onEnterDragonsCave2;
+    this.eventBus = eventBus;
 
     this.tileSize = 64;
     this.speed = 4;
@@ -46,7 +48,6 @@ export class FieldManager {
 
     this.pendingMonsterId = null;
     this.pendingMonsterIndex = null;
-    this.teleportTransition = null;
   }
 
   getMapBgm(mapId = this.currentMapId) {
@@ -75,24 +76,57 @@ export class FieldManager {
     });
   }
 
-  changeMap(targetMapId, targetGridX, targetGridY, newDirection, isTeleport = false, isLoad = false) {
-    if (isTeleport) {
-      if (this.onStateChange) this.onStateChange('MESSAGE');
-      this.teleportTransition = {
-        targetMapId,
-        targetGridX,
-        targetGridY,
-        newDirection,
-        timer: 120,
-        phase: 'WAIT',
-        fadeAlpha: 0
-      };
+  emitMapTransitionEvent(phase, fromMapId, targetMapId, targetGridX, targetGridY, direction, isTeleport, isLoad) {
+    if (!this.eventBus || typeof this.eventBus.emit !== 'function') {
       return;
     }
-    this.executeChangeMap(targetMapId, targetGridX, targetGridY, newDirection, isLoad);
+    const safeFromMapId = typeof fromMapId === 'string' ? fromMapId : '';
+    const safeTargetMapId = typeof targetMapId === 'string' ? targetMapId : '';
+    const safeGridX = typeof targetGridX === 'number' && Number.isFinite(targetGridX) ? targetGridX : 0;
+    const safeGridY = typeof targetGridY === 'number' && Number.isFinite(targetGridY) ? targetGridY : 0;
+    const safeDirection = typeof direction === 'string' && direction.length > 0 ? direction : 'down';
+
+    this.eventBus.emit(EventTypes.FIELD.MAP_TRANSITION_TRIGGERED, {
+      phase,
+      fromMapId: safeFromMapId,
+      targetMapId: safeTargetMapId,
+      targetGridX: safeGridX,
+      targetGridY: safeGridY,
+      direction: safeDirection,
+      isTeleport: Boolean(isTeleport),
+      isLoad: Boolean(isLoad)
+    });
   }
 
-  executeChangeMap(targetMapId, targetGridX, targetGridY, newDirection, isLoad = false) {
+  changeMap(targetMapId, targetGridX, targetGridY, newDirection, isTeleport = false, isLoad = false) {
+    const fromMapId = this.currentMapId;
+    const teleportFlag = Boolean(isTeleport);
+    const loadFlag = Boolean(isLoad);
+
+    this.emitMapTransitionEvent(
+      'TRIGGERED',
+      fromMapId,
+      targetMapId,
+      targetGridX,
+      targetGridY,
+      newDirection,
+      teleportFlag,
+      loadFlag
+    );
+
+    if (teleportFlag) {
+      if (this.onStateChange) this.onStateChange('MESSAGE');
+      return;
+    }
+
+    this.executeChangeMap(targetMapId, targetGridX, targetGridY, newDirection, loadFlag, false);
+  }
+
+  executeChangeMap(targetMapId, targetGridX, targetGridY, newDirection, isLoad = false, isTeleport = false) {
+    const fromMapId = this.currentMapId;
+    const loadFlag = Boolean(isLoad);
+    const teleportFlag = Boolean(isTeleport);
+
     if (!maps[targetMapId]) {
       console.error(`マップID [${targetMapId}] が見つかりません。はじまりのまちへ安全復帰します。`);
       targetMapId = 'first_town';
@@ -100,15 +134,17 @@ export class FieldManager {
       targetGridY = 15;
     }
 
-    if (!isLoad) {
+    if (!loadFlag) {
       sound.playStairs();
     }
 
     if (this.currentMapId === 'lighthousekeeper_cottage' && targetMapId !== 'lighthousekeeper_cottage') {
-      this.player.flags.hasLeftInitialCottage = true;
+      if (this.player && this.player.flags) {
+        this.player.flags.hasLeftInitialCottage = true;
+      }
     }
 
-    if (!isLoad && this.currentMapId !== targetMapId && maps[targetMapId]?.randomEntryPoints?.length > 0) {
+    if (!loadFlag && this.currentMapId !== targetMapId && maps[targetMapId]?.randomEntryPoints?.length > 0) {
       const entryPoints = maps[targetMapId].randomEntryPoints;
       const selectedEntry = entryPoints[Math.floor(Math.random() * entryPoints.length)];
       targetGridX = selectedEntry.gridX;
@@ -128,51 +164,42 @@ export class FieldManager {
       sound.stopBgm();
     }
 
-    this.player.setPosition(targetGridX, targetGridY, newDirection);
+    if (typeof this.player.setPosition === 'function') {
+      this.player.setPosition(targetGridX, targetGridY, newDirection);
+    } else {
+      this.player.gridX = targetGridX;
+      this.player.gridY = targetGridY;
+      this.player.pixelX = targetGridX * this.tileSize;
+      this.player.pixelY = targetGridY * this.tileSize;
+      this.player.targetPixelX = this.player.pixelX;
+      this.player.targetPixelY = this.player.pixelY;
+      this.player.isMoving = false;
+      if (typeof newDirection === 'string' && newDirection.length > 0) {
+        this.player.direction = newDirection;
+      }
+    }
+
     this.refreshCurrentMapNpcs();
 
     const canvas = this.getCanvas();
-    this.renderer.updateCamera(this.player, this.currentMap, canvas.width, canvas.height);
+    if (this.renderer && typeof this.renderer.updateCamera === 'function' && canvas) {
+      this.renderer.updateCamera(this.player, this.currentMap, canvas.width, canvas.height);
+    }
 
-    if (!isLoad && targetMapId === 'dragons_cave2' && this.onEnterDragonsCave2) {
+    this.emitMapTransitionEvent(
+      'EXECUTED',
+      fromMapId,
+      targetMapId,
+      targetGridX,
+      targetGridY,
+      newDirection,
+      teleportFlag,
+      loadFlag
+    );
+
+    if (!loadFlag && targetMapId === 'dragons_cave2' && this.onEnterDragonsCave2) {
       this.onEnterDragonsCave2();
     }
-  }
-
-  updateTeleportTransition() {
-    if (!this.teleportTransition) return false;
-
-    if (this.teleportTransition.phase === 'WAIT') {
-      if (!this.messageWindow.isComplete) {
-        this.messageWindow.update();
-      } else {
-        this.teleportTransition.timer--;
-        if (this.teleportTransition.timer <= 0) {
-          this.teleportTransition.phase = 'FADE_OUT';
-        }
-      }
-    } else if (this.teleportTransition.phase === 'FADE_OUT') {
-      this.teleportTransition.fadeAlpha += 1 / 30;
-      if (this.teleportTransition.fadeAlpha >= 1.0) {
-        this.teleportTransition.fadeAlpha = 1.0;
-        this.executeChangeMap(
-          this.teleportTransition.targetMapId,
-          this.teleportTransition.targetGridX,
-          this.teleportTransition.targetGridY,
-          this.teleportTransition.newDirection
-        );
-        this.messageWindow.close();
-        this.teleportTransition.phase = 'FADE_IN';
-      }
-    } else if (this.teleportTransition.phase === 'FADE_IN') {
-      this.teleportTransition.fadeAlpha -= 1 / 30;
-      if (this.teleportTransition.fadeAlpha <= 0) {
-        this.teleportTransition.fadeAlpha = 0;
-        this.teleportTransition = null;
-        if (this.onStateChange) this.onStateChange('EXPLORE');
-      }
-    }
-    return true;
   }
 
   canPlayerMoveTo(gx, gy) {
@@ -204,7 +231,8 @@ export class FieldManager {
     sound.playEncounter();
     if (this.onEncounter) this.onEncounter(monsterNpc.monsterId, this.pendingMonsterIndex);
   }
-shouldRepelMonster(monsterId) {
+
+  shouldRepelMonster(monsterId) {
     const holyWaterSteps =
       typeof this.player.holyWaterSteps === 'number' ? this.player.holyWaterSteps : 0;
     return shouldRepelMonster({
@@ -243,8 +271,6 @@ shouldRepelMonster(monsterId) {
     }
   }
 
-
-
   interactFacingObject() {
     let targetX = this.player.gridX;
     let targetY = this.player.gridY;
@@ -271,7 +297,7 @@ shouldRepelMonster(monsterId) {
         const resolved = i18n.resolve(targetObj.pages);
         const textArray = Array.isArray(resolved) ? resolved : [resolved];
         this.messageWindow.open(textArray);
-} else if (targetObj.type === 'chest') {
+      } else if (targetObj.type === 'chest') {
         if (!targetObj.isOpen) {
           if (targetObj.itemId === 'corrada') {
             const hasAntique = (this.player.inventory['antique_key'] || 0) > 0;
@@ -296,10 +322,9 @@ shouldRepelMonster(monsterId) {
             ]);
             return;
           } else {
-            // ★itemNameをここで1度だけ宣言
             const itemName = ITEM_DB[targetObj.itemId]?.name || '';
             let netGain = 1;
-            
+
             if (targetObj.requiredKey) {
               const hasKey = (this.player.inventory[targetObj.requiredKey] || 0) > 0;
               if (!hasKey) {
@@ -314,7 +339,7 @@ shouldRepelMonster(monsterId) {
 
             if (this.player.isInventoryFull(netGain)) {
               sound.playChest();
-              
+
               const candidates = [];
               for (const [id, count] of Object.entries(this.player.inventory)) {
                 if (count > 0 && ITEM_DB[id]) {
@@ -335,7 +360,7 @@ shouldRepelMonster(monsterId) {
                   logFormatter.format('field.chest_inventory_full_give_up', { item: itemName })
                 ]);
               } else {
-                const promptMsg = i18n.currentLang === 'ja' 
+                const promptMsg = i18n.currentLang === 'ja'
                   ? `宝箱を開けた！\nなんと ${itemName} が入っていた！\n\nしかし 荷物がいっぱいで持てない。\n代わりに 何かを捨てますか？`
                   : `Opened the chest!\nFound ${itemName}!\nBut your bag is full.\nDiscard something else?`;
 
@@ -346,7 +371,7 @@ shouldRepelMonster(monsterId) {
                     if (selectedIndex === 0) {
                       const discardNames = candidates.map(c => c.name);
                       discardNames.push(i18n.t('common.back'));
-                      
+
                       this.messageWindow.openMenu(
                         logFormatter.format('battle_log.discard_select_msg'),
                         discardNames,
@@ -356,14 +381,14 @@ shouldRepelMonster(monsterId) {
                           } else {
                             const discarded = candidates[discardIdx];
                             this.player.removeItem(discarded.id, 1);
-                            
+
                             if (targetObj.requiredKey && targetObj.consumeKey) {
                               this.player.removeItem(targetObj.requiredKey, 1);
                             }
                             targetObj.isOpen = true;
                             this.player.addItem(targetObj.itemId, 1);
                             sound.playChest();
-                            
+
                             const msg = i18n.currentLang === 'ja'
                               ? `${discarded.name} を捨てて\n${itemName} を手に入れた！`
                               : `Discarded ${discarded.name} and\nacquired ${itemName}!`;
@@ -392,7 +417,6 @@ shouldRepelMonster(monsterId) {
             targetObj.isOpen = true;
             this.player.addItem(targetObj.itemId, 1);
             sound.playChest();
-            // ★ここでは itemName を再宣言せず、上部で取得したものを使い回す
             this.messageWindow.open([logFormatter.format('field.chest_open', { item: itemName })]);
           }
         } else {
@@ -494,7 +518,7 @@ shouldRepelMonster(monsterId) {
     });
   }
 
-updatePlayer(input) {
+  updatePlayer(input) {
     if (this.player.bumpCoolDown > 0) this.player.bumpCoolDown--;
     if (this.player.poisonFlashTimer > 0) this.player.poisonFlashTimer--;
     if (this.player.poisonShakeTimer > 0) this.player.poisonShakeTimer--;

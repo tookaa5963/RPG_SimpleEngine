@@ -1,9 +1,3 @@
-/**
- * EventTypes.js
- * システム全体で送受信されるイベント識別子の定数定義。
- * Core層・Driver層の双方が参照する共通定義であり、外部依存を持たない純粋データ構造です。
- */
-
 export const EventTypes = Object.freeze({
   ACTOR: Object.freeze({
     HP_CHANGED: 'actor:hp_changed',
@@ -22,6 +16,9 @@ export const EventTypes = Object.freeze({
   BATTLE: Object.freeze({
     PHASE_CHANGED: 'battle:phase_changed',
     ACTION_EXECUTED: 'battle:action_executed',
+  }),
+  FIELD: Object.freeze({
+    MAP_TRANSITION_TRIGGERED: 'field:map_transition_triggered',
   }),
   SYSTEM: Object.freeze({
     MESSAGE_LOG: 'system:message_log',

@@ -31,6 +31,7 @@ import { runBattleDoubleSubmitTests } from './test_battle_double_submit.mjs';
 import { runNpcMovementControlTests } from './test_npc_movement_control.mjs';
 import { runCollisionSystemTests } from './test_collision_system.mjs';
 import { runEncounterCalculatorTests } from './test_encounter_calculator.mjs';
+import { runMapTransitionEventTests } from './test_map_transition_event.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -551,6 +552,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_encounter_calculator.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 22. マップ遷移トリガー EventBus 化・演出分離検証（FieldManager / EventTypes）
+// -------------------------------------------------------------
+try {
+  await runMapTransitionEventTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_map_transition_event.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);

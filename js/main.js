@@ -77,6 +77,7 @@ const START_DIRECTION = 'up';
 let player, flashTimer, pendingMonsterId, pendingIsAmbush, input, renderer, uiManager, messageWindow;
 let btnToggleBgm, btnToggleSe, cutsceneOverlay, cutsceneVideo, isCutscenePlaying, cutsceneOnFinished, cutsceneFinishHandler;
 let titleScene, slotDialog, battleManager, menuManager, shopManager, innManager, churchManager, eventManager, fieldManager;
+let teleportFadeState = null;
 let hasStartedBgm = false;
 let lastTime, accumulator;
 const FIXED_STEP = 1000 / 60;
@@ -441,6 +442,7 @@ function startNewGame() {
   player.flags.hasLeftInitialCottage = false;
   syncPlayerToManagers(player);
 
+  teleportFadeState = null;
   fieldManager.currentMapId = START_MAP_ID;
   fieldManager.currentMap = maps[START_MAP_ID];
   fieldManager.defeatedBosses = [];
@@ -486,6 +488,7 @@ function returnToTitle() {
   player.direction = START_DIRECTION;
   syncPlayerToManagers(player);
 
+  teleportFadeState = null;
   fieldManager.currentMapId = START_MAP_ID;
   fieldManager.currentMap = maps[START_MAP_ID];
   fieldManager.defeatedBosses = [];
@@ -505,6 +508,44 @@ function emitVirtualKey(keyName) {
   else if (currentState === STATE_MESSAGE) {
     messageWindow.handleKeyDown(keyName);
   }
+}
+
+function updateTeleportFadeTransition() {
+  if (!teleportFadeState) return false;
+
+  if (teleportFadeState.phase === 'WAIT') {
+    if (!messageWindow.isComplete) {
+      messageWindow.update();
+    } else {
+      teleportFadeState.timer--;
+      if (teleportFadeState.timer <= 0) {
+        teleportFadeState.phase = 'FADE_OUT';
+      }
+    }
+  } else if (teleportFadeState.phase === 'FADE_OUT') {
+    teleportFadeState.fadeAlpha += 1 / 30;
+    if (teleportFadeState.fadeAlpha >= 1.0) {
+      teleportFadeState.fadeAlpha = 1.0;
+      fieldManager.executeChangeMap(
+        teleportFadeState.targetMapId,
+        teleportFadeState.targetGridX,
+        teleportFadeState.targetGridY,
+        teleportFadeState.newDirection,
+        false,
+        true
+      );
+      messageWindow.close();
+      teleportFadeState.phase = 'FADE_IN';
+    }
+  } else if (teleportFadeState.phase === 'FADE_IN') {
+    teleportFadeState.fadeAlpha -= 1 / 30;
+    if (teleportFadeState.fadeAlpha <= 0) {
+      teleportFadeState.fadeAlpha = 0;
+      teleportFadeState = null;
+      currentState = STATE_EXPLORE;
+    }
+  }
+  return true;
 }
 
 function update() {
@@ -547,8 +588,8 @@ function update() {
     return;
   }
 
-  if (fieldManager.teleportTransition) {
-    fieldManager.updateTeleportTransition();
+  if (teleportFadeState) {
+    updateTeleportFadeTransition();
     return;
   }
 
@@ -618,8 +659,8 @@ function draw() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  if (fieldManager.teleportTransition && fieldManager.teleportTransition.fadeAlpha > 0) {
-    ctx.fillStyle = `rgba(0, 0, 0, ${Math.min(1.0, Math.max(0.0, fieldManager.teleportTransition.fadeAlpha))})`;
+  if (teleportFadeState && teleportFadeState.fadeAlpha > 0) {
+    ctx.fillStyle = `rgba(0, 0, 0, ${Math.min(1.0, Math.max(0.0, teleportFadeState.fadeAlpha))})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 }
@@ -646,6 +687,7 @@ function initializeGameEntities() {
   flashTimer = 0;
   pendingMonsterId = null;
   pendingIsAmbush = false;
+  teleportFadeState = null;
 
   input = new InputManager();
   renderer = new Renderer(TILE_SIZE);
@@ -771,18 +813,18 @@ function initializeGameEntities() {
     }
   });
 
-engineEventBus.on(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, (payload) => {
-  let mode = 'save';
-  if (payload && payload.mode) {
-    mode = payload.mode;
-  }
-  slotDialog.open(mode, false);
-});
-engineEventBus.on(ActionTypes.SYSTEM.RETURN_TO_TITLE, () => {
-  returnToTitle();
-});
+  engineEventBus.on(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, (payload) => {
+    let mode = 'save';
+    if (payload && payload.mode) {
+      mode = payload.mode;
+    }
+    slotDialog.open(mode, false);
+  });
+  engineEventBus.on(ActionTypes.SYSTEM.RETURN_TO_TITLE, () => {
+    returnToTitle();
+  });
 
-engineEventBus.on(ActionTypes.SYSTEM.CHANGE_MAP, (payload) => {
+  engineEventBus.on(ActionTypes.SYSTEM.CHANGE_MAP, (payload) => {
     if (typeof payload !== 'object' || payload === null) {
       return;
     }
@@ -824,15 +866,32 @@ engineEventBus.on(ActionTypes.SYSTEM.CHANGE_MAP, (payload) => {
       fieldManager.changeMap(targetMap, targetX, targetY, direction, isTeleport);
     }
   });
-  
-menuManager = new MenuManager(
-player,
-messageWindow,
-() => { currentState = STATE_EXPLORE; },
-(targetMap, gx, gy, dir, isTeleport) => { fieldManager.changeMap(targetMap, gx, gy, dir, isTeleport); },
-() => fieldManager.currentMap,
-engineEventBus
-);
+
+  engineEventBus.on(EventTypes.FIELD.MAP_TRANSITION_TRIGGERED, (payload) => {
+    if (typeof payload !== 'object' || payload === null) {
+      return;
+    }
+    if (payload.phase === 'TRIGGERED' && payload.isTeleport === true) {
+      teleportFadeState = {
+        targetMapId: payload.targetMapId,
+        targetGridX: payload.targetGridX,
+        targetGridY: payload.targetGridY,
+        newDirection: payload.direction,
+        timer: 120,
+        phase: 'WAIT',
+        fadeAlpha: 0
+      };
+    }
+  });
+
+  menuManager = new MenuManager(
+    player,
+    messageWindow,
+    () => { currentState = STATE_EXPLORE; },
+    (targetMap, gx, gy, dir, isTeleport) => { fieldManager.changeMap(targetMap, gx, gy, dir, isTeleport); },
+    () => fieldManager.currentMap,
+    engineEventBus
+  );
   shopManager = new ShopManager(player, () => { currentState = STATE_EXPLORE; });
   innManager = new InnManager(
     player,
@@ -888,7 +947,8 @@ engineEventBus
         slotDialog.open('auto_save');
       });
     },
-    startMapId: START_MAP_ID
+    startMapId: START_MAP_ID,
+    eventBus: engineEventBus
   });
 
   Object.keys(maps).forEach(mapId => {
@@ -907,14 +967,14 @@ async function bootstrapEngine() {
     await Promise.all([
       initLocaleData(),
       initItemData(),
-    initMonsterData(),
-    initMapData(),
-    initEventData(),
-    initShopData(),
-    initInnData(),
-    initChurchData()
-      , initLogData()
-  ]);
+      initMonsterData(),
+      initMapData(),
+      initEventData(),
+      initShopData(),
+      initInnData(),
+      initChurchData(),
+      initLogData()
+    ]);
     console.log("JSON data loaded (items, spells, monsters, maps, events). Initializing entities...");
 
     initializeGameEntities();
