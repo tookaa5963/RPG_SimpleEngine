@@ -1,7 +1,6 @@
 // FILE_ENTRY: js/menu.js
 import { logFormatter } from './logFormatter.js';
 import { getObjectiveText, resolveCurrentObjectiveKey, canCastFieldSpell } from './events.js';
-import { sound } from './sound.js';
 import { maps } from './maps.js';
 import { ITEM_DB, SPELL_DB } from './items.js';
 import { drawListBox, drawMessageBox } from './ui.js';
@@ -34,6 +33,20 @@ export class MenuManager {
     this.quitConfirmIndex = 1;
   }
 
+  _playSe(soundId) {
+    if (this.eventBus) {
+      this.eventBus.emit(EventTypes.SYSTEM.AUDIO_PLAY_SE, { se: soundId });
+    }
+  }
+
+  _openMessages(messages) {
+    if (this.eventBus) {
+      this.eventBus.emit(EventTypes.SYSTEM.MESSAGE_LOG, { messages });
+    } else if (this.msgWin) {
+      this.msgWin.open(messages);
+    }
+  }
+
   getRootCommands() {
     return [
       i18n.t('menu.spell'),
@@ -61,7 +74,7 @@ export class MenuManager {
 
   showCurrentObjective() {
     const key = resolveCurrentObjectiveKey(this.player);
-    this.msgWin.open([getObjectiveText(key)]);
+    this._openMessages([getObjectiveText(key)]);
   }
 
   handleKeyDown(key) {
@@ -71,12 +84,12 @@ export class MenuManager {
     if (this.phase === 'ROOT') {
       if (key === 'ArrowUp' || key === 'w' || key === 'W') {
         this.rootIndex = (this.rootIndex - 1 + rootCommands.length) % rootCommands.length;
-        sound.playSubmit();
+        this._playSe('submit');
       } else if (key === 'ArrowDown' || key === 's' || key === 'S') {
         this.rootIndex = (this.rootIndex + 1) % rootCommands.length;
-        sound.playSubmit();
+        this._playSe('submit');
       } else if (key === ' ' || key === 'Enter') {
-        sound.playSubmit();
+        this._playSe('submit');
         if (this.rootIndex === 0) {
           this.currentMode = 'magic';
           this.itemList = [];
@@ -115,8 +128,8 @@ export class MenuManager {
           this.phase = 'QUIT_CONFIRM';
         }
       } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        sound.playSubmit();
         this.onEnd();
+        this._playSe('submit');
       }
 
     } else if (this.phase === 'QUIT_CONFIRM') {
@@ -125,31 +138,32 @@ export class MenuManager {
         key === 'ArrowLeft' || key === 'ArrowRight' || key === 'a' || key === 'd'
       ) {
         this.quitConfirmIndex = this.quitConfirmIndex === 0 ? 1 : 0;
-        sound.playSubmit();
+        this._playSe('submit');
       } else if (key === ' ' || key === 'Enter') {
-        sound.playSubmit();
         if (this.quitConfirmIndex === 0) {
           this.onEnd();
+          this._playSe('submit');
           if (this.eventBus) {
             this.eventBus.emit(ActionTypes.SYSTEM.RETURN_TO_TITLE);
           }
         } else {
+          this._playSe('submit');
           this.phase = 'ROOT';
         }
       } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        sound.playCancel();
+        this._playSe('cancel');
         this.phase = 'ROOT';
       }
 
     } else if (this.phase === 'ITEM_SELECT') {
       if (key === 'ArrowUp' || key === 'w' || key === 'W') {
         this.itemIndex = (this.itemIndex - 1 + this.itemList.length) % this.itemList.length;
-        sound.playSubmit();
+        this._playSe('submit');
       } else if (key === 'ArrowDown' || key === 's' || key === 'S') {
         this.itemIndex = (this.itemIndex + 1) % this.itemList.length;
-        sound.playSubmit();
+        this._playSe('submit');
       } else if (key === ' ' || key === 'Enter') {
-        sound.playSubmit();
+        this._playSe('submit');
         const selected = this.itemList[this.itemIndex];
         if (selected.id === 'cancel') {
           this.phase = 'ROOT';
@@ -165,19 +179,19 @@ export class MenuManager {
           }
         }
       } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        sound.playSubmit();
+        this._playSe('submit');
         this.phase = 'ROOT';
       }
 
     } else if (this.phase === 'ITEM_ACTION') {
       if (key === 'ArrowUp' || key === 'w' || key === 'W') {
         this.actionIndex = (this.actionIndex - 1 + actionCommands.length) % actionCommands.length;
-        sound.playSubmit();
+        this._playSe('submit');
       } else if (key === 'ArrowDown' || key === 's' || key === 'S') {
         this.actionIndex = (this.actionIndex + 1) % actionCommands.length;
-        sound.playSubmit();
+        this._playSe('submit');
       } else if (key === ' ' || key === 'Enter') {
-        sound.playSubmit();
+        this._playSe('submit');
         if (this.actionIndex === 0) {
           const effectDef = this.selectedItem.effect || (ITEM_DB[this.selectedItem.id] ? ITEM_DB[this.selectedItem.id].effect : null);
           if (this.selectedItem.type === 'weapon' || this.selectedItem.type === 'armor' || this.selectedItem.type === 'shield') {
@@ -186,10 +200,10 @@ export class MenuManager {
             this.useItem(this.selectedItem);
           } else if (this.selectedItem.type === 'charm') {
             this.onEnd();
-            this.msgWin.open([logFormatter.format('menu_action.charm_passive')]);
+            this._openMessages([logFormatter.format('menu_action.charm_passive')]);
           } else if (this.selectedItem.type === 'key' || this.selectedItem.type === 'keyItem') {
             this.onEnd();
-            this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+            this._openMessages([i18n.t('menu.cannot_use_here')]);
           } else {
             this.useItem(this.selectedItem);
           }
@@ -201,7 +215,7 @@ export class MenuManager {
             if (dropCheck.reason === 'equipped') {
               msgKey = 'menu.cannot_drop_equipped';
             }
-            this.msgWin.open([i18n.t(msgKey)]);
+            this._openMessages([i18n.t(msgKey)]);
           } else {
             this.dropConfirmIndex = 1;
             this.phase = 'DROP_CONFIRM';
@@ -210,27 +224,28 @@ export class MenuManager {
           this.phase = 'ITEM_SELECT';
         }
       } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        sound.playSubmit();
+        this._playSe('submit');
         this.phase = 'ITEM_SELECT';
       }
 
     } else if (this.phase === 'DROP_CONFIRM') {
       if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'w' || key === 's') {
         this.dropConfirmIndex = this.dropConfirmIndex === 0 ? 1 : 0;
-        sound.playSubmit();
+        this._playSe('submit');
       } else if (key === ' ' || key === 'Enter') {
-        sound.playSubmit();
         if (this.dropConfirmIndex === 0) {
           this.player.removeItem(this.selectedItem.id, 1);
-          sound.playChest();
           this.onEnd();
+          this._playSe('submit');
+          this._playSe('chest');
           const itemName = ITEM_DB[this.selectedItem.id].name;
-          this.msgWin.open([i18n.t('menu.dropped', { name: itemName })]);
+          this._openMessages([i18n.t('menu.dropped', { name: itemName })]);
         } else {
+          this._playSe('submit');
           this.phase = 'ITEM_ACTION';
         }
       } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        sound.playSubmit();
+        this._playSe('submit');
         this.phase = 'ITEM_ACTION';
       }
     }
@@ -265,22 +280,22 @@ export class MenuManager {
 
     if (isEquipped) {
       if (this.player.isInventoryFull(1)) {
-        sound.playBump();
         this.onEnd();
-        this.msgWin.open([i18n.t('menu.inventory_full_unequip')]);
+        this._playSe('bump');
+        this._openMessages([i18n.t('menu.inventory_full_unequip')]);
         return;
       }
       this.player.unequip(slot);
-      sound.playChest();
       this.onEnd();
-      this.msgWin.open([i18n.t('menu.unequipped', { name: itemName })]);
+      this._playSe('chest');
+      this._openMessages([i18n.t('menu.unequipped', { name: itemName })]);
       return;
     }
 
     this.player.equip(slot, item.id);
-    sound.playChest();
     this.onEnd();
-    this.msgWin.open([i18n.t('menu.equipped', { name: itemName })]);
+    this._playSe('chest');
+    this._openMessages([i18n.t('menu.equipped', { name: itemName })]);
   }
 
   useItem(item) {
@@ -290,13 +305,13 @@ export class MenuManager {
       if (effectDef.type === 'heal_hp') {
         if (this.player.hp >= this.player.maxHp) {
           this.onEnd();
-          this.msgWin.open([i18n.t('menu.full_hp')]);
+          this._openMessages([i18n.t('menu.full_hp')]);
           return;
         }
       } else if (effectDef.type === 'heal_mp') {
         if (this.player.mp >= this.player.maxMp) {
           this.onEnd();
-          this.msgWin.open([i18n.t('menu.full_mp')]);
+          this._openMessages([i18n.t('menu.full_mp')]);
           return;
         }
       }
@@ -306,7 +321,7 @@ export class MenuManager {
 
       if (result.success === false) {
         this.onEnd();
-        this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+        this._openMessages([i18n.t('menu.cannot_use_here')]);
         return;
       }
 
@@ -323,38 +338,38 @@ export class MenuManager {
 
       if (result.strategy === 'heal_hp') {
         this.player.heal(result.effectiveAmount);
-        sound.playHeal();
+        this._playSe('heal');
         if (item.id === 'herb') {
-          this.msgWin.open([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
+          this._openMessages([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
         } else if (item.id === 'strong_herb') {
-          this.msgWin.open([logFormatter.format('menu_action.used_strong_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
+          this._openMessages([logFormatter.format('menu_action.used_strong_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
         } else if (item.id === 'special_herb') {
-          this.msgWin.open([logFormatter.format('menu_action.used_special_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
+          this._openMessages([logFormatter.format('menu_action.used_special_herb_1'), logFormatter.format('menu_action.used_strong_herb_2')]);
         } else {
-          this.msgWin.open([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
+          this._openMessages([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
         }
       } else if (result.strategy === 'heal_mp') {
         this.player.healMp(result.effectiveAmount);
-        sound.playHeal();
+        this._playSe('heal');
         if (item.id === 'magic_water') {
-          this.msgWin.open([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
+          this._openMessages([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
         } else if (item.id === 'sage_water') {
-          this.msgWin.open([logFormatter.format('menu_action.drank_sage_water_1'), logFormatter.format('menu_action.drank_sage_water_2')]);
+          this._openMessages([logFormatter.format('menu_action.drank_sage_water_1'), logFormatter.format('menu_action.drank_sage_water_2')]);
         } else {
-          this.msgWin.open([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
+          this._openMessages([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
         }
       } else if (result.strategy === 'cure_status') {
-        sound.playHeal();
+        this._playSe('heal');
         if (result.cured) {
           this.player.curePoison();
-          this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_2')]);
+          this._openMessages([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_2')]);
         } else {
-          this.msgWin.open([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_not_poisoned')]);
+          this._openMessages([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_not_poisoned')]);
         }
       } else if (result.strategy === 'teleport') {
-        sound.playMagic();
+        this._playSe('magic');
         const msgKey = (effectDef.params && effectDef.params.messageKey) ? effectDef.params.messageKey : 'menu_action.forest_guide';
-        this.msgWin.open([logFormatter.format(msgKey)]);
+        this._openMessages([logFormatter.format(msgKey)]);
         if (this.eventBus) {
           this.eventBus.emit(ActionTypes.SYSTEM.CHANGE_MAP, {
             targetMap: result.targetMap,
@@ -368,7 +383,7 @@ export class MenuManager {
         }
       } else if (result.strategy === 'message') {
         const msgs = result.messageKeys.map((k) => logFormatter.format(k));
-        this.msgWin.open(msgs);
+        this._openMessages(msgs);
       }
       return;
     }
@@ -376,23 +391,23 @@ export class MenuManager {
     if (item.id === 'holy_water') {
       this.player.removeItem('holy_water', 1);
       this.player.holyWaterSteps = 128;
-      sound.playMagic();
       this.onEnd();
-      this.msgWin.open([logFormatter.format('menu_action.holy_water_1'), logFormatter.format('menu_action.holy_water_2')]);
+      this._playSe('magic');
+      this._openMessages([logFormatter.format('menu_action.holy_water_1'), logFormatter.format('menu_action.holy_water_2')]);
     } else if (item.id === 'torch') {
       this.player.removeItem('torch', 1);
       this.player.torchSteps = Math.max(this.player.torchSteps || 0, 60);
-      sound.playMagic();
       this.onEnd();
-      this.msgWin.open([logFormatter.format('menu_action.torch_1'), logFormatter.format('menu_action.torch_2')]);
+      this._playSe('magic');
+      this._openMessages([logFormatter.format('menu_action.torch_1'), logFormatter.format('menu_action.torch_2')]);
     } else if (item.id === 'lantern') {
       this.player.isLanternLit = !this.player.isLanternLit;
-      sound.playMagic();
       this.onEnd();
+      this._playSe('magic');
       if (this.player.isLanternLit) {
-        this.msgWin.open([logFormatter.format('menu_action.lantern_on')]);
+        this._openMessages([logFormatter.format('menu_action.lantern_on')]);
       } else {
-        this.msgWin.open([logFormatter.format('menu_action.lantern_off')]);
+        this._openMessages([logFormatter.format('menu_action.lantern_off')]);
       }
     }
   }
@@ -402,7 +417,7 @@ export class MenuManager {
     if (effectDef && effectDef.type === 'heal_hp') {
       if (this.player.hp >= this.player.maxHp) {
         this.onEnd();
-        this.msgWin.open([i18n.t('menu.full_hp')]);
+        this._openMessages([i18n.t('menu.full_hp')]);
         return;
       }
     }
@@ -411,9 +426,9 @@ export class MenuManager {
     if (!spellCheck.allowed) {
       this.onEnd();
       if (spellCheck.reason === 'girl_priority') {
-        this.msgWin.open([i18n.t('menu.girl_priority')]);
+        this._openMessages([i18n.t('menu.girl_priority')]);
       } else {
-        this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+        this._openMessages([i18n.t('menu.cannot_use_here')]);
       }
       return;
     }
@@ -424,9 +439,9 @@ export class MenuManager {
       if (!preCheck.success) {
         this.onEnd();
         if (preCheck.reason === 'NO_RETURN_POINT') {
-          this.msgWin.open([i18n.t('menu.no_return_point')]);
+          this._openMessages([i18n.t('menu.no_return_point')]);
         } else {
-          this.msgWin.open([i18n.t('menu.cannot_use_here')]);
+          this._openMessages([i18n.t('menu.cannot_use_here')]);
         }
         return;
       }
@@ -434,11 +449,11 @@ export class MenuManager {
 
     if (!this.player.consumeMp(spell.cost)) {
       this.onEnd();
-      this.msgWin.open([i18n.t('menu.mp_shortage')]);
+      this._openMessages([i18n.t('menu.mp_shortage')]);
       return;
     }
 
-    sound.playMagic();
+    this._playSe('magic');
 
     const spellName = SPELL_DB[spell.id]?.name || spell.name;
     const castMsg = logFormatter.format('menu_action.spell_cast', { spell: spellName });
@@ -449,23 +464,23 @@ export class MenuManager {
 
       if (result.strategy === 'heal_hp') {
         this.player.heal(result.effectiveAmount);
-        sound.playHeal();
+        this._playSe('heal');
         if (spell.id === 'hoimi') {
-          this.msgWin.open([castMsg, logFormatter.format('menu_action.healed')]);
+          this._openMessages([castMsg, logFormatter.format('menu_action.healed')]);
         } else if (spell.id === 'behoimi') {
-          this.msgWin.open([castMsg, logFormatter.format('menu_action.greatly_healed')]);
+          this._openMessages([castMsg, logFormatter.format('menu_action.greatly_healed')]);
         } else if (spell.id === 'behoma') {
-          this.msgWin.open([castMsg, logFormatter.format('menu_action.fully_healed')]);
+          this._openMessages([castMsg, logFormatter.format('menu_action.fully_healed')]);
         } else {
-          this.msgWin.open([castMsg, logFormatter.format('menu_action.healed')]);
+          this._openMessages([castMsg, logFormatter.format('menu_action.healed')]);
         }
       } else if (result.strategy === 'cure_status') {
         if (result.cured) {
           this.player.curePoison();
-          sound.playHeal();
-          this.msgWin.open([castMsg, logFormatter.format('menu_action.antidote_2')]);
+          this._playSe('heal');
+          this._openMessages([castMsg, logFormatter.format('menu_action.antidote_2')]);
         } else {
-          this.msgWin.open([castMsg, logFormatter.format('menu_action.antidote_not_poisoned')]);
+          this._openMessages([castMsg, logFormatter.format('menu_action.antidote_not_poisoned')]);
         }
       }
       return;
@@ -475,7 +490,7 @@ export class MenuManager {
       const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
       const result = effectResolver.resolve(effectDef, this.player, this.player, { currentMap });
       this.onEnd();
-      this.msgWin.open([castMsg]);
+      this._openMessages([castMsg]);
       if (this.eventBus) {
         this.eventBus.emit(ActionTypes.SYSTEM.CHANGE_MAP, {
           targetMap: result.targetMap,
@@ -493,11 +508,11 @@ export class MenuManager {
     if (spell.id === 'remira') {
       this.player.remiraSteps = 120;
       this.onEnd();
-      this.msgWin.open([castMsg, logFormatter.format('menu_action.remira_shine')]);
+      this._openMessages([castMsg, logFormatter.format('menu_action.remira_shine')]);
     } else if (spell.id === 'toherosu') {
       this.player.holyWaterSteps = 128;
       this.onEnd();
-      this.msgWin.open([castMsg, logFormatter.format('menu_action.holy_water_2')]);
+      this._openMessages([castMsg, logFormatter.format('menu_action.holy_water_2')]);
     }
   }
 

@@ -881,7 +881,16 @@ function initializeGameEntities() {
         timer: 120,
         phase: 'WAIT',
         fadeAlpha: 0
-      };
+   };
+    }
+  });
+
+  engineEventBus.on(EventTypes.SYSTEM.MESSAGE_LOG, (payload) => {
+    if (typeof payload !== 'object' || payload === null) {
+      return;
+    }
+    if (Array.isArray(payload.messages) && payload.messages.length > 0) {
+      messageWindow.open(payload.messages);
     }
   });
 

@@ -33,6 +33,7 @@ import { runCollisionSystemTests } from './test_collision_system.mjs';
 import { runEncounterCalculatorTests } from './test_encounter_calculator.mjs';
 import { runMapTransitionEventTests } from './test_map_transition_event.mjs';
 import { runFieldRendererTests } from './test_field_renderer.mjs';
+import { runMenuEventDecouplingTests } from './test_menu_event_decoupling.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -571,6 +572,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_field_renderer.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 24. メニュー効果音・メッセージ枠イベント通知分離検証（MenuManager / main）
+// -------------------------------------------------------------
+try {
+  await runMenuEventDecouplingTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_menu_event_decoupling.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
