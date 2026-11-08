@@ -252,7 +252,7 @@ export class MenuManager {
     if (result.intent === 'ACTION_DROP_REQUEST') {
       const item = result.payload.item;
       const dropCheck = this.player.canDropItem(item);
-      if (!dropCheck.success) {
+      if (!dropCheck.canDrop) {
         this.onEnd();
         let msgKey = 'menu.cannot_drop_key';
         if (dropCheck.reason === 'equipped') {
