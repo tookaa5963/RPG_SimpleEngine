@@ -8,6 +8,7 @@ import { i18n } from './i18n.js';
 import { EffectResolver } from './engine/effects/EffectResolver.js';
 import { EventTypes } from './engine/core/EventTypes.js';
 import { ActionTypes } from './engine/core/ActionTypes.js';
+import { MenuStateMachine } from './engine/menu/MenuStateMachine.js';
 
 const effectResolver = new EffectResolver();
 
@@ -20,17 +21,79 @@ export class MenuManager {
     this.getCurrentMap = getCurrentMap;
     this.eventBus = eventBus;
 
-    this.phase = 'ROOT';
-    this.rootIndex = 0;
+    this.stateMachine = new MenuStateMachine();
+  }
 
-    this.itemList = [];
-    this.itemIndex = 0;
-    this.currentMode = null;
+  get phase() {
+    return this.stateMachine.phase;
+  }
 
-    this.actionIndex = 0;
-    this.selectedItem = null;
-    this.dropConfirmIndex = 1;
-    this.quitConfirmIndex = 1;
+  set phase(nextPhase) {
+    this.stateMachine.setPhase(nextPhase);
+  }
+
+  get rootIndex() {
+    return this.stateMachine.rootIndex;
+  }
+
+  set rootIndex(index) {
+    this.stateMachine.rootIndex = index;
+  }
+
+  get itemList() {
+    return this.stateMachine.itemList;
+  }
+
+  set itemList(list) {
+    this.stateMachine.itemList = list;
+  }
+
+  get itemIndex() {
+    return this.stateMachine.itemIndex;
+  }
+
+  set itemIndex(index) {
+    this.stateMachine.itemIndex = index;
+  }
+
+  get currentMode() {
+    return this.stateMachine.currentMode;
+  }
+
+  set currentMode(mode) {
+    this.stateMachine.currentMode = mode;
+  }
+
+  get actionIndex() {
+    return this.stateMachine.actionIndex;
+  }
+
+  set actionIndex(index) {
+    this.stateMachine.actionIndex = index;
+  }
+
+  get selectedItem() {
+    return this.stateMachine.selectedItem;
+  }
+
+  set selectedItem(item) {
+    this.stateMachine.selectedItem = item;
+  }
+
+  get dropConfirmIndex() {
+    return this.stateMachine.dropConfirmIndex;
+  }
+
+  set dropConfirmIndex(index) {
+    this.stateMachine.dropConfirmIndex = index;
+  }
+
+  get quitConfirmIndex() {
+    return this.stateMachine.quitConfirmIndex;
+  }
+
+  set quitConfirmIndex(index) {
+    this.stateMachine.quitConfirmIndex = index;
   }
 
   _playSe(soundId) {
@@ -68,8 +131,7 @@ export class MenuManager {
   }
 
   open() {
-    this.phase = 'ROOT';
-    this.rootIndex = 0;
+    this.stateMachine.open();
   }
 
   showCurrentObjective() {
@@ -77,195 +139,155 @@ export class MenuManager {
     this._openMessages([getObjectiveText(key)]);
   }
 
+  _normalizeMenuKey(key) {
+    if (key === 'ArrowUp' || key === 'w' || key === 'W') {
+      return 'UP';
+    }
+    if (key === 'ArrowDown' || key === 's' || key === 'S') {
+      return 'DOWN';
+    }
+    if (key === 'ArrowLeft' || key === 'a' || key === 'A') {
+      return 'LEFT';
+    }
+    if (key === 'ArrowRight' || key === 'd' || key === 'D') {
+      return 'RIGHT';
+    }
+    if (key === ' ' || key === 'Enter') {
+      return 'CONFIRM';
+    }
+    if (key === 'Escape' || key === 'x' || key === 'X') {
+      return 'CANCEL';
+    }
+    return null;
+  }
+
   handleKeyDown(key) {
-    const rootCommands = this.getRootCommands();
-    const actionCommands = this.getActionCommands();
+    const command = this._normalizeMenuKey(key);
+    if (!command) {
+      return;
+    }
 
-    if (this.phase === 'ROOT') {
-      if (key === 'ArrowUp' || key === 'w' || key === 'W') {
-        this.rootIndex = (this.rootIndex - 1 + rootCommands.length) % rootCommands.length;
-        this._playSe('submit');
-      } else if (key === 'ArrowDown' || key === 's' || key === 'S') {
-        this.rootIndex = (this.rootIndex + 1) % rootCommands.length;
-        this._playSe('submit');
-      } else if (key === ' ' || key === 'Enter') {
-        this._playSe('submit');
-        if (this.rootIndex === 0) {
-          this.currentMode = 'magic';
-          this.itemList = [];
-          this.player.spells.forEach(spellId => {
-            const spell = SPELL_DB[spellId];
-            if (spell && spell.fieldUsable) {
-              this.itemList.push({ name: `${spell.name}(MP${spell.cost})`, id: spell.id, cost: spell.cost, type: 'magic' });
-            }
-          });
-          this.itemList.push({ name: i18n.t('common.back'), id: 'cancel' });
-          this.itemIndex = 0;
-          this.phase = 'ITEM_SELECT';
-        } else if (this.rootIndex === 1) {
-          this.currentMode = 'item';
-          this.itemList = [];
-          for (const [id, count] of Object.entries(this.player.inventory)) {
-            if (count > 0 && ITEM_DB[id]) {
-              const isEquipped = (this.player.equipment.weapon === id || this.player.equipment.armor === id || this.player.equipment.shield === id);
-              this.itemList.push({ name: `${isEquipped ? 'E ' : ''}${ITEM_DB[id].name}`, id: id, type: ITEM_DB[id].type });
-            }
+    const result = this.stateMachine.handleCommand(command);
+    if (result.se) {
+      this._playSe(result.se);
+    }
+
+    if (result.intent === 'CLOSE_MENU') {
+      this.onEnd();
+      return;
+    }
+
+    if (result.intent === 'ROOT_SELECTED') {
+      const idx = result.payload.index;
+      if (idx === 0) {
+        const items = [];
+        this.player.spells.forEach(spellId => {
+          const spell = SPELL_DB[spellId];
+          if (spell && spell.fieldUsable) {
+            items.push({ name: `${spell.name}(MP${spell.cost})`, id: spell.id, cost: spell.cost, type: 'magic' });
           }
-          this.itemList.push({ name: i18n.t('common.back'), id: 'cancel' });
-          this.itemIndex = 0;
-          this.phase = 'ITEM_SELECT';
-        } else if (this.rootIndex === 2) {
-          this.openEquipMenu();
-        } else if (this.rootIndex === 3) {
-          this.onEnd();
-          this.showCurrentObjective();
-        } else if (this.rootIndex === 4) {
-          if (this.eventBus) this.eventBus.emit(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, { mode: 'load' });
-        } else if (this.rootIndex === 5) {
-          if (this.eventBus) this.eventBus.emit(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, { mode: 'save' });
-        } else if (this.rootIndex === 6) {
-          this.quitConfirmIndex = 1;
-          this.phase = 'QUIT_CONFIRM';
+        });
+        items.push({ name: i18n.t('common.back'), id: 'cancel' });
+        this.stateMachine.enterItemSelect('magic', items);
+      } else if (idx === 1) {
+        const items = [];
+        for (const [id, count] of Object.entries(this.player.inventory)) {
+          if (count > 0 && ITEM_DB[id]) {
+            const isEquipped = (this.player.equipment.weapon === id || this.player.equipment.armor === id || this.player.equipment.shield === id);
+            items.push({ name: `${isEquipped ? 'E ' : ''}${ITEM_DB[id].name}`, id: id, type: ITEM_DB[id].type });
+          }
         }
-      } else if (key === 'Escape' || key === 'x' || key === 'X') {
+        items.push({ name: i18n.t('common.back'), id: 'cancel' });
+        this.stateMachine.enterItemSelect('item', items);
+      } else if (idx === 2) {
+        this.openEquipMenu();
+      } else if (idx === 3) {
         this.onEnd();
-        this._playSe('submit');
+        this.showCurrentObjective();
+      } else if (idx === 4) {
+        if (this.eventBus) this.eventBus.emit(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, { mode: 'load' });
+      } else if (idx === 5) {
+        if (this.eventBus) this.eventBus.emit(ActionTypes.SYSTEM.OPEN_SLOT_DIALOG, { mode: 'save' });
       }
+      return;
+    }
 
-    } else if (this.phase === 'QUIT_CONFIRM') {
-      if (
-        key === 'ArrowUp' || key === 'ArrowDown' || key === 'w' || key === 's' ||
-        key === 'ArrowLeft' || key === 'ArrowRight' || key === 'a' || key === 'd'
-      ) {
-        this.quitConfirmIndex = this.quitConfirmIndex === 0 ? 1 : 0;
-        this._playSe('submit');
-      } else if (key === ' ' || key === 'Enter') {
-        if (this.quitConfirmIndex === 0) {
-          this.onEnd();
-          this._playSe('submit');
-          if (this.eventBus) {
-            this.eventBus.emit(ActionTypes.SYSTEM.RETURN_TO_TITLE);
-          }
-        } else {
-          this._playSe('submit');
-          this.phase = 'ROOT';
-        }
-      } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        this._playSe('cancel');
-        this.phase = 'ROOT';
+    if (result.intent === 'CONFIRM_QUIT') {
+      this.onEnd();
+      if (this.eventBus) {
+        this.eventBus.emit(ActionTypes.SYSTEM.RETURN_TO_TITLE);
       }
+      return;
+    }
 
-    } else if (this.phase === 'ITEM_SELECT') {
-      if (key === 'ArrowUp' || key === 'w' || key === 'W') {
-        this.itemIndex = (this.itemIndex - 1 + this.itemList.length) % this.itemList.length;
-        this._playSe('submit');
-      } else if (key === 'ArrowDown' || key === 's' || key === 'S') {
-        this.itemIndex = (this.itemIndex + 1) % this.itemList.length;
-        this._playSe('submit');
-      } else if (key === ' ' || key === 'Enter') {
-        this._playSe('submit');
-        const selected = this.itemList[this.itemIndex];
-        if (selected.id === 'cancel') {
-          this.phase = 'ROOT';
-        } else {
-          if (this.currentMode === 'magic') {
-            this.useMagic(selected);
-          } else if (this.currentMode === 'equip') {
-            this.equipItem(selected);
-          } else {
-            this.selectedItem = selected;
-            this.actionIndex = 0;
-            this.phase = 'ITEM_ACTION';
-          }
-        }
-      } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        this._playSe('submit');
-        this.phase = 'ROOT';
-      }
+    if (result.intent === 'SELECT_MAGIC') {
+      this.useMagic(result.payload.item);
+      return;
+    }
 
-    } else if (this.phase === 'ITEM_ACTION') {
-      if (key === 'ArrowUp' || key === 'w' || key === 'W') {
-        this.actionIndex = (this.actionIndex - 1 + actionCommands.length) % actionCommands.length;
-        this._playSe('submit');
-      } else if (key === 'ArrowDown' || key === 's' || key === 'S') {
-        this.actionIndex = (this.actionIndex + 1) % actionCommands.length;
-        this._playSe('submit');
-      } else if (key === ' ' || key === 'Enter') {
-        this._playSe('submit');
-        if (this.actionIndex === 0) {
-          const effectDef = this.selectedItem.effect || (ITEM_DB[this.selectedItem.id] ? ITEM_DB[this.selectedItem.id].effect : null);
-          if (this.selectedItem.type === 'weapon' || this.selectedItem.type === 'armor' || this.selectedItem.type === 'shield') {
-            this.equipItem(this.selectedItem);
-          } else if (effectDef) {
-            this.useItem(this.selectedItem);
-          } else if (this.selectedItem.type === 'charm') {
-            this.onEnd();
-            this._openMessages([logFormatter.format('menu_action.charm_passive')]);
-          } else if (this.selectedItem.type === 'key' || this.selectedItem.type === 'keyItem') {
-            this.onEnd();
-            this._openMessages([i18n.t('menu.cannot_use_here')]);
-          } else {
-            this.useItem(this.selectedItem);
-          }
-        } else if (this.actionIndex === 1) {
-          const dropCheck = this.player.canDropItem(this.selectedItem);
-          if (!dropCheck.success) {
-            this.onEnd();
-            let msgKey = 'menu.cannot_drop_key';
-            if (dropCheck.reason === 'equipped') {
-              msgKey = 'menu.cannot_drop_equipped';
-            }
-            this._openMessages([i18n.t(msgKey)]);
-          } else {
-            this.dropConfirmIndex = 1;
-            this.phase = 'DROP_CONFIRM';
-          }
-        } else {
-          this.phase = 'ITEM_SELECT';
-        }
-      } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        this._playSe('submit');
-        this.phase = 'ITEM_SELECT';
-      }
+    if (result.intent === 'SELECT_EQUIP') {
+      this.equipItem(result.payload.item);
+      return;
+    }
 
-    } else if (this.phase === 'DROP_CONFIRM') {
-      if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'w' || key === 's') {
-        this.dropConfirmIndex = this.dropConfirmIndex === 0 ? 1 : 0;
-        this._playSe('submit');
-      } else if (key === ' ' || key === 'Enter') {
-        if (this.dropConfirmIndex === 0) {
-          this.player.removeItem(this.selectedItem.id, 1);
-          this.onEnd();
-          this._playSe('submit');
-          this._playSe('chest');
-          const itemName = ITEM_DB[this.selectedItem.id].name;
-          this._openMessages([i18n.t('menu.dropped', { name: itemName })]);
-        } else {
-          this._playSe('submit');
-          this.phase = 'ITEM_ACTION';
-        }
-      } else if (key === 'Escape' || key === 'x' || key === 'X') {
-        this._playSe('submit');
-        this.phase = 'ITEM_ACTION';
+    if (result.intent === 'ACTION_USE') {
+      const item = result.payload.item;
+      const effectDef = item.effect || (ITEM_DB[item.id] ? ITEM_DB[item.id].effect : null);
+      if (item.type === 'weapon' || item.type === 'armor' || item.type === 'shield') {
+        this.equipItem(item);
+      } else if (effectDef) {
+        this.useItem(item);
+      } else if (item.type === 'charm') {
+        this.onEnd();
+        this._openMessages([logFormatter.format('menu_action.charm_passive')]);
+      } else if (item.type === 'key' || item.type === 'keyItem') {
+        this.onEnd();
+        this._openMessages([i18n.t('menu.cannot_use_here')]);
+      } else {
+        this.useItem(item);
       }
+      return;
+    }
+
+    if (result.intent === 'ACTION_DROP_REQUEST') {
+      const item = result.payload.item;
+      const dropCheck = this.player.canDropItem(item);
+      if (!dropCheck.success) {
+        this.onEnd();
+        let msgKey = 'menu.cannot_drop_key';
+        if (dropCheck.reason === 'equipped') {
+          msgKey = 'menu.cannot_drop_equipped';
+        }
+        this._openMessages([i18n.t(msgKey)]);
+      } else {
+        this.stateMachine.enterDropConfirm();
+      }
+      return;
+    }
+
+    if (result.intent === 'CONFIRM_DROP') {
+      const item = result.payload.item;
+      this.player.removeItem(item.id, 1);
+      this.onEnd();
+      this._playSe('chest');
+      const itemName = ITEM_DB[item.id].name;
+      this._openMessages([i18n.t('menu.dropped', { name: itemName })]);
     }
   }
 
   openEquipMenu() {
-    this.currentMode = 'equip';
-    this.itemList = [];
+    const items = [];
 
     for (const [id, count] of Object.entries(this.player.inventory)) {
       if (count > 0 && ITEM_DB[id] && (ITEM_DB[id].type === 'weapon' || ITEM_DB[id].type === 'armor' || ITEM_DB[id].type === 'shield')) {
         const isEquipped = (this.player.equipment.weapon === id || this.player.equipment.armor === id || this.player.equipment.shield === id);
         const mark = isEquipped ? 'E ' : '  ';
-        this.itemList.push({ name: `${mark}${ITEM_DB[id].name}`, id: id, type: ITEM_DB[id].type });
+        items.push({ name: `${mark}${ITEM_DB[id].name}`, id: id, type: ITEM_DB[id].type });
       }
     }
 
-    this.itemList.push({ name: i18n.t('common.back'), id: 'cancel' });
-    this.itemIndex = 0;
-    this.phase = 'ITEM_SELECT';
+    items.push({ name: i18n.t('common.back'), id: 'cancel' });
+    this.stateMachine.enterItemSelect('equip', items);
   }
 
   equipItem(item) {
