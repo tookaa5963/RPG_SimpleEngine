@@ -1,4 +1,3 @@
-// FILE_ENTRY: tools/test_headless_run.mjs
 /**
  * tools/test_headless_run.mjs
  * 完全ヘッドレス実証テスト（Core層統合実行シナリオ）
@@ -36,6 +35,7 @@ import { runFieldRendererTests } from './test_field_renderer.mjs';
 import { runMenuEventDecouplingTests } from './test_menu_event_decoupling.mjs';
 import { runMenuStateMachineTests } from './test_menu_state_machine.mjs';
 import { runMenuActionDispatchTests } from './test_menu_action_dispatch.mjs';
+import { runMenuRendererTests } from './test_menu_renderer.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -610,6 +610,15 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_menu_action_dispatch.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 27. メニュー描画・入力の Platform Driver 単体検証（MenuRenderer）
+// -------------------------------------------------------------
+try {
+  runMenuRendererTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_menu_renderer.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);
