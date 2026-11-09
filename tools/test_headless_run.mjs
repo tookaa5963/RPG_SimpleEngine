@@ -35,6 +35,7 @@ import { runMapTransitionEventTests } from './test_map_transition_event.mjs';
 import { runFieldRendererTests } from './test_field_renderer.mjs';
 import { runMenuEventDecouplingTests } from './test_menu_event_decoupling.mjs';
 import { runMenuStateMachineTests } from './test_menu_state_machine.mjs';
+import { runMenuActionDispatchTests } from './test_menu_action_dispatch.mjs';
 
 console.log('=== [完全ヘッドレス実行実証テスト開始] ===');
 
@@ -591,6 +592,24 @@ try {
   recordAssertion();
 } catch (error) {
   assert.fail('契約違反: tools/test_menu_state_machine.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 25. メニュー階層・カーソル純粋ステートマシン検証（MenuStateMachine）
+// -------------------------------------------------------------
+try {
+  runMenuStateMachineTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_menu_state_machine.mjs の検証に失敗しました: ' + error.message);
+}
+// -------------------------------------------------------------
+// 26. メニューコマンド決定アクションディスパッチ検証（MenuActionExecutor / MenuManager / main）
+// -------------------------------------------------------------
+try {
+  await runMenuActionDispatchTests();
+  recordAssertion();
+} catch (error) {
+  assert.fail('契約違反: tools/test_menu_action_dispatch.mjs の検証に失敗しました: ' + error.message);
 }
 
 console.log(`[PASS] 全 ${totalAssertions} 項目すべてのアサーションに合格しました。`);

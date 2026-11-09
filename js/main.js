@@ -26,6 +26,7 @@ import { EventTypes } from './engine/core/EventTypes.js';
 import { ActionTypes } from './engine/core/ActionTypes.js';
 import { WebAudioDriver } from './drivers/audio/WebAudioDriver.js';
 import { DomUiDriver } from './drivers/ui/DomUiDriver.js';
+import { applyMenuAction } from './engine/menu/MenuActionExecutor.js';
 
 // Core Event Hub instance
 export const engineEventBus = new EngineEventBus();
@@ -821,8 +822,13 @@ function initializeGameEntities() {
     }
     slotDialog.open(mode, false);
   });
+  
   engineEventBus.on(ActionTypes.SYSTEM.RETURN_TO_TITLE, () => {
     returnToTitle();
+  });
+
+  engineEventBus.on(ActionTypes.MENU.EXECUTE, (payload) => {
+    applyMenuAction(player, payload);
   });
 
   engineEventBus.on(ActionTypes.SYSTEM.CHANGE_MAP, (payload) => {

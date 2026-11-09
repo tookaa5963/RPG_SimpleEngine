@@ -9,6 +9,7 @@ import { EffectResolver } from './engine/effects/EffectResolver.js';
 import { EventTypes } from './engine/core/EventTypes.js';
 import { ActionTypes } from './engine/core/ActionTypes.js';
 import { MenuStateMachine } from './engine/menu/MenuStateMachine.js';
+import { applyMenuAction } from './engine/menu/MenuActionExecutor.js';
 
 const effectResolver = new EffectResolver();
 
@@ -107,6 +108,24 @@ export class MenuManager {
       this.eventBus.emit(EventTypes.SYSTEM.MESSAGE_LOG, { messages });
     } else if (this.msgWin) {
       this.msgWin.open(messages);
+    }
+  }
+
+  _dispatchMenuAction(payload) {
+    let hasListener = false;
+    if (this.eventBus !== null && typeof this.eventBus.listeners !== 'undefined' && this.eventBus.listeners !== null) {
+      if (typeof this.eventBus.listeners.has === 'function' && this.eventBus.listeners.has(ActionTypes.MENU.EXECUTE)) {
+        const listeners = this.eventBus.listeners.get(ActionTypes.MENU.EXECUTE);
+        if (Array.isArray(listeners) && listeners.length > 0) {
+          hasListener = true;
+        }
+      }
+    }
+
+    if (hasListener) {
+      this.eventBus.emit(ActionTypes.MENU.EXECUTE, payload);
+    } else {
+      applyMenuAction(this.player, payload);
     }
   }
 
@@ -267,8 +286,11 @@ export class MenuManager {
 
     if (result.intent === 'CONFIRM_DROP') {
       const item = result.payload.item;
-      this.player.removeItem(item.id, 1);
+      const payload = { actionType: 'DROP_ITEM', itemId: item.id, count: 1 };
+
       this.onEnd();
+      this._dispatchMenuAction(payload);
+
       this._playSe('chest');
       const itemName = ITEM_DB[item.id].name;
       this._openMessages([i18n.t('menu.dropped', { name: itemName })]);
@@ -281,7 +303,7 @@ export class MenuManager {
     for (const [id, count] of Object.entries(this.player.inventory)) {
       if (count > 0 && ITEM_DB[id] && (ITEM_DB[id].type === 'weapon' || ITEM_DB[id].type === 'armor' || ITEM_DB[id].type === 'shield')) {
         const isEquipped = (this.player.equipment.weapon === id || this.player.equipment.armor === id || this.player.equipment.shield === id);
-        const mark = isEquipped ? 'E ' : '  ';
+        const mark = isEquipped ? 'E ' : ' ';
         items.push({ name: `${mark}${ITEM_DB[id].name}`, id: id, type: ITEM_DB[id].type });
       }
     }
@@ -307,15 +329,19 @@ export class MenuManager {
         this._openMessages([i18n.t('menu.inventory_full_unequip')]);
         return;
       }
-      this.player.unequip(slot);
+      const payload = { actionType: 'EQUIP_ITEM', slot: slot, operation: 'unequip', itemId: item.id };
       this.onEnd();
+      this._dispatchMenuAction(payload);
+
       this._playSe('chest');
       this._openMessages([i18n.t('menu.unequipped', { name: itemName })]);
       return;
     }
 
-    this.player.equip(slot, item.id);
+    const payload = { actionType: 'EQUIP_ITEM', slot: slot, operation: 'equip', itemId: item.id };
     this.onEnd();
+    this._dispatchMenuAction(payload);
+
     this._playSe('chest');
     this._openMessages([i18n.t('menu.equipped', { name: itemName })]);
   }
@@ -352,14 +378,34 @@ export class MenuManager {
       if (typeof result.consumeItem === 'boolean') {
         shouldConsume = result.consumeItem;
       }
-      if (shouldConsume) {
-        this.player.removeItem(item.id, 1);
+
+      const payload = {
+        actionType: 'USE_ITEM',
+        itemId: item.id,
+        consumeCount: shouldConsume ? 1 : 0
+      };
+
+      if (result.strategy === 'heal_hp') {
+        payload.healHp = result.rawAmount;
+      } else if (result.strategy === 'heal_mp') {
+        payload.healMp = result.rawAmount;
+      } else if (result.strategy === 'cure_status') {
+        if (result.cured) {
+          payload.curePoison = true;
+        }
       }
 
       this.onEnd();
 
+      if (result.strategy === 'heal_hp' || result.strategy === 'heal_mp' || result.strategy === 'cure_status') {
+        this._dispatchMenuAction(payload);
+      } else if (result.strategy === 'teleport' || result.strategy === 'message') {
+        if (shouldConsume) {
+          this._dispatchMenuAction(payload);
+        }
+      }
+
       if (result.strategy === 'heal_hp') {
-        this.player.heal(result.effectiveAmount);
         this._playSe('heal');
         if (item.id === 'herb') {
           this._openMessages([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
@@ -371,7 +417,6 @@ export class MenuManager {
           this._openMessages([logFormatter.format('menu_action.used_herb_1'), logFormatter.format('menu_action.used_herb_2')]);
         }
       } else if (result.strategy === 'heal_mp') {
-        this.player.healMp(result.effectiveAmount);
         this._playSe('heal');
         if (item.id === 'magic_water') {
           this._openMessages([logFormatter.format('menu_action.drank_magic_water_1'), logFormatter.format('menu_action.drank_magic_water_2')]);
@@ -383,7 +428,6 @@ export class MenuManager {
       } else if (result.strategy === 'cure_status') {
         this._playSe('heal');
         if (result.cured) {
-          this.player.curePoison();
           this._openMessages([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_2')]);
         } else {
           this._openMessages([logFormatter.format('menu_action.antidote_1'), logFormatter.format('menu_action.antidote_not_poisoned')]);
@@ -411,22 +455,50 @@ export class MenuManager {
     }
 
     if (item.id === 'holy_water') {
-      this.player.removeItem('holy_water', 1);
-      this.player.holyWaterSteps = 128;
+      const payload = {
+        actionType: 'USE_ITEM',
+        itemId: 'holy_water',
+        consumeCount: 1,
+        holyWaterSteps: 128
+      };
+
       this.onEnd();
+      this._dispatchMenuAction(payload);
+
       this._playSe('magic');
       this._openMessages([logFormatter.format('menu_action.holy_water_1'), logFormatter.format('menu_action.holy_water_2')]);
     } else if (item.id === 'torch') {
-      this.player.removeItem('torch', 1);
-      this.player.torchSteps = Math.max(this.player.torchSteps || 0, 60);
+      let currentTorch = this.player.torchSteps;
+      if (typeof currentTorch !== 'number') {
+        currentTorch = 0;
+      }
+      const nextTorch = Math.max(currentTorch, 60);
+      const payload = {
+        actionType: 'USE_ITEM',
+        itemId: 'torch',
+        consumeCount: 1,
+        torchSteps: nextTorch
+      };
+
       this.onEnd();
+      this._dispatchMenuAction(payload);
+
       this._playSe('magic');
       this._openMessages([logFormatter.format('menu_action.torch_1'), logFormatter.format('menu_action.torch_2')]);
     } else if (item.id === 'lantern') {
-      this.player.isLanternLit = !this.player.isLanternLit;
+      const nextLitState = !this.player.isLanternLit;
+      const payload = {
+        actionType: 'USE_ITEM',
+        itemId: 'lantern',
+        consumeCount: 0,
+        isLanternLit: nextLitState
+      };
+
       this.onEnd();
+      this._dispatchMenuAction(payload);
+
       this._playSe('magic');
-      if (this.player.isLanternLit) {
+      if (nextLitState) {
         this._openMessages([logFormatter.format('menu_action.lantern_on')]);
       } else {
         this._openMessages([logFormatter.format('menu_action.lantern_off')]);
@@ -469,23 +541,33 @@ export class MenuManager {
       }
     }
 
-    if (!this.player.consumeMp(spell.cost)) {
+    if (this.player.mp < spell.cost) {
       this.onEnd();
       this._openMessages([i18n.t('menu.mp_shortage')]);
       return;
     }
 
     this._playSe('magic');
+    this.onEnd();
 
     const spellName = SPELL_DB[spell.id]?.name || spell.name;
     const castMsg = logFormatter.format('menu_action.spell_cast', { spell: spellName });
 
     if (effectDef && (effectDef.type === 'heal_hp' || effectDef.type === 'cure_status')) {
       const result = effectResolver.resolve(effectDef, this.player, this.player);
-      this.onEnd();
+
+      const payload = { actionType: 'USE_MAGIC', spellId: spell.id, mpCost: spell.cost };
+      if (result.strategy === 'heal_hp') {
+        payload.healHp = result.rawAmount;
+      } else if (result.strategy === 'cure_status') {
+        if (result.cured) {
+          payload.curePoison = true;
+        }
+      }
+
+      this._dispatchMenuAction(payload);
 
       if (result.strategy === 'heal_hp') {
-        this.player.heal(result.effectiveAmount);
         this._playSe('heal');
         if (spell.id === 'hoimi') {
           this._openMessages([castMsg, logFormatter.format('menu_action.healed')]);
@@ -498,7 +580,6 @@ export class MenuManager {
         }
       } else if (result.strategy === 'cure_status') {
         if (result.cured) {
-          this.player.curePoison();
           this._playSe('heal');
           this._openMessages([castMsg, logFormatter.format('menu_action.antidote_2')]);
         } else {
@@ -511,7 +592,10 @@ export class MenuManager {
     if (effectDef && effectDef.type === 'teleport') {
       const currentMap = this.getCurrentMap ? this.getCurrentMap() : null;
       const result = effectResolver.resolve(effectDef, this.player, this.player, { currentMap });
-      this.onEnd();
+
+      const payload = { actionType: 'USE_MAGIC', spellId: spell.id, mpCost: spell.cost };
+      this._dispatchMenuAction(payload);
+
       this._openMessages([castMsg]);
       if (this.eventBus) {
         this.eventBus.emit(ActionTypes.SYSTEM.CHANGE_MAP, {
@@ -528,12 +612,12 @@ export class MenuManager {
     }
 
     if (spell.id === 'remira') {
-      this.player.remiraSteps = 120;
-      this.onEnd();
+      const payload = { actionType: 'USE_MAGIC', spellId: spell.id, mpCost: spell.cost, remiraSteps: 120 };
+      this._dispatchMenuAction(payload);
       this._openMessages([castMsg, logFormatter.format('menu_action.remira_shine')]);
     } else if (spell.id === 'toherosu') {
-      this.player.holyWaterSteps = 128;
-      this.onEnd();
+      const payload = { actionType: 'USE_MAGIC', spellId: spell.id, mpCost: spell.cost, holyWaterSteps: 128 };
+      this._dispatchMenuAction(payload);
       this._openMessages([castMsg, logFormatter.format('menu_action.holy_water_2')]);
     }
   }
